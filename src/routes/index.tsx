@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroBackground from "@/assets/lumea-pungilor-hero.jpg.asset.json";
+import heroBackground from "@/assets/lumea-pungilor-hero-wide.jpg.asset.json";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 
