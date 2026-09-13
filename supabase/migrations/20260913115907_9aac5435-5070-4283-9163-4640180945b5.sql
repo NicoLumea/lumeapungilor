@@ -1,0 +1,2 @@
+revoke execute on function public.has_role(uuid, public.app_role) from public, anon, authenticated;
+comment on function public.is_admin() is 'Required by RLS policies; returns only whether the calling user is an admin.';
