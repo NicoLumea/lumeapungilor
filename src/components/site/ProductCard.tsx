@@ -44,7 +44,9 @@ export function ProductCard({ product }: { product: Product }) {
           </>
         ) : (
           <div className="flex size-full items-center justify-center">
-            <span className="micro-sm text-muted-foreground">Fără imagine</span>
+            <span className="micro-sm text-muted-foreground">
+              {failed ? "Imaginea nu s-a încărcat" : "Fără imagine"}
+            </span>
           </div>
         )}
       </div>
