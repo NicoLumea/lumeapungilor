@@ -22,6 +22,7 @@ import { Route as ReturRouteImport } from './routes/retur'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
@@ -92,6 +93,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGuideRoute = AdminGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersRoute = AdminOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/guide': typeof AdminGuideRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/termeni'
     | '/admin/categories'
+    | '/admin/guide'
     | '/admin/orders'
     | '/categorie/$slug'
     | '/comanda/$number'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/termeni'
     | '/admin/categories'
+    | '/admin/guide'
     | '/admin/orders'
     | '/categorie/$slug'
     | '/comanda/$number'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/termeni'
     | '/admin/categories'
+    | '/admin/guide'
     | '/admin/orders'
     | '/categorie/$slug'
     | '/comanda/$number'
@@ -339,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/guide': {
+      id: '/admin/guide'
+      path: '/guide'
+      fullPath: '/admin/guide'
+      preLoaderRoute: typeof AdminGuideRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders': {
       id: '/admin/orders'
       path: '/orders'
@@ -372,12 +391,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminGuideRoute: typeof AdminGuideRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminGuideRoute: AdminGuideRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
