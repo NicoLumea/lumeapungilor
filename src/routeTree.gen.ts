@@ -20,6 +20,9 @@ import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as TermeniRouteImport } from './routes/termeni'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
@@ -79,6 +82,21 @@ const TermeniRoute = TermeniRouteImport.update({
   path: '/termeni',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
   id: '/categorie/$slug',
   path: '/categorie/$slug',
@@ -97,7 +115,7 @@ const ProdusSlugRoute = ProdusSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/confidentialitate': typeof ConfidentialitateRoute
   '/contact': typeof ContactRoute
@@ -107,13 +125,15 @@ export interface FileRoutesByFullPath {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/checkout': typeof CheckoutRoute
   '/confidentialitate': typeof ConfidentialitateRoute
   '/contact': typeof ContactRoute
@@ -123,14 +143,17 @@ export interface FileRoutesByTo {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/confidentialitate': typeof ConfidentialitateRoute
   '/contact': typeof ContactRoute
@@ -140,9 +163,12 @@ export interface FileRoutesById {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,13 +184,15 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/termeni'
+    | '/admin/categories'
+    | '/admin/orders'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/checkout'
     | '/confidentialitate'
     | '/contact'
@@ -174,9 +202,12 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/termeni'
+    | '/admin/categories'
+    | '/admin/orders'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -190,14 +221,17 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/termeni'
+    | '/admin/categories'
+    | '/admin/orders'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   ConfidentialitateRoute: typeof ConfidentialitateRoute
   ContactRoute: typeof ContactRoute
@@ -291,6 +325,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermeniRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/categorie/$slug': {
       id: '/categorie/$slug'
       path: '/categorie/$slug'
@@ -315,9 +370,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   ConfidentialitateRoute: ConfidentialitateRoute,
   ContactRoute: ContactRoute,

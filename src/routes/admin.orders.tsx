@@ -101,9 +101,10 @@ function AdminOrders() {
                           product_name: string;
                           variant_name: string | null;
                           quantity: number;
-                          selling_unit: string;
+                          selling_unit: string | null;
                           line_total: number;
                         }) => (
+
                           <li key={it.id} className="flex justify-between gap-4">
                             <span>
                               {it.product_name}
