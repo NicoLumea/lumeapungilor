@@ -37,12 +37,14 @@ function Home() {
 
   return (
     <div>
-      <section
-        className="relative min-h-[500px] border-b border-border bg-cover bg-[position:center_center] bg-no-repeat md:min-h-[650px]"
-        style={{ backgroundImage: `url(${heroBackground.url})` }}
-      >
-        <div className="absolute inset-0 bg-background/25" aria-hidden="true" />
-        <div className="relative mx-auto flex min-h-[500px] max-w-[1600px] items-center px-4 py-16 md:min-h-[650px] md:px-8 md:py-24">
+      <section className="relative min-h-[520px] overflow-hidden border-b border-border bg-background sm:min-h-[clamp(440px,35vw,560px)]">
+        <img
+          src={heroBackground.url}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        <div className="relative z-10 mx-auto flex min-h-[520px] max-w-[1600px] items-center px-4 sm:min-h-[clamp(440px,35vw,560px)] md:px-8">
           <div className="max-w-3xl">
             {heroTitle ? <h1 className="display text-4xl md:text-6xl">{heroTitle}</h1> : null}
             {heroSubtitle ? (
