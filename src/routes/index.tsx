@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroBackground from "@/assets/lumea-pungilor-main-hero.webp.asset.json";
+import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 
@@ -37,19 +37,12 @@ function Home() {
 
   return (
     <div>
-      <section className="relative h-[520px] overflow-hidden border-b border-border bg-background sm:h-[580px] lg:h-[640px]">
-        <img
-          src={heroBackground.url}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
-        <div aria-hidden="true" className="absolute inset-0 bg-background/10" />
-        <div className="relative z-10 mx-auto flex h-full max-w-[1600px] items-center justify-center px-6 md:px-8">
-          <div className="max-w-xl text-center">
+      <section className="relative overflow-hidden border-b border-border bg-background md:aspect-[12/5] md:max-h-[calc(100svh-3.5rem)]">
+        <div className="relative z-10 mx-auto px-6 py-10 md:flex md:h-full md:max-w-[1600px] md:items-center md:px-8 md:py-0">
+          <div className="max-w-md text-left lg:max-w-xl">
             {heroTitle ? <h1 className="display text-4xl md:text-6xl">{heroTitle}</h1> : null}
             {heroSubtitle ? (
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
+              <p className="mt-6 max-w-md text-base leading-relaxed text-foreground/80">
                 {heroSubtitle}
               </p>
             ) : null}
@@ -63,6 +56,14 @@ function Home() {
             ) : null}
           </div>
         </div>
+        <img
+          src={heroBackground.url}
+          alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
+          width="1920"
+          height="800"
+          fetchPriority="high"
+          className="pointer-events-none relative block h-auto w-full object-contain md:absolute md:inset-0 md:h-full md:w-full md:object-contain md:object-center"
+        />
       </section>
 
       {(categories ?? []).length > 0 ? (
