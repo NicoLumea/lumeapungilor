@@ -26,6 +26,7 @@ function ProductPage() {
   const [active, setActive] = useState(0);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [qty, setQty] = useState<number | null>(null);
+  const [mainFailed, setMainFailed] = useState(false);
 
   const images = useMemo(() => (product ? sortedImages(product) : []), [product]);
   const variants = useMemo(
