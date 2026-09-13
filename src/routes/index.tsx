@@ -71,7 +71,7 @@ function Home() {
       {(categories ?? []).length > 0 ? (
         <section className="site-container py-20">
           <p className="micro-sm text-muted-foreground">Categorii</p>
-          <div className="mt-8 grid grid-cols-2 gap-x-[clamp(16px,2vw,32px)] gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-x-[clamp(16px,2vw,32px)] gap-y-10 lg:grid-cols-4">
             {(categories ?? []).map((c) => {
               const img = imageUrl(c.image_url);
               return (

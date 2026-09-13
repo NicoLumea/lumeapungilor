@@ -29,8 +29,8 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <div className="site-container grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
-        <div className="flex min-w-0 items-center gap-[clamp(18px,1.8vw,32px)]">
+      <div className="site-container grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 lg:flex">
+        <div className="flex min-w-0 items-center gap-[clamp(18px,1.8vw,32px)] lg:shrink-0">
           <button
             type="button"
             aria-label="Deschide meniul"
@@ -47,7 +47,7 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <Link to="/" className="flex shrink-0 items-center justify-center" aria-label={name}>
+        <Link to="/" className="flex shrink-0 items-center justify-center lg:ml-1" aria-label={name}>
           {logo ? (
             <img src={logo} alt={name} className="h-6 w-auto object-contain" />
           ) : (
@@ -55,7 +55,7 @@ export function SiteHeader() {
           )}
         </Link>
 
-        <div className="flex min-w-0 items-center justify-end gap-[clamp(18px,1.8vw,32px)] whitespace-nowrap">
+        <div className="flex min-w-0 items-center justify-end gap-[clamp(18px,1.8vw,32px)] whitespace-nowrap lg:ml-auto">
           <Link to="/produse" aria-label="Caută" className="hidden shrink-0 lg:block">
             <Search className="size-4" />
           </Link>
