@@ -115,7 +115,7 @@ function ProductPage() {
                 <button
                   key={img.id}
                   type="button"
-                  onClick={() => setActive(i)}
+                  onClick={() => { setActive(i); setMainFailed(false); }}
                   aria-label={`Imaginea ${i + 1}`}
                   aria-current={i === active}
                   className="size-20 border bg-field p-2"
