@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -6,10 +6,17 @@ export type AdminState = {
   loading: boolean;
   user: User | null;
   isAdmin: boolean;
+  refresh: () => void;
 };
 
 export function useAdmin(): AdminState {
-  const [state, setState] = useState<AdminState>({ loading: true, user: null, isAdmin: false });
+  const [state, setState] = useState<Omit<AdminState, "refresh">>({
+    loading: true,
+    user: null,
+    isAdmin: false,
+  });
+  const [tick, setTick] = useState(0);
+  const refresh = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
     let active = true;
@@ -40,7 +47,7 @@ export function useAdmin(): AdminState {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [tick]);
 
-  return state;
+  return { ...state, refresh };
 }
