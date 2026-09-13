@@ -18,14 +18,15 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-const NAV = [
+const NAV: { to: string; label: string; exact: boolean }[] = [
   { to: "/admin", label: "Panou", exact: true },
-  { to: "/admin/products", label: "Produse" },
-  { to: "/admin/categories", label: "Categorii" },
-  { to: "/admin/content", label: "Conținut site" },
-  { to: "/admin/orders", label: "Comenzi" },
-  { to: "/admin/guide", label: "Ghid" },
-] as const;
+  { to: "/admin/products", label: "Produse", exact: false },
+  { to: "/admin/categories", label: "Categorii", exact: false },
+  { to: "/admin/content", label: "Conținut site", exact: false },
+  { to: "/admin/orders", label: "Comenzi", exact: false },
+  { to: "/admin/guide", label: "Ghid", exact: false },
+];
+
 
 function AdminLayout() {
   const { user, isAdmin, loading, refresh } = useAdmin();
@@ -47,14 +48,15 @@ function AdminLayout() {
           {NAV.map((item) => (
             <Link
               key={item.to}
-              to={item.to}
-              activeOptions={{ exact: item.exact ?? false }}
+              to={item.to as "/admin"}
+              activeOptions={{ exact: item.exact }}
               activeProps={{ className: "micro-sm text-foreground underline underline-offset-4" }}
               inactiveProps={{ className: "micro-sm text-muted-foreground hover:text-foreground" }}
             >
               {item.label}
             </Link>
           ))}
+
         </nav>
         <button
           type="button"
