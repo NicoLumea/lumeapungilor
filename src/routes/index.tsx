@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroBackground from "@/assets/lumea-pungilor-hero-wide.jpg.asset.json";
+import heroBackground from "@/assets/lumea-pungilor-main-hero.webp.asset.json";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 
@@ -37,15 +37,16 @@ function Home() {
 
   return (
     <div>
-      <section className="relative min-h-[520px] overflow-hidden border-b border-border bg-background sm:min-h-[clamp(440px,35vw,560px)]">
+      <section className="relative h-[520px] overflow-hidden border-b border-border bg-background sm:h-[580px] lg:h-[640px]">
         <img
           src={heroBackground.url}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
-        <div className="relative z-10 mx-auto flex min-h-[520px] max-w-[1600px] items-center px-4 sm:min-h-[clamp(440px,35vw,560px)] md:px-8">
-          <div className="max-w-3xl">
+        <div aria-hidden="true" className="absolute inset-0 bg-background/10" />
+        <div className="relative z-10 mx-auto flex h-full max-w-[1600px] items-center justify-center px-6 md:px-8">
+          <div className="max-w-xl text-center">
             {heroTitle ? <h1 className="display text-4xl md:text-6xl">{heroTitle}</h1> : null}
             {heroSubtitle ? (
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
