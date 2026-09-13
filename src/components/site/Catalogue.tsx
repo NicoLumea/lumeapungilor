@@ -96,7 +96,7 @@ export function Catalogue({
   }
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-14 md:px-8">
+    <div className="site-container py-14">
       <h1 className="display text-3xl md:text-4xl">{title}</h1>
       {intro ? <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">{intro}</p> : null}
 
@@ -238,7 +238,7 @@ export function Catalogue({
           </button>
         </div>
       ) : (
-        <div className="mt-10 grid grid-cols-1 gap-x-4 gap-y-12 min-[420px]:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-x-[clamp(16px,2vw,32px)] gap-y-12">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

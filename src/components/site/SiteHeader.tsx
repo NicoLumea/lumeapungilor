@@ -29,25 +29,25 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4 md:px-8">
-        <div className="flex flex-1 items-center gap-6">
+      <div className="site-container grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 lg:flex">
+        <div className="flex min-w-0 items-center gap-[clamp(18px,1.8vw,32px)] lg:shrink-0">
           <button
             type="button"
             aria-label="Deschide meniul"
-            className="micro md:hidden"
+            className="micro shrink-0 lg:hidden"
             onClick={() => setOpen((v) => !v)}
           >
             {open ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link to="/produse" className="micro link-underline">
+          <nav className="hidden min-w-0 items-center gap-[clamp(18px,1.8vw,32px)] whitespace-nowrap lg:flex">
+            <Link to="/produse" className="micro shrink-0 link-underline">
               Catalog
             </Link>
             {nav}
           </nav>
         </div>
 
-        <Link to="/" className="flex items-center justify-center" aria-label={name}>
+        <Link to="/" className="flex shrink-0 items-center justify-center lg:ml-1" aria-label={name}>
           {logo ? (
             <img src={logo} alt={name} className="h-6 w-auto object-contain" />
           ) : (
@@ -55,18 +55,18 @@ export function SiteHeader() {
           )}
         </Link>
 
-        <div className="flex flex-1 items-center justify-end gap-5">
-          <Link to="/produse" aria-label="Caută" className="hidden md:block">
+        <div className="flex min-w-0 items-center justify-end gap-[clamp(18px,1.8vw,32px)] whitespace-nowrap lg:ml-auto">
+          <Link to="/produse" aria-label="Caută" className="hidden shrink-0 lg:block">
             <Search className="size-4" />
           </Link>
-          <Link to="/cos" className="micro link-underline">
+          <Link to="/cos" className="micro shrink-0 link-underline">
             Coș ({count})
           </Link>
         </div>
       </div>
 
       {open ? (
-        <nav className="flex flex-col gap-4 border-t border-border px-4 py-5 md:hidden">
+        <nav className="site-container flex flex-col gap-4 py-5 lg:hidden">
           <Link to="/produse" className="micro" onClick={() => setOpen(false)}>
             Catalog
           </Link>

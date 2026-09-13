@@ -30,7 +30,7 @@ export function ContentPage({
 
 
   return (
-    <article className="mx-auto max-w-[900px] px-4 py-20 md:px-8">
+    <article className="site-container max-w-[900px] py-20">
       <h1 className="display text-4xl md:text-5xl">{title}</h1>
       {image ? (
         <div className="mt-10 bg-field">
