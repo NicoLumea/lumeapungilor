@@ -186,7 +186,7 @@ function ClaimCard({
           e.preventDefault();
           setBusy(true);
           try {
-            const res = await claim({ data: { code } });
+            const res = await claim({ data: { code, userId } });
             if (!res.ok) {
               toast.error(res.error);
               return;
