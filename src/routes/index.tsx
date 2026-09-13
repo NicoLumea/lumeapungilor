@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import heroBackground from "@/assets/lumea-pungilor-hero.jpg.asset.json";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 
@@ -28,7 +29,6 @@ function Home() {
 
   const heroTitle = text(home, "hero_title");
   const heroSubtitle = text(home, "hero_subtitle");
-  const heroImage = imageUrl(text(home, "hero_image_url"));
   const ctaLabel = text(home, "cta_label");
   const ctaHref = text(home, "cta_href") ?? "/produse";
   const edTitle = text(home, "editorial_title");
@@ -37,9 +37,13 @@ function Home() {
 
   return (
     <div>
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-[1600px] px-4 py-24 md:px-8 md:py-32">
-          <div className="max-w-3xl">
+      <section
+        className="relative min-h-[500px] border-b border-border bg-cover bg-[position:center_center] bg-no-repeat md:min-h-[650px]"
+        style={{ backgroundImage: `url(${heroBackground.url})` }}
+      >
+        <div className="absolute inset-0 bg-background/25" aria-hidden="true" />
+        <div className="relative mx-auto flex min-h-[500px] max-w-[1600px] items-center px-4 py-16 md:min-h-[650px] md:px-8 md:py-24">
+          <div className="max-w-3xl bg-background/70 p-5 backdrop-blur-[2px] md:bg-transparent md:p-0 md:backdrop-blur-none">
             {heroTitle ? <h1 className="display text-4xl md:text-6xl">{heroTitle}</h1> : null}
             {heroSubtitle ? (
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
@@ -55,11 +59,6 @@ function Home() {
               </a>
             ) : null}
           </div>
-          {heroImage ? (
-            <div className="mt-16 bg-field">
-              <img src={heroImage} alt={heroTitle ?? ""} className="max-h-[70vh] w-full object-cover" />
-            </div>
-          ) : null}
         </div>
       </section>
 
