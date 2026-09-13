@@ -11,8 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
+import { Route as DespreRouteImport } from './routes/despre'
+import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as ProduseRouteImport } from './routes/produse'
+import { Route as ReturRouteImport } from './routes/retur'
+import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
@@ -27,14 +33,44 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfidentialitateRoute = ConfidentialitateRouteImport.update({
+  id: '/confidentialitate',
+  path: '/confidentialitate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CosRoute = CosRouteImport.update({
   id: '/cos',
   path: '/cos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DespreRoute = DespreRouteImport.update({
+  id: '/despre',
+  path: '/despre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivrareRoute = LivrareRouteImport.update({
+  id: '/livrare',
+  path: '/livrare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProduseRoute = ProduseRouteImport.update({
   id: '/produse',
   path: '/produse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturRoute = ReturRouteImport.update({
+  id: '/retur',
+  path: '/retur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermeniRoute = TermeniRouteImport.update({
+  id: '/termeni',
+  path: '/termeni',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
@@ -56,8 +92,14 @@ const ProdusSlugRoute = ProdusSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/confidentialitate': typeof ConfidentialitateRoute
+  '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
+  '/despre': typeof DespreRoute
+  '/livrare': typeof LivrareRoute
   '/produse': typeof ProduseRoute
+  '/retur': typeof ReturRoute
+  '/termeni': typeof TermeniRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -65,8 +107,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/confidentialitate': typeof ConfidentialitateRoute
+  '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
+  '/despre': typeof DespreRoute
+  '/livrare': typeof LivrareRoute
   '/produse': typeof ProduseRoute
+  '/retur': typeof ReturRoute
+  '/termeni': typeof TermeniRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -75,8 +123,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/confidentialitate': typeof ConfidentialitateRoute
+  '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
+  '/despre': typeof DespreRoute
+  '/livrare': typeof LivrareRoute
   '/produse': typeof ProduseRoute
+  '/retur': typeof ReturRoute
+  '/termeni': typeof TermeniRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -86,8 +140,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/checkout'
+    | '/confidentialitate'
+    | '/contact'
     | '/cos'
+    | '/despre'
+    | '/livrare'
     | '/produse'
+    | '/retur'
+    | '/termeni'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -95,8 +155,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/checkout'
+    | '/confidentialitate'
+    | '/contact'
     | '/cos'
+    | '/despre'
+    | '/livrare'
     | '/produse'
+    | '/retur'
+    | '/termeni'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -104,8 +170,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/checkout'
+    | '/confidentialitate'
+    | '/contact'
     | '/cos'
+    | '/despre'
+    | '/livrare'
     | '/produse'
+    | '/retur'
+    | '/termeni'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -114,8 +186,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckoutRoute: typeof CheckoutRoute
+  ConfidentialitateRoute: typeof ConfidentialitateRoute
+  ContactRoute: typeof ContactRoute
   CosRoute: typeof CosRoute
+  DespreRoute: typeof DespreRoute
+  LivrareRoute: typeof LivrareRoute
   ProduseRoute: typeof ProduseRoute
+  ReturRoute: typeof ReturRoute
+  TermeniRoute: typeof TermeniRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
   ProdusSlugRoute: typeof ProdusSlugRoute
@@ -137,6 +215,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/confidentialitate': {
+      id: '/confidentialitate'
+      path: '/confidentialitate'
+      fullPath: '/confidentialitate'
+      preLoaderRoute: typeof ConfidentialitateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cos': {
       id: '/cos'
       path: '/cos'
@@ -144,11 +236,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/despre': {
+      id: '/despre'
+      path: '/despre'
+      fullPath: '/despre'
+      preLoaderRoute: typeof DespreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livrare': {
+      id: '/livrare'
+      path: '/livrare'
+      fullPath: '/livrare'
+      preLoaderRoute: typeof LivrareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produse': {
       id: '/produse'
       path: '/produse'
       fullPath: '/produse'
       preLoaderRoute: typeof ProduseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retur': {
+      id: '/retur'
+      path: '/retur'
+      fullPath: '/retur'
+      preLoaderRoute: typeof ReturRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termeni': {
+      id: '/termeni'
+      path: '/termeni'
+      fullPath: '/termeni'
+      preLoaderRoute: typeof TermeniRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categorie/$slug': {
@@ -178,8 +298,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckoutRoute: CheckoutRoute,
+  ConfidentialitateRoute: ConfidentialitateRoute,
+  ContactRoute: ContactRoute,
   CosRoute: CosRoute,
+  DespreRoute: DespreRoute,
+  LivrareRoute: LivrareRoute,
   ProduseRoute: ProduseRoute,
+  ReturRoute: ReturRoute,
+  TermeniRoute: TermeniRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
   ProdusSlugRoute: ProdusSlugRoute,
