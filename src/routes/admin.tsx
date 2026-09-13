@@ -1,0 +1,219 @@
+import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAdmin } from "@/lib/use-admin";
+import { claimOwnerAccess } from "@/lib/shop.functions";
+
+export const Route = createFileRoute("/admin")({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Administrare — Lumea Pungilor" },
+      { name: "description", content: "Panou de administrare al magazinului." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: AdminLayout,
+});
+
+const NAV = [
+  { to: "/admin", label: "Panou", exact: true },
+  { to: "/admin/products", label: "Produse" },
+  { to: "/admin/categories", label: "Categorii" },
+  { to: "/admin/content", label: "Conținut site" },
+  { to: "/admin/orders", label: "Comenzi" },
+  { to: "/admin/guide", label: "Ghid" },
+] as const;
+
+function AdminLayout() {
+  const { user, isAdmin, loading, refresh } = useAdmin();
+
+  if (loading) {
+    return <p className="py-32 text-center text-sm text-muted-foreground">Se încarcă…</p>;
+  }
+
+  if (!user) return <AuthCard />;
+  if (!isAdmin) return <ClaimCard onClaimed={refresh} email={user.email ?? ""} />;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-border px-4 py-4 md:px-8">
+        <Link to="/" className="micro">
+          Lumea Pungilor
+        </Link>
+        <nav className="flex flex-wrap gap-x-6 gap-y-2">
+          {NAV.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              activeOptions={{ exact: item.exact ?? false }}
+              activeProps={{ className: "micro-sm text-foreground underline underline-offset-4" }}
+              inactiveProps={{ className: "micro-sm text-muted-foreground hover:text-foreground" }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <button
+          type="button"
+          className="micro-sm ml-auto text-muted-foreground hover:text-foreground"
+          onClick={async () => {
+            await supabase.auth.signOut();
+            refresh();
+          }}
+        >
+          Ieșire
+        </button>
+      </header>
+      <main className="px-4 py-10 md:px-8">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+function AuthCard() {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<"in" | "up">("in");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      if (mode === "in") {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        navigate({ to: "/admin" });
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: `${window.location.origin}/admin` },
+        });
+        if (error) throw error;
+        if (!data.session) {
+          toast.success("Ți-am trimis un e-mail de confirmare. Confirmă, apoi autentifică-te.");
+          setMode("in");
+        }
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Autentificare eșuată.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mx-auto max-w-[420px] px-4 py-28">
+      <h1 className="display text-2xl">Administrare</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        {mode === "in" ? "Autentifică-te pentru a administra magazinul." : "Creează contul de proprietar."}
+      </p>
+      <form onSubmit={onSubmit} className="mt-8 space-y-5">
+        <label className="block">
+          <span className="micro-sm text-muted-foreground">E-mail</span>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+          />
+        </label>
+        <label className="block">
+          <span className="micro-sm text-muted-foreground">Parolă</span>
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={busy}
+          className="micro w-full border border-foreground bg-foreground px-6 py-3 text-background disabled:opacity-40"
+        >
+          {busy ? "Se procesează…" : mode === "in" ? "Intră în cont" : "Creează cont"}
+        </button>
+      </form>
+      <button
+        type="button"
+        className="micro-sm mt-6 link-underline"
+        onClick={() => setMode(mode === "in" ? "up" : "in")}
+      >
+        {mode === "in" ? "Nu ai cont? Creează unul" : "Ai deja cont? Autentifică-te"}
+      </button>
+    </div>
+  );
+}
+
+function ClaimCard({ onClaimed, email }: { onClaimed: () => void; email: string }) {
+  const claim = useServerFn(claimOwnerAccess);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <div className="mx-auto max-w-[480px] px-4 py-28">
+      <h1 className="display text-2xl">Acces proprietar</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Ești autentificat ca {email}, dar contul nu are încă drepturi de administrare. Introdu codul de
+        proprietar o singură dată pentru a le activa.
+      </p>
+      <form
+        className="mt-8 space-y-5"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          try {
+            const res = await claim({ data: { code } });
+            if (!res.ok) {
+              toast.error(res.error);
+              return;
+            }
+            toast.success("Acces activat.");
+            onClaimed();
+          } catch {
+            toast.error("Codul nu a putut fi verificat.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <label className="block">
+          <span className="micro-sm text-muted-foreground">Cod de proprietar</span>
+          <input
+            required
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={busy}
+          className="micro w-full border border-foreground bg-foreground px-6 py-3 text-background disabled:opacity-40"
+        >
+          {busy ? "Se verifică…" : "Activează accesul"}
+        </button>
+      </form>
+      <button
+        type="button"
+        className="micro-sm mt-6 link-underline"
+        onClick={async () => {
+          await supabase.auth.signOut();
+          onClaimed();
+        }}
+      >
+        Ieșire
+      </button>
+    </div>
+  );
+}
