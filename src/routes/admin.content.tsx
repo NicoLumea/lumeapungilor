@@ -91,7 +91,7 @@ function AdminContent() {
     setBusy(key);
     const { error } = await supabase
       .from("site_content")
-      .upsert({ key, value: values[key] ?? {} }, { onConflict: "key" });
+      .upsert({ key, value: (values[key] ?? {}) as never }, { onConflict: "key" });
     setBusy(null);
     if (error) {
       toast.error(error.message);

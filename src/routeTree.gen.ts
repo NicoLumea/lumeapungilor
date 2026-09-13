@@ -22,6 +22,7 @@ import { Route as ReturRouteImport } from './routes/retur'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
@@ -94,6 +95,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContentRoute = AdminContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminGuideRoute = AdminGuideRouteImport.update({
   id: '/guide',
   path: '/guide',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/termeni'
     | '/admin/categories'
+    | '/admin/content'
     | '/admin/guide'
     | '/admin/orders'
     | '/admin/products'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/termeni'
     | '/admin/categories'
+    | '/admin/content'
     | '/admin/guide'
     | '/admin/orders'
     | '/admin/products'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/termeni'
     | '/admin/categories'
+    | '/admin/content'
     | '/admin/guide'
     | '/admin/orders'
     | '/admin/products'
@@ -363,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/content': {
+      id: '/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AdminContentRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/guide': {
       id: '/admin/guide'
       path: '/guide'
@@ -410,6 +429,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminContentRoute: typeof AdminContentRoute
   AdminGuideRoute: typeof AdminGuideRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
@@ -418,6 +438,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminContentRoute: AdminContentRoute,
   AdminGuideRoute: AdminGuideRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
