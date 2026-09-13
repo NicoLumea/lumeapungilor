@@ -9,6 +9,8 @@ export function ProductCard({ product }: { product: Product }) {
   const primary = imageUrl(images[0]?.url);
   const secondary = imageUrl(images[1]?.url);
   const [hover, setHover] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   return (
     <Link
@@ -19,14 +21,16 @@ export function ProductCard({ product }: { product: Product }) {
       onMouseLeave={() => setHover(false)}
     >
       <div className="product-field">
-        {primary ? (
+        {primary && !failed ? (
           <>
             <img
               src={primary}
               alt={images[0]?.alt ?? product.name}
               loading="lazy"
+              onLoad={() => setLoaded(true)}
+              onError={() => setFailed(true)}
               className="absolute inset-0 size-full object-contain p-6 transition-opacity duration-300"
-              style={{ opacity: hover && secondary ? 0 : 1 }}
+              style={{ opacity: loaded ? (hover && secondary ? 0 : 1) : 0 }}
             />
             {secondary ? (
               <img
@@ -40,7 +44,9 @@ export function ProductCard({ product }: { product: Product }) {
           </>
         ) : (
           <div className="flex size-full items-center justify-center">
-            <span className="micro-sm text-muted-foreground">Fără imagine</span>
+            <span className="micro-sm text-muted-foreground">
+              {failed ? "Imaginea nu s-a încărcat" : "Fără imagine"}
+            </span>
           </div>
         )}
       </div>

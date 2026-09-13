@@ -26,6 +26,7 @@ function ProductPage() {
   const [active, setActive] = useState(0);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [qty, setQty] = useState<number | null>(null);
+  const [mainFailed, setMainFailed] = useState(false);
 
   const images = useMemo(() => (product ? sortedImages(product) : []), [product]);
   const variants = useMemo(
@@ -92,15 +93,19 @@ function ProductPage() {
       <div className="mt-8 grid gap-12 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <div className="product-field">
-            {images[active] ? (
+            {images[active] && !mainFailed ? (
               <img
+                key={images[active]?.id}
                 src={imageUrl(images[active]?.url) ?? ""}
                 alt={images[active]?.alt ?? product.name}
+                onError={() => setMainFailed(true)}
                 className="absolute inset-0 size-full object-contain p-10"
               />
             ) : (
               <div className="flex size-full items-center justify-center">
-                <span className="micro-sm text-muted-foreground">Fără imagine</span>
+                <span className="micro-sm text-muted-foreground">
+                  {mainFailed ? "Imaginea nu s-a încărcat" : "Fără imagine"}
+                </span>
               </div>
             )}
           </div>
@@ -110,7 +115,7 @@ function ProductPage() {
                 <button
                   key={img.id}
                   type="button"
-                  onClick={() => setActive(i)}
+                  onClick={() => { setActive(i); setMainFailed(false); }}
                   aria-label={`Imaginea ${i + 1}`}
                   aria-current={i === active}
                   className="size-20 border bg-field p-2"
