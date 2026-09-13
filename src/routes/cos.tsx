@@ -23,7 +23,7 @@ function CartPage() {
     useCartLines();
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-14 md:px-8">
+    <div className="site-container max-w-[1200px] py-14">
       <h1 className="display text-3xl md:text-4xl">Coș</h1>
 
       {isLoading ? (

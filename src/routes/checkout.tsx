@@ -120,7 +120,7 @@ function CheckoutPage() {
 
   if (lines.length === 0) {
     return (
-      <div className="mx-auto max-w-[900px] px-4 py-24 md:px-8">
+      <div className="site-container max-w-[900px] py-24">
         <h1 className="display text-3xl">Finalizare comandă</h1>
         <p className="mt-6 text-sm text-muted-foreground">Coșul este gol.</p>
         <Link to="/produse" className="micro mt-6 inline-block link-underline">
@@ -131,7 +131,7 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-14 md:px-8">
+    <div className="site-container max-w-[1200px] py-14">
       <h1 className="display text-3xl md:text-4xl">Finalizare comandă</h1>
 
       {!paymentsConfigured ? (

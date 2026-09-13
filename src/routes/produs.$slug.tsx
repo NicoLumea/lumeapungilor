@@ -71,7 +71,7 @@ function ProductPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-10 md:px-8">
+    <div className="site-container py-10">
       <nav className="micro-sm text-muted-foreground">
         <Link to="/produse" className="link-underline">
           Catalog

@@ -37,12 +37,13 @@ function Home() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-border bg-background md:aspect-[12/5] md:max-h-[calc(100svh-3.5rem)]">
-        <div className="relative z-10 mx-auto px-6 py-10 md:flex md:h-full md:max-w-[1600px] md:items-center md:px-8 md:py-0">
-          <div className="max-w-md text-left lg:max-w-xl">
-            {heroTitle ? <h1 className="display text-4xl md:text-6xl">{heroTitle}</h1> : null}
+      <section className="overflow-hidden border-b border-border bg-hero">
+        <div className="relative mx-auto w-full max-w-[1920px] lg:aspect-[12/5]">
+          <div className="site-container relative z-10 py-10 lg:absolute lg:inset-0 lg:grid lg:w-full lg:max-w-none lg:grid-cols-[38%_62%] lg:items-center lg:py-0">
+            <div className="max-w-[520px] text-left lg:px-[clamp(32px,3vw,56px)]">
+            {heroTitle ? <h1 className="display text-4xl leading-[1.05] lg:text-[clamp(44px,4vw,68px)]">{heroTitle}</h1> : null}
             {heroSubtitle ? (
-              <p className="mt-6 max-w-md text-base leading-relaxed text-foreground/80">
+              <p className="mt-6 max-w-md text-base leading-[1.5] text-foreground/80 lg:text-[clamp(16px,1.25vw,19px)]">
                 {heroSubtitle}
               </p>
             ) : null}
@@ -54,22 +55,23 @@ function Home() {
                 {ctaLabel}
               </a>
             ) : null}
+            </div>
           </div>
+          <img
+            src={heroBackground.url}
+            alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
+            width="1920"
+            height="800"
+            fetchPriority="high"
+            className="pointer-events-none relative block h-auto w-full object-contain lg:absolute lg:inset-0 lg:size-full lg:object-contain lg:object-center"
+          />
         </div>
-        <img
-          src={heroBackground.url}
-          alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
-          width="1920"
-          height="800"
-          fetchPriority="high"
-          className="pointer-events-none relative block h-auto w-full object-contain md:absolute md:inset-0 md:h-full md:w-full md:object-contain md:object-center"
-        />
       </section>
 
       {(categories ?? []).length > 0 ? (
-        <section className="mx-auto max-w-[1600px] px-4 py-20 md:px-8">
+        <section className="site-container py-20">
           <p className="micro-sm text-muted-foreground">Categorii</p>
-          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-x-[clamp(16px,2vw,32px)] gap-y-10 md:grid-cols-3 lg:grid-cols-4">
             {(categories ?? []).map((c) => {
               const img = imageUrl(c.image_url);
               return (
@@ -101,7 +103,7 @@ function Home() {
 
       {edTitle || edBody || edImage ? (
         <section className="rule-t">
-          <div className="mx-auto grid max-w-[1600px] items-center gap-12 px-4 py-24 md:grid-cols-2 md:px-8">
+          <div className="site-container grid items-center gap-12 py-24 md:grid-cols-2">
             <div>
               {edTitle ? <h2 className="display text-3xl md:text-5xl">{edTitle}</h2> : null}
               {edBody ? (

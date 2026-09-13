@@ -18,7 +18,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-24 border-t border-border">
-      <div className="mx-auto grid max-w-[1600px] gap-10 px-4 py-14 md:grid-cols-4 md:px-8">
+      <div className="site-container grid gap-10 py-14 md:grid-cols-4">
         <div>
           <p className="micro">{name.toUpperCase()}</p>
           {footerText ? (
@@ -123,7 +123,7 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-8">
+        <div className="site-container flex flex-wrap items-center justify-between gap-3 py-5">
           <p className="micro-sm text-muted-foreground">
             © {new Date().getFullYear()} {name}
           </p>

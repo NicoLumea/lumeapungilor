@@ -39,6 +39,7 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
   --color-field: var(--field);
+  --color-hero: var(--hero);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -72,6 +73,7 @@
   --input: oklch(0.88 0 0);
   --ring: oklch(0.16 0 0);
   --field: oklch(0.968 0 0);
+  --hero: oklch(0.94 0.025 82);
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.16 0 0);
   --sidebar-primary: oklch(0.16 0 0);
@@ -103,6 +105,7 @@
   --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.8 0 0);
   --field: oklch(0.22 0 0);
+  --hero: oklch(0.24 0.018 82);
   --sidebar: oklch(0.2 0 0);
   --sidebar-foreground: oklch(0.98 0 0);
   --sidebar-primary: oklch(0.98 0 0);
@@ -151,8 +154,18 @@
 /* Editorial display heading */
 @utility display {
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   line-height: 1.02;
+}
+
+/* Shared public-site content boundary: 24px sides on tablet/desktop, 20px on mobile. */
+@utility site-container {
+  width: min(calc(100% - 3rem), 90rem);
+  margin-inline: auto;
+
+  @media (max-width: 47.999rem) {
+    width: calc(100% - 2.5rem);
+  }
 }
 
 /* Grey product image field with 3:4 ratio */

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/comanda/$number")({
 function OrderConfirmation() {
   const { number } = Route.useParams();
   return (
-    <div className="mx-auto max-w-[720px] px-4 py-32 text-center md:px-8">
+    <div className="site-container max-w-[720px] py-32 text-center">
       <p className="micro-sm text-muted-foreground">Confirmare</p>
       <h1 className="display mt-4 text-3xl md:text-4xl">Comanda a fost înregistrată</h1>
       <p className="mt-6 text-sm text-muted-foreground">
