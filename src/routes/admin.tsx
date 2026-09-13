@@ -36,7 +36,9 @@ function AdminLayout() {
   }
 
   if (!user) return <AuthCard />;
-  if (!isAdmin) return <ClaimCard onClaimed={refresh} email={user.email ?? ""} />;
+  if (!isAdmin)
+    return <ClaimCard onClaimed={refresh} email={user.email ?? ""} userId={user.id} />;
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -157,7 +159,16 @@ function AuthCard() {
   );
 }
 
-function ClaimCard({ onClaimed, email }: { onClaimed: () => void; email: string }) {
+function ClaimCard({
+  onClaimed,
+  email,
+  userId,
+}: {
+  onClaimed: () => void;
+  email: string;
+  userId: string;
+}) {
+
   const claim = useServerFn(claimOwnerAccess);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
