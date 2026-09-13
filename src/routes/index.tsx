@@ -43,7 +43,7 @@ function Home() {
       >
         <div className="absolute inset-0 bg-background/25" aria-hidden="true" />
         <div className="relative mx-auto flex min-h-[500px] max-w-[1600px] items-center px-4 py-16 md:min-h-[650px] md:px-8 md:py-24">
-          <div className="max-w-3xl bg-background/70 p-5 backdrop-blur-[2px] md:bg-transparent md:p-0 md:backdrop-blur-none">
+          <div className="max-w-3xl">
             {heroTitle ? <h1 className="display text-4xl md:text-6xl">{heroTitle}</h1> : null}
             {heroSubtitle ? (
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
