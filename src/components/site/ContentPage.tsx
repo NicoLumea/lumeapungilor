@@ -47,7 +47,7 @@ export function ContentPage({
         </div>
       ) : isLoading ? null : (
         <p className="mt-10 text-sm text-muted-foreground">
-          Conținutul acestei pagini nu a fost completat încă.
+          Lumea Pungilor | versiune de lucru
         </p>
       )}
       {details.length > 0 ? (
