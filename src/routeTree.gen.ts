@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AjutorComandaRouteImport } from './routes/ajutor-comanda'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ComenzileMeleRouteImport } from './routes/comenzile-mele'
 import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
@@ -20,6 +21,7 @@ import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
+import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
@@ -43,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AjutorComandaRoute = AjutorComandaRouteImport.update({
+  id: '/ajutor-comanda',
+  path: '/ajutor-comanda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -88,6 +95,11 @@ const LivrareRoute = LivrareRouteImport.update({
 const MagazinRoute = MagazinRouteImport.update({
   id: '/magazin',
   path: '/magazin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaNouaRoute = ParolaNouaRouteImport.update({
+  id: '/parola-noua',
+  path: '/parola-noua',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProduseRoute = ProduseRouteImport.update({
@@ -164,6 +176,7 @@ const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ajutor-comanda': typeof AjutorComandaRoute
   '/checkout': typeof CheckoutRoute
   '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
@@ -173,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
@@ -190,6 +204,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ajutor-comanda': typeof AjutorComandaRoute
   '/checkout': typeof CheckoutRoute
   '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
@@ -199,6 +214,7 @@ export interface FileRoutesByTo {
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
@@ -218,6 +234,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ajutor-comanda': typeof AjutorComandaRoute
   '/checkout': typeof CheckoutRoute
   '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
@@ -227,6 +244,7 @@ export interface FileRoutesById {
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
@@ -247,6 +265,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/ajutor-comanda'
     | '/checkout'
     | '/comenzile-mele'
     | '/confidentialitate'
@@ -256,6 +275,7 @@ export interface FileRouteTypes {
     | '/despre'
     | '/livrare'
     | '/magazin'
+    | '/parola-noua'
     | '/produse'
     | '/retur'
     | '/retururi'
@@ -273,6 +293,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ajutor-comanda'
     | '/checkout'
     | '/comenzile-mele'
     | '/confidentialitate'
@@ -282,6 +303,7 @@ export interface FileRouteTypes {
     | '/despre'
     | '/livrare'
     | '/magazin'
+    | '/parola-noua'
     | '/produse'
     | '/retur'
     | '/retururi'
@@ -300,6 +322,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/ajutor-comanda'
     | '/checkout'
     | '/comenzile-mele'
     | '/confidentialitate'
@@ -309,6 +332,7 @@ export interface FileRouteTypes {
     | '/despre'
     | '/livrare'
     | '/magazin'
+    | '/parola-noua'
     | '/produse'
     | '/retur'
     | '/retururi'
@@ -328,6 +352,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AjutorComandaRoute: typeof AjutorComandaRoute
   CheckoutRoute: typeof CheckoutRoute
   ComenzileMeleRoute: typeof ComenzileMeleRoute
   ConfidentialitateRoute: typeof ConfidentialitateRoute
@@ -337,6 +362,7 @@ export interface RootRouteChildren {
   DespreRoute: typeof DespreRoute
   LivrareRoute: typeof LivrareRoute
   MagazinRoute: typeof MagazinRoute
+  ParolaNouaRoute: typeof ParolaNouaRoute
   ProduseRoute: typeof ProduseRoute
   ReturRoute: typeof ReturRoute
   RetururiRoute: typeof RetururiRoute
@@ -361,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ajutor-comanda': {
+      id: '/ajutor-comanda'
+      path: '/ajutor-comanda'
+      fullPath: '/ajutor-comanda'
+      preLoaderRoute: typeof AjutorComandaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -424,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/magazin'
       fullPath: '/magazin'
       preLoaderRoute: typeof MagazinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-noua': {
+      id: '/parola-noua'
+      path: '/parola-noua'
+      fullPath: '/parola-noua'
+      preLoaderRoute: typeof ParolaNouaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produse': {
@@ -550,6 +590,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AjutorComandaRoute: AjutorComandaRoute,
   CheckoutRoute: CheckoutRoute,
   ComenzileMeleRoute: ComenzileMeleRoute,
   ConfidentialitateRoute: ConfidentialitateRoute,
@@ -559,6 +600,7 @@ const rootRouteChildren: RootRouteChildren = {
   DespreRoute: DespreRoute,
   LivrareRoute: LivrareRoute,
   MagazinRoute: MagazinRoute,
+  ParolaNouaRoute: ParolaNouaRoute,
   ProduseRoute: ProduseRoute,
   ReturRoute: ReturRoute,
   RetururiRoute: RetururiRoute,

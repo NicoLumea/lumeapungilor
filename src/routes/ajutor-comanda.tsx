@@ -28,10 +28,10 @@ export const Route = createFileRoute("/ajutor-comanda")({
 });
 
 type FoundOrder = {
-  orderNumber: string;
+  order_number: string;
   status: string;
   total: number;
-  createdAt: string;
+  created_at: string;
 };
 
 function GuestOrderHelp() {
@@ -67,7 +67,7 @@ function GuestOrderHelp() {
     try {
       const res = await submit({
         data: {
-          orderNumber: order.orderNumber,
+          orderNumber: order.order_number,
           email: form.email.trim(),
           kind: request.kind as "retur",
           message: request.message,
@@ -140,7 +140,7 @@ function GuestOrderHelp() {
         <div className="mt-10 border border-border p-6">
           <p className="micro-sm text-muted-foreground">Comanda găsită</p>
           <p className="mt-3 text-sm">
-            {order.orderNumber} — {new Date(order.createdAt).toLocaleDateString("ro-RO")} —{" "}
+            {order.order_number} — {new Date(order.created_at).toLocaleDateString("ro-RO")} —{" "}
             {formatRon(Number(order.total))} — {order.status}
           </p>
 
