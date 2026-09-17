@@ -6,6 +6,8 @@ import { useCart } from "@/lib/cart";
 import { useCartLines } from "@/lib/use-cart-lines";
 import { formatRon } from "@/lib/format";
 import { placeOrder } from "@/lib/shop.functions";
+import { useAuth } from "@/lib/use-auth";
+import { useGuestCartLimit } from "@/lib/dashboard-data";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -82,6 +84,10 @@ function CheckoutPage() {
   const { lines, subtotal, shipping, shippingConfigured, tax, vatRate, total, paymentsConfigured } =
     useCartLines();
   const submit = useServerFn(placeOrder);
+  const auth = useAuth();
+  const { data: guestLimit } = useGuestCartLimit();
+  const distinctProducts = new Set(cartLines.map((l) => l.productId)).size;
+  const overGuestLimit = !auth.user && typeof guestLimit === "number" && distinctProducts > guestLimit;
   const [form, setForm] = useState(emptyForm);
   const [busy, setBusy] = useState(false);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
@@ -133,6 +139,26 @@ function CheckoutPage() {
   return (
     <div className="site-container max-w-[1200px] py-14">
       <h1 className="display text-3xl md:text-4xl">Finalizare comandă</h1>
+
+      {!auth.user ? (
+        <div className="mt-6 border border-border bg-field p-4 text-sm">
+          <p>
+            Comanzi fără cont. Fără cont poți comanda maximum{" "}
+            {typeof guestLimit === "number" ? guestLimit : 3} produse diferite, o singură dată per adresă
+            de e-mail.
+          </p>
+          <Link to="/" hash="cont" className="micro-sm mt-2 inline-block link-underline">
+            Creează un cont pentru comenzi nelimitate
+          </Link>
+        </div>
+      ) : null}
+
+      {overGuestLimit ? (
+        <p className="mt-4 border border-destructive p-4 text-sm text-destructive" role="alert">
+          Ai {distinctProducts} produse diferite în coș. Fără cont poți comanda maximum {guestLimit}.
+          Creează un cont sau scoate câteva produse din coș.
+        </p>
+      ) : null}
 
       {!paymentsConfigured ? (
         <p className="mt-6 border border-border bg-field p-4 text-sm">
@@ -205,7 +231,7 @@ function CheckoutPage() {
           </dl>
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || overGuestLimit}
             className="micro mt-8 w-full border border-foreground bg-foreground px-8 py-4 text-background transition-opacity hover:opacity-85 disabled:opacity-40"
           >
             {busy ? "Se trimite…" : paymentsConfigured ? "Plătește" : "Trimite comanda (test)"}
