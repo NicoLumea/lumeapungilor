@@ -219,6 +219,9 @@ export const placeOrder = createServerFn({ method: "POST" })
         county: data.customer.county ?? null,
         postal_code: data.customer.postal_code ?? null,
         notes: data.customer.notes ?? null,
+        user_id: userId,
+        is_guest: !userId,
+        email_verified: !!userId && !!userEmail && userEmail.toLowerCase() === email,
         payment_reference: reference,
         subtotal,
         shipping_total: shipping,
@@ -255,6 +258,12 @@ export const placeOrder = createServerFn({ method: "POST" })
     if (iErr) {
       await supabaseAdmin.from("orders").delete().eq("id", order.id);
       return { ok: false, error: "Comanda nu a putut fi salvată." };
+    }
+
+    if (!userId) {
+      await supabaseAdmin
+        .from("guest_checkout_usage")
+        .upsert({ email, first_order_id: order.id }, { onConflict: "email" });
     }
 
     return {
