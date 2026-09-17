@@ -31,11 +31,20 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
+import { Route as AdminMesajeRouteImport } from './routes/admin.mesaje'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminRetururiRouteImport } from './routes/admin.retururi'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
+import { Route as StaffIndexRouteImport } from './routes/staff.index'
+import { Route as StaffCategoriiRouteImport } from './routes/staff.categorii'
+import { Route as StaffComenziRouteImport } from './routes/staff.comenzi'
+import { Route as StaffContinutRouteImport } from './routes/staff.continut'
+import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
+import { Route as StaffProduseRouteImport } from './routes/staff.produse'
+import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
 import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -148,6 +157,11 @@ const AdminGuideRoute = AdminGuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMesajeRoute = AdminMesajeRouteImport.update({
+  id: '/mesaje',
+  path: '/mesaje',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersRoute = AdminOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -156,6 +170,11 @@ const AdminOrdersRoute = AdminOrdersRouteImport.update({
 const AdminProductsRoute = AdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRetururiRoute = AdminRetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
   getParentRoute: () => AdminRoute,
 } as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
@@ -172,6 +191,41 @@ const ProdusSlugRoute = ProdusSlugRouteImport.update({
   id: '/produs/$slug',
   path: '/produs/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffCategoriiRoute = StaffCategoriiRouteImport.update({
+  id: '/categorii',
+  path: '/categorii',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffComenziRoute = StaffComenziRouteImport.update({
+  id: '/comenzi',
+  path: '/comenzi',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffContinutRoute = StaffContinutRouteImport.update({
+  id: '/continut',
+  path: '/continut',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffMesajeRoute = StaffMesajeRouteImport.update({
+  id: '/mesaje',
+  path: '/mesaje',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffProduseRoute = StaffProduseRouteImport.update({
+  id: '/produse',
+  path: '/produse',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffRetururiRoute = StaffRetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
+  getParentRoute: () => StaffRoute,
 } as any)
 const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
   id: '/api/public/img/$',
@@ -196,17 +250,26 @@ export interface FileRoutesByFullPath {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
-  '/staff': typeof StaffRoute
+  '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/retururi': typeof AdminRetururiRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/staff/categorii': typeof StaffCategoriiRoute
+  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/continut': typeof StaffContinutRoute
+  '/staff/mesaje': typeof StaffMesajeRoute
+  '/staff/produse': typeof StaffProduseRoute
+  '/staff/retururi': typeof StaffRetururiRoute
   '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesByTo {
@@ -225,17 +288,25 @@ export interface FileRoutesByTo {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
-  '/staff': typeof StaffRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/retururi': typeof AdminRetururiRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/staff/categorii': typeof StaffCategoriiRoute
+  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/continut': typeof StaffContinutRoute
+  '/staff/mesaje': typeof StaffMesajeRoute
+  '/staff/produse': typeof StaffProduseRoute
+  '/staff/retururi': typeof StaffRetururiRoute
   '/admin': typeof AdminIndexRoute
+  '/staff': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesById {
@@ -256,17 +327,26 @@ export interface FileRoutesById {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
-  '/staff': typeof StaffRoute
+  '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/retururi': typeof AdminRetururiRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/staff/categorii': typeof StaffCategoriiRoute
+  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/continut': typeof StaffContinutRoute
+  '/staff/mesaje': typeof StaffMesajeRoute
+  '/staff/produse': typeof StaffProduseRoute
+  '/staff/retururi': typeof StaffRetururiRoute
   '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRouteTypes {
@@ -293,12 +373,21 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
+    | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/retururi'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/staff/categorii'
+    | '/staff/comenzi'
+    | '/staff/continut'
+    | '/staff/mesaje'
+    | '/staff/produse'
+    | '/staff/retururi'
     | '/admin/'
+    | '/staff/'
     | '/api/public/img/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -317,17 +406,25 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/retururi'
-    | '/staff'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
+    | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/retururi'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/staff/categorii'
+    | '/staff/comenzi'
+    | '/staff/continut'
+    | '/staff/mesaje'
+    | '/staff/produse'
+    | '/staff/retururi'
     | '/admin'
+    | '/staff'
     | '/api/public/img/$'
   id:
     | '__root__'
@@ -352,12 +449,21 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
+    | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/retururi'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/staff/categorii'
+    | '/staff/comenzi'
+    | '/staff/continut'
+    | '/staff/mesaje'
+    | '/staff/produse'
+    | '/staff/retururi'
     | '/admin/'
+    | '/staff/'
     | '/api/public/img/$'
   fileRoutesById: FileRoutesById
 }
@@ -378,7 +484,7 @@ export interface RootRouteChildren {
   ProduseRoute: typeof ProduseRoute
   ReturRoute: typeof ReturRoute
   RetururiRoute: typeof RetururiRoute
-  StaffRoute: typeof StaffRoute
+  StaffRoute: typeof StaffRouteWithChildren
   TermeniRoute: typeof TermeniRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
@@ -542,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGuideRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/mesaje': {
+      id: '/admin/mesaje'
+      path: '/mesaje'
+      fullPath: '/admin/mesaje'
+      preLoaderRoute: typeof AdminMesajeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders': {
       id: '/admin/orders'
       path: '/orders'
@@ -554,6 +667,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/admin/products'
       preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/retururi': {
+      id: '/admin/retururi'
+      path: '/retururi'
+      fullPath: '/admin/retururi'
+      preLoaderRoute: typeof AdminRetururiRouteImport
       parentRoute: typeof AdminRoute
     }
     '/categorie/$slug': {
@@ -577,6 +697,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdusSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staff/': {
+      id: '/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/categorii': {
+      id: '/staff/categorii'
+      path: '/categorii'
+      fullPath: '/staff/categorii'
+      preLoaderRoute: typeof StaffCategoriiRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/comenzi': {
+      id: '/staff/comenzi'
+      path: '/comenzi'
+      fullPath: '/staff/comenzi'
+      preLoaderRoute: typeof StaffComenziRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/continut': {
+      id: '/staff/continut'
+      path: '/continut'
+      fullPath: '/staff/continut'
+      preLoaderRoute: typeof StaffContinutRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/mesaje': {
+      id: '/staff/mesaje'
+      path: '/mesaje'
+      fullPath: '/staff/mesaje'
+      preLoaderRoute: typeof StaffMesajeRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/produse': {
+      id: '/staff/produse'
+      path: '/produse'
+      fullPath: '/staff/produse'
+      preLoaderRoute: typeof StaffProduseRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/retururi': {
+      id: '/staff/retururi'
+      path: '/retururi'
+      fullPath: '/staff/retururi'
+      preLoaderRoute: typeof StaffRetururiRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/api/public/img/$': {
       id: '/api/public/img/$'
       path: '/api/public/img/$'
@@ -591,8 +760,10 @@ interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminGuideRoute: typeof AdminGuideRoute
+  AdminMesajeRoute: typeof AdminMesajeRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminRetururiRoute: typeof AdminRetururiRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -600,12 +771,36 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminContentRoute: AdminContentRoute,
   AdminGuideRoute: AdminGuideRoute,
+  AdminMesajeRoute: AdminMesajeRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
+  AdminRetururiRoute: AdminRetururiRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface StaffRouteChildren {
+  StaffCategoriiRoute: typeof StaffCategoriiRoute
+  StaffComenziRoute: typeof StaffComenziRoute
+  StaffContinutRoute: typeof StaffContinutRoute
+  StaffMesajeRoute: typeof StaffMesajeRoute
+  StaffProduseRoute: typeof StaffProduseRoute
+  StaffRetururiRoute: typeof StaffRetururiRoute
+  StaffIndexRoute: typeof StaffIndexRoute
+}
+
+const StaffRouteChildren: StaffRouteChildren = {
+  StaffCategoriiRoute: StaffCategoriiRoute,
+  StaffComenziRoute: StaffComenziRoute,
+  StaffContinutRoute: StaffContinutRoute,
+  StaffMesajeRoute: StaffMesajeRoute,
+  StaffProduseRoute: StaffProduseRoute,
+  StaffRetururiRoute: StaffRetururiRoute,
+  StaffIndexRoute: StaffIndexRoute,
+}
+
+const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -624,7 +819,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProduseRoute: ProduseRoute,
   ReturRoute: ReturRoute,
   RetururiRoute: RetururiRoute,
-  StaffRoute: StaffRoute,
+  StaffRoute: StaffRouteWithChildren,
   TermeniRoute: TermeniRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
