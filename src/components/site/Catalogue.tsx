@@ -2,9 +2,29 @@ import { useMemo, useState } from "react";
 import { usePublishedProducts } from "@/lib/products";
 import { useCategories } from "@/lib/content";
 import { ProductCard } from "@/components/site/ProductCard";
+import { Button } from "@/components/ui/button";
 import type { Product } from "@/lib/shop-types";
 
 type Sort = "recent" | "pret-asc" | "pret-desc" | "nume";
+
+function ProductCardSkeleton() {
+  return (
+    <div className="flex h-full animate-pulse flex-col" aria-hidden="true">
+      <div className="aspect-[4/5] w-full bg-field" />
+      <div className="mt-4 flex flex-1 flex-col gap-3">
+        <div className="h-2.5 w-1/3 bg-muted" />
+        <div className="space-y-2">
+          <div className="h-3.5 w-full bg-muted" />
+          <div className="h-3.5 w-2/3 bg-muted" />
+        </div>
+        <div className="mt-auto space-y-2 pt-4">
+          <div className="h-2.5 w-1/4 bg-muted" />
+          <div className="h-4 w-2/5 bg-muted" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function specValues(products: Product[], label: string): string[] {
   const set = new Set<string>();
@@ -25,7 +45,7 @@ export function Catalogue({
   title: string;
   intro?: string | null;
 }) {
-  const { data: all, isLoading, error } = usePublishedProducts();
+  const { data: all, isLoading, error, refetch, isFetching } = usePublishedProducts();
   const { data: categories } = useCategories();
   const [panelOpen, setPanelOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -96,7 +116,7 @@ export function Catalogue({
   }
 
   return (
-    <div className="site-container py-14">
+    <div className="catalogue-container py-14">
       <h1 className="display text-3xl md:text-4xl">{title}</h1>
       {intro ? <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">{intro}</p> : null}
 
@@ -109,9 +129,11 @@ export function Catalogue({
         >
           Filtrează și sortează{activeFilters ? ` (${activeFilters})` : ""}
         </button>
-        <span className="micro-sm text-muted-foreground">
-          {filtered.length} {filtered.length === 1 ? "produs" : "produse"}
-        </span>
+        {!isLoading && !error ? (
+          <span className="micro-sm text-muted-foreground">
+            {filtered.length} {filtered.length === 1 ? "produs" : "produse"}
+          </span>
+        ) : null}
       </div>
 
       {panelOpen ? (
@@ -221,11 +243,30 @@ export function Catalogue({
       ) : null}
 
       {isLoading ? (
-        <p className="py-24 text-center text-sm text-muted-foreground">Se încarcă…</p>
+        <div
+          className="catalogue-grid mt-10 motion-reduce:[&>*]:animate-none"
+          aria-label="Produsele se încarcă"
+          aria-busy="true"
+        >
+          {Array.from({ length: 8 }, (_, index) => (
+            <ProductCardSkeleton key={index} />
+          ))}
+        </div>
       ) : error ? (
-        <p className="py-24 text-center text-sm text-muted-foreground">
-          Produsele nu au putut fi încărcate.
-        </p>
+        <div className="py-24 text-center" role="alert">
+          <p className="text-sm text-muted-foreground">
+            Produsele nu au putut fi încărcate. Te rugăm să încerci din nou.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="micro mt-6 rounded-none"
+            disabled={isFetching}
+            onClick={() => void refetch()}
+          >
+            {isFetching ? "Se reîncearcă…" : "Încearcă din nou"}
+          </Button>
+        </div>
       ) : scoped.length === 0 ? (
         <p className="py-24 text-center text-sm text-muted-foreground">
           Catalogul este în pregătire. Produsele vor apărea aici în curând.
@@ -238,7 +279,7 @@ export function Catalogue({
           </button>
         </div>
       ) : (
-        <div className="mt-10 grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-x-[clamp(16px,2vw,32px)] gap-y-12">
+        <div className="catalogue-grid mt-10">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
