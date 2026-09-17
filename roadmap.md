@@ -6,3 +6,10 @@
 4. [ ] Auth panel (login/register/reset), `/cont`, `/comenzile-mele`, `/retururi`, `/ajutor-comanda`
 5. [ ] `/staff` dashboard, `/admin` extensions (`/admin/roluri`, `/admin/audit`, clients, employees, settings, returns)
 6. [ ] Testing: guest limits, guest re-order block, cart transfer, customer isolation, role guards, direct URL + direct DB attempts, mobile/desktop, no store regressions
+
+# Verified company information
+- [ ] Centralize verified identity, phones, and schedule in the company content record
+- [ ] Update footer and Contact page
+- [ ] Add reusable legal identity to legal pages, checkout, and order confirmation
+- [ ] Add Organization structured data from the centralized record
+- [ ] Verify exact details, call links, mobile layout, and existing shop flows
