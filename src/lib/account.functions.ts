@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-export type ActionResult<T = Record<string, never>> =
-  | ({ ok: true } & T)
+export type ActionResult<T = unknown> =
+  | ({ ok: true } & (T extends object ? T : Record<string, unknown>))
   | { ok: false; error: string };
 
 const DENIED = "Nu ai permisiunea necesară pentru această acțiune.";
