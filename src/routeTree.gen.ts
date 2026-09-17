@@ -17,6 +17,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
 import { Route as LivrareRouteImport } from './routes/livrare'
+import { Route as MagazinRouteImport } from './routes/magazin'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as TermeniRouteImport } from './routes/termeni'
@@ -69,6 +70,11 @@ const DespreRoute = DespreRouteImport.update({
 const LivrareRoute = LivrareRouteImport.update({
   id: '/livrare',
   path: '/livrare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MagazinRoute = MagazinRouteImport.update({
+  id: '/magazin',
+  path: '/magazin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProduseRoute = ProduseRouteImport.update({
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
+  '/magazin': typeof MagazinRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
+  '/magazin': typeof MagazinRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
+  '/magazin': typeof MagazinRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/termeni': typeof TermeniRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/cos'
     | '/despre'
     | '/livrare'
+    | '/magazin'
     | '/produse'
     | '/retur'
     | '/termeni'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/cos'
     | '/despre'
     | '/livrare'
+    | '/magazin'
     | '/produse'
     | '/retur'
     | '/termeni'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/cos'
     | '/despre'
     | '/livrare'
+    | '/magazin'
     | '/produse'
     | '/retur'
     | '/termeni'
@@ -286,6 +298,7 @@ export interface RootRouteChildren {
   CosRoute: typeof CosRoute
   DespreRoute: typeof DespreRoute
   LivrareRoute: typeof LivrareRoute
+  MagazinRoute: typeof MagazinRoute
   ProduseRoute: typeof ProduseRoute
   ReturRoute: typeof ReturRoute
   TermeniRoute: typeof TermeniRoute
@@ -351,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/livrare'
       fullPath: '/livrare'
       preLoaderRoute: typeof LivrareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/magazin': {
+      id: '/magazin'
+      path: '/magazin'
+      fullPath: '/magazin'
+      preLoaderRoute: typeof MagazinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produse': {
@@ -476,6 +496,7 @@ const rootRouteChildren: RootRouteChildren = {
   CosRoute: CosRoute,
   DespreRoute: DespreRoute,
   LivrareRoute: LivrareRoute,
+  MagazinRoute: MagazinRoute,
   ProduseRoute: ProduseRoute,
   ReturRoute: ReturRoute,
   TermeniRoute: TermeniRoute,
