@@ -62,6 +62,6 @@ export async function audit(entry: {
     action: entry.action,
     entity: entry.entity,
     entity_id: entry.entityId ?? null,
-    details: entry.details ?? {},
+    details: JSON.parse(JSON.stringify(entry.details ?? {})),
   });
 }
