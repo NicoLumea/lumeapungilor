@@ -1,86 +1,104 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AuthPanel } from "@/components/site/AuthPanel";
 import { FeaturedProductCard } from "@/components/site/FeaturedProductCard";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { usePublishedProducts } from "@/lib/products";
+import { useAuth } from "@/lib/use-auth";
+
+type EntrySearch = { redirect?: string };
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): EntrySearch => {
+    const raw = typeof search["redirect"] === "string" ? (search["redirect"] as string) : "";
+    return raw.startsWith("/") ? { redirect: raw } : {};
+  },
   head: () => ({
     meta: [
       { title: "Lumea Pungilor — Ambalaje pentru afaceri" },
       {
         name: "description",
         content:
-          "Furnizor de pungi de plastic, pungi de hârtie, fețe de masă și folie cu bule pentru afaceri.",
+          "Furnizor de pungi de plastic, fețe de masă și folie cu bule. Intră în magazin sau creează-ți un cont de client.",
       },
       { property: "og:title", content: "Lumea Pungilor — Ambalaje pentru afaceri" },
       {
         property: "og:description",
-        content: "Pungi de plastic, pungi de hârtie, fețe de masă și folie cu bule.",
+        content: "Ambalaje pentru afaceri: catalog, cont de client și comenzi online.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Home,
+  component: EntryPage,
 });
 
-function Home() {
+const BENEFITS = [
+  "Istoricul comenzilor și statusul lor, la un loc.",
+  "Date de contact și livrare salvate, comandă mai rapidă.",
+  "Comenzi repetate, fără limită de produse diferite.",
+  "Cereri de retur, retragere și reclamații direct din cont.",
+];
+
+function EntryPage() {
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const auth = useAuth();
   const { data: content } = useContent();
   const { data: categories } = useCategories();
   const { data: products } = usePublishedProducts();
+
+  const company = content?.["company"];
   const home = content?.["home"];
-  const availableProducts = (products ?? []).filter((product) => !product.track_stock || product.stock > 0);
-  const featuredProducts = [
-    ...availableProducts.filter((product) => product.is_featured),
-    ...availableProducts.filter((product) => !product.is_featured),
+  const available = (products ?? []).filter((p) => !p.track_stock || p.stock > 0);
+  const featured = [
+    ...available.filter((p) => p.is_featured),
+    ...available.filter((p) => !p.is_featured),
   ].slice(0, 6);
 
-  const heroTitle = text(home, "hero_title");
-  const heroSubtitle = text(home, "hero_subtitle");
-  const ctaLabel = text(home, "cta_label");
-  const ctaHref = text(home, "cta_href") ?? "/produse";
-  const edTitle = text(home, "editorial_title");
-  const edBody = text(home, "editorial_body");
-  const edImage = imageUrl(text(home, "editorial_image_url"));
+  const intro = text(home, "hero_text") ?? text(company, "tagline");
 
   return (
     <div>
-      <section className="overflow-hidden border-b border-border bg-hero">
-        <div className="relative mx-auto w-full max-w-[1920px] lg:aspect-[12/5]">
-          <div className="site-container relative z-10 py-10 lg:absolute lg:inset-0 lg:grid lg:w-full lg:max-w-none lg:grid-cols-[38%_62%] lg:items-center lg:py-0">
-            <div className="max-w-[520px] text-left lg:px-[clamp(32px,3vw,56px)]">
-            {heroTitle ? <h1 className="display text-4xl leading-[1.05] lg:text-[clamp(44px,4vw,68px)]">{heroTitle}</h1> : null}
-            {heroSubtitle ? (
-              <p className="mt-6 max-w-md text-base leading-[1.5] text-foreground/80 lg:text-[clamp(16px,1.25vw,19px)]">
-                {heroSubtitle}
-              </p>
-            ) : null}
-            {ctaLabel ? (
-              <a
-                href={ctaHref}
-                className="micro mt-7 inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background sm:mt-10 sm:px-8 sm:py-4"
+      <section className="border-b border-border bg-hero">
+        <div className="site-container py-14 md:py-24">
+          <p className="micro-sm text-muted-foreground">Lumea Pungilor</p>
+          <h1 className="display mt-4 max-w-3xl text-4xl leading-[1.05] md:text-6xl">
+            Ambalaje pentru afacerea ta, comandate simplu
+          </h1>
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-foreground/80">
+            {intro ??
+              "Livrăm pungi de plastic, fețe de masă și folie cu bule pentru magazine, restaurante și ateliere din toată țara."}
+          </p>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link
+              to="/magazin"
+              className="micro inline-flex min-h-11 items-center border border-foreground bg-foreground px-6 py-3 text-background transition-opacity hover:opacity-85"
+            >
+              {auth.user ? "Intră în magazin" : "Continuă ca vizitator"}
+            </Link>
+            {auth.user ? (
+              <Link
+                to="/cont"
+                className="micro inline-flex min-h-11 items-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
               >
-                {ctaLabel}
+                Contul meu
+              </Link>
+            ) : (
+              <a
+                href="#cont"
+                className="micro inline-flex min-h-11 items-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
+              >
+                Autentificare
               </a>
-            ) : null}
-            </div>
+            )}
           </div>
-          <img
-            src={heroBackground.url}
-            alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
-            width="1920"
-            height="800"
-            fetchPriority="high"
-            className="pointer-events-none relative block h-auto w-full object-contain lg:absolute lg:inset-0 lg:size-full lg:object-contain lg:object-center"
-          />
         </div>
       </section>
 
       {(categories ?? []).length > 0 ? (
-        <section className="site-container py-8 md:py-20">
-          <p className="micro-sm text-muted-foreground">Categorii</p>
+        <section className="site-container py-10 md:py-20">
+          <p className="micro-sm text-muted-foreground">Categorii principale</p>
           <div className="mt-5 grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 md:mt-8 md:gap-x-[clamp(16px,2vw,32px)] md:gap-y-10 lg:grid-cols-4">
             {(categories ?? []).map((c) => {
               const img = imageUrl(c.image_url);
@@ -111,9 +129,6 @@ function Home() {
                       {c.name}
                     </p>
                   </div>
-                  {c.description ? (
-                    <p className="mt-1 hidden text-sm text-muted-foreground md:block">{c.description}</p>
-                  ) : null}
                 </Link>
               );
             })}
@@ -121,7 +136,7 @@ function Home() {
         </section>
       ) : null}
 
-      {featuredProducts.length > 0 ? (
+      {featured.length > 0 ? (
         <section className="rule-t">
           <div className="catalogue-container py-10 md:py-20">
             <div className="max-w-2xl">
@@ -131,7 +146,7 @@ function Home() {
               </p>
             </div>
             <div className="featured-products-grid mt-7 md:mt-10">
-              {featuredProducts.map((product, index) => (
+              {featured.map((product, index) => (
                 <FeaturedProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
@@ -139,31 +154,114 @@ function Home() {
         </section>
       ) : null}
 
-      {edTitle || edBody || edImage ? (
-        <section className="rule-t">
-          <div className="site-container grid items-center gap-8 py-8 md:grid-cols-2 md:gap-12 md:py-24">
-            <div>
-              {edTitle ? <h2 className="display text-3xl md:text-5xl">{edTitle}</h2> : null}
-              {edBody ? (
-                <p className="mt-6 max-w-md whitespace-pre-line text-base leading-relaxed text-muted-foreground">
-                  {edBody}
-                </p>
-              ) : null}
-              <Link
-                to="/produse"
-                className="micro mt-7 inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background sm:mt-10 sm:px-8 sm:py-4"
-              >
-                Vezi catalogul
-              </Link>
-            </div>
-            {edImage ? (
-              <div className="bg-field">
-                <img src={edImage} alt={edTitle ?? ""} className="w-full object-cover" />
+      <section id="cont" className="rule-t scroll-mt-20">
+        <div className="site-container grid gap-10 py-10 md:grid-cols-2 md:gap-16 md:py-20">
+          <div>
+            <h2 className="display text-3xl md:text-4xl">Cont de client</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Poți comanda și fără cont, o singură dată, cu un număr limitat de produse diferite. Cu un
+              cont ai acces la toate avantajele de mai jos.
+            </p>
+            <ul className="mt-6 space-y-3 text-sm">
+              {BENEFITS.map((b) => (
+                <li key={b} className="border-l border-brand pl-4">
+                  {b}
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/ajutor-comanda"
+              className="micro-sm mt-6 inline-block underline underline-offset-4"
+            >
+              Ai comandat fără cont? Ajutor pentru comanda ta
+            </Link>
+          </div>
+
+          {auth.user ? (
+            <div className="border border-border p-6 md:p-8">
+              <p className="micro-sm text-muted-foreground">Ești autentificat</p>
+              <p className="mt-3 text-sm">{auth.user.email}</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  to="/magazin"
+                  className="micro inline-flex min-h-11 items-center border border-foreground bg-foreground px-5 py-3 text-background"
+                >
+                  Intră în magazin
+                </Link>
+                <Link
+                  to="/cont"
+                  className="micro inline-flex min-h-11 items-center border border-foreground px-5 py-3"
+                >
+                  Contul meu
+                </Link>
               </div>
+            </div>
+          ) : (
+            <AuthPanel
+              onSignedIn={() => {
+                const target = search.redirect;
+                if (target) window.location.assign(target);
+                else navigate({ to: "/cont" });
+              }}
+            />
+          )}
+        </div>
+      </section>
+
+      <section className="rule-t">
+        <div className="site-container grid gap-8 py-10 text-sm md:grid-cols-3 md:py-16">
+          <div>
+            <p className="micro-sm text-muted-foreground">Contact</p>
+            {text(company, "email") ? <p className="mt-3">{text(company, "email")}</p> : null}
+            {text(company, "phone") ? <p className="mt-1">{text(company, "phone")}</p> : null}
+            {text(company, "address") ? (
+              <p className="mt-1 whitespace-pre-line text-muted-foreground">
+                {text(company, "address")}
+              </p>
             ) : null}
           </div>
-        </section>
-      ) : null}
+          <div>
+            <p className="micro-sm text-muted-foreground">Informații</p>
+            <ul className="mt-3 space-y-2">
+              <li>
+                <Link to="/despre" className="link-underline">
+                  Despre noi
+                </Link>
+              </li>
+              <li>
+                <Link to="/livrare" className="link-underline">
+                  Livrare
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="link-underline">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="micro-sm text-muted-foreground">Legal</p>
+            <ul className="mt-3 space-y-2">
+              <li>
+                <Link to="/termeni" className="link-underline">
+                  Termeni și condiții
+                </Link>
+              </li>
+              <li>
+                <Link to="/confidentialitate" className="link-underline">
+                  Confidențialitate
+                </Link>
+              </li>
+              <li>
+                <Link to="/retur" className="link-underline">
+                  Retur și retragere
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
