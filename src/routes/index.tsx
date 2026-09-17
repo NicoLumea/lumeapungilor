@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
+import { FeaturedProductCard } from "@/components/site/FeaturedProductCard";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
+import { usePublishedProducts } from "@/lib/products";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,6 +19,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Pungi de plastic, pungi de hârtie, fețe de masă și folie cu bule.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -25,7 +29,13 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { data: content } = useContent();
   const { data: categories } = useCategories();
+  const { data: products } = usePublishedProducts();
   const home = content?.["home"];
+  const availableProducts = (products ?? []).filter((product) => !product.track_stock || product.stock > 0);
+  const featuredProducts = [
+    ...availableProducts.filter((product) => product.is_featured),
+    ...availableProducts.filter((product) => !product.is_featured),
+  ].slice(0, 6);
 
   const heroTitle = text(home, "hero_title");
   const heroSubtitle = text(home, "hero_subtitle");
@@ -79,31 +89,52 @@ function Home() {
                   key={c.id}
                   to="/categorie/$slug"
                   params={{ slug: c.slug }}
-                  className="group block min-w-0 active:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  className="category-card group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
+                  <div className="category-card-media relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
                     {img ? (
                       <img
                         src={img}
                         alt={c.name}
                         loading="lazy"
-                        className="absolute inset-0 size-full object-contain p-3 transition-transform duration-500 motion-reduce:transition-none sm:p-6 sm:group-hover:scale-[1.02]"
+                        className="category-card-image absolute inset-0 size-full object-contain p-3 sm:p-6"
                       />
                     ) : (
                       <div className="flex size-full items-center justify-center">
                         <span className="micro-sm text-muted-foreground">{c.name}</span>
                       </div>
                     )}
+                    <span className="category-card-overlay absolute inset-0" aria-hidden="true" />
                   </div>
-                  <p className="mt-2 line-clamp-2 min-h-8 text-center text-xs font-medium uppercase leading-4 sm:mt-3 sm:text-left sm:text-[0.6875rem] sm:leading-[1.2]">
-                    {c.name}
-                  </p>
+                  <div className="category-card-label mt-2 min-h-8 text-center sm:mt-3 sm:text-left">
+                    <p className="line-clamp-2 inline text-xs font-medium uppercase leading-4 sm:text-[0.6875rem] sm:leading-[1.2]">
+                      {c.name}
+                    </p>
+                  </div>
                   {c.description ? (
                     <p className="mt-1 hidden text-sm text-muted-foreground md:block">{c.description}</p>
                   ) : null}
                 </Link>
               );
             })}
+          </div>
+        </section>
+      ) : null}
+
+      {featuredProducts.length > 0 ? (
+        <section className="rule-t">
+          <div className="catalogue-container py-10 md:py-20">
+            <div className="max-w-2xl">
+              <h2 className="display text-3xl md:text-4xl">Produse recomandate</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Descoperă câteva dintre produsele disponibile în catalog.
+              </p>
+            </div>
+            <div className="featured-products-grid mt-7 md:mt-10">
+              {featuredProducts.map((product, index) => (
+                <FeaturedProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
           </div>
         </section>
       ) : null}
