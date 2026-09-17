@@ -48,7 +48,7 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.from("profiles").update(form).eq("id", userId);
+    const { error } = await supabase.from("profiles").update(form as never).eq("id", userId);
     setBusy(false);
     if (error) {
       toast.error("Datele nu au putut fi salvate.");
@@ -66,7 +66,6 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
     }
     const { error } = await supabase.auth.updateUser({
       password: password.next,
-      // @ts-expect-error current_password is accepted by Lovable Cloud auth
       current_password: password.current,
     });
     if (error) {

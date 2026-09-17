@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
+import { Route as ContRouteImport } from './routes/cont'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
@@ -50,6 +51,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const ConfidentialitateRoute = ConfidentialitateRouteImport.update({
   id: '/confidentialitate',
   path: '/confidentialitate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContRoute = ContRouteImport.update({
+  id: '/cont',
+  path: '/cont',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/confidentialitate': typeof ConfidentialitateRoute
+  '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
   '/confidentialitate': typeof ConfidentialitateRoute
+  '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/confidentialitate': typeof ConfidentialitateRoute
+  '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checkout'
     | '/confidentialitate'
+    | '/cont'
     | '/contact'
     | '/cos'
     | '/despre'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/'
     | '/checkout'
     | '/confidentialitate'
+    | '/cont'
     | '/contact'
     | '/cos'
     | '/despre'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checkout'
     | '/confidentialitate'
+    | '/cont'
     | '/contact'
     | '/cos'
     | '/despre'
@@ -294,6 +306,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   ConfidentialitateRoute: typeof ConfidentialitateRoute
+  ContRoute: typeof ContRoute
   ContactRoute: typeof ContactRoute
   CosRoute: typeof CosRoute
   DespreRoute: typeof DespreRoute
@@ -336,6 +349,13 @@ declare module '@tanstack/react-router' {
       path: '/confidentialitate'
       fullPath: '/confidentialitate'
       preLoaderRoute: typeof ConfidentialitateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cont': {
+      id: '/cont'
+      path: '/cont'
+      fullPath: '/cont'
+      preLoaderRoute: typeof ContRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -492,6 +512,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   ConfidentialitateRoute: ConfidentialitateRoute,
+  ContRoute: ContRoute,
   ContactRoute: ContactRoute,
   CosRoute: CosRoute,
   DespreRoute: DespreRoute,
