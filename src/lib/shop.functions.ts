@@ -290,7 +290,13 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin
       .from("user_roles")
-      .upsert({ user_id: data.userId, role: "admin" }, { onConflict: "user_id,role" });
+      .upsert(
+        [
+          { user_id: data.userId, role: "owner" as const },
+          { user_id: data.userId, role: "admin" as const },
+        ],
+        { onConflict: "user_id,role" },
+      );
     if (error) return { ok: false, error: "Nu am putut acorda accesul." };
     return { ok: true };
   });
