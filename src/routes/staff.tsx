@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { RequireAccess } from "@/components/site/RequireAccess";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
@@ -35,5 +35,3 @@ function StaffLayout() {
     </RequireAccess>
   );
 }
-
-export { Link };

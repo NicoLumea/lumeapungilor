@@ -25,6 +25,7 @@ import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
+import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -117,6 +118,11 @@ const RetururiRoute = RetururiRouteImport.update({
   path: '/retururi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermeniRoute = TermeniRouteImport.update({
   id: '/termeni',
   path: '/termeni',
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/staff': typeof StaffRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/staff': typeof StaffRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/staff': typeof StaffRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/retururi'
+    | '/staff'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/retururi'
+    | '/staff'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/produse'
     | '/retur'
     | '/retururi'
+    | '/staff'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
@@ -366,6 +378,7 @@ export interface RootRouteChildren {
   ProduseRoute: typeof ProduseRoute
   ReturRoute: typeof ReturRoute
   RetururiRoute: typeof RetururiRoute
+  StaffRoute: typeof StaffRoute
   TermeniRoute: typeof TermeniRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
@@ -487,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetururiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/termeni': {
       id: '/termeni'
       path: '/termeni'
@@ -604,6 +624,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProduseRoute: ProduseRoute,
   ReturRoute: ReturRoute,
   RetururiRoute: RetururiRoute,
+  StaffRoute: StaffRoute,
   TermeniRoute: TermeniRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
