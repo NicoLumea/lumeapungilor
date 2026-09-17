@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { formatRon } from "@/lib/format";
 import { imageUrl } from "@/lib/images";
 import { sortedImages, type Product } from "@/lib/shop-types";
@@ -49,7 +49,7 @@ export function FeaturedProductCard({ product, index }: { product: Product; inde
       aria-label={`${product.name}, ${displayPrice(product.price)} per ${product.selling_unit}`}
       title={product.name}
       className={`featured-product group flex h-full min-w-0 flex-col outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-4 focus-visible:ring-offset-background ${revealed ? "is-revealed" : ""}`}
-      style={{ "--reveal-delay": `${index * 70}ms` } as React.CSSProperties}
+      style={{ "--reveal-delay": `${index * 70}ms` } as CSSProperties}
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-field">
         <span className="micro-sm absolute left-2.5 top-2.5 z-10 bg-stock-available px-2 py-1.5 text-stock-available-foreground">
