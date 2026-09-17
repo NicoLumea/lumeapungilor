@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { lookupGuestOrder, submitReturnRequest } from "@/lib/account.functions";
+import { lookupGuestOrder, submitGuestReturnRequest } from "@/lib/account.functions";
 import { formatRon } from "@/lib/format";
 import { RETURN_KIND_LABEL } from "@/lib/dashboard-data";
 
@@ -36,7 +36,7 @@ type FoundOrder = {
 
 function GuestOrderHelp() {
   const lookup = useServerFn(lookupGuestOrder);
-  const submit = useServerFn(submitReturnRequest);
+  const submit = useServerFn(submitGuestReturnRequest);
   const [form, setForm] = useState({ orderNumber: "", email: "" });
   const [order, setOrder] = useState<FoundOrder | null>(null);
   const [busy, setBusy] = useState(false);
