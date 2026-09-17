@@ -11,24 +11,40 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AjutorComandaRouteImport } from './routes/ajutor-comanda'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ComenzileMeleRouteImport } from './routes/comenzile-mele'
 import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
+import { Route as ContRouteImport } from './routes/cont'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
 import { Route as LivrareRouteImport } from './routes/livrare'
+import { Route as MagazinRouteImport } from './routes/magazin'
+import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ReturRouteImport } from './routes/retur'
+import { Route as RetururiRouteImport } from './routes/retururi'
+import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
+import { Route as AdminMesajeRouteImport } from './routes/admin.mesaje'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminRetururiRouteImport } from './routes/admin.retururi'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
+import { Route as StaffIndexRouteImport } from './routes/staff.index'
+import { Route as StaffCategoriiRouteImport } from './routes/staff.categorii'
+import { Route as StaffComenziRouteImport } from './routes/staff.comenzi'
+import { Route as StaffContinutRouteImport } from './routes/staff.continut'
+import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
+import { Route as StaffProduseRouteImport } from './routes/staff.produse'
+import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
 import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,14 +57,29 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AjutorComandaRoute = AjutorComandaRouteImport.update({
+  id: '/ajutor-comanda',
+  path: '/ajutor-comanda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComenzileMeleRoute = ComenzileMeleRouteImport.update({
+  id: '/comenzile-mele',
+  path: '/comenzile-mele',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfidentialitateRoute = ConfidentialitateRouteImport.update({
   id: '/confidentialitate',
   path: '/confidentialitate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContRoute = ContRouteImport.update({
+  id: '/cont',
+  path: '/cont',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -71,6 +102,16 @@ const LivrareRoute = LivrareRouteImport.update({
   path: '/livrare',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MagazinRoute = MagazinRouteImport.update({
+  id: '/magazin',
+  path: '/magazin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaNouaRoute = ParolaNouaRouteImport.update({
+  id: '/parola-noua',
+  path: '/parola-noua',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProduseRoute = ProduseRouteImport.update({
   id: '/produse',
   path: '/produse',
@@ -79,6 +120,16 @@ const ProduseRoute = ProduseRouteImport.update({
 const ReturRoute = ReturRouteImport.update({
   id: '/retur',
   path: '/retur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetururiRoute = RetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermeniRoute = TermeniRouteImport.update({
@@ -106,6 +157,11 @@ const AdminGuideRoute = AdminGuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMesajeRoute = AdminMesajeRouteImport.update({
+  id: '/mesaje',
+  path: '/mesaje',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersRoute = AdminOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -114,6 +170,11 @@ const AdminOrdersRoute = AdminOrdersRouteImport.update({
 const AdminProductsRoute = AdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRetururiRoute = AdminRetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
   getParentRoute: () => AdminRoute,
 } as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
@@ -131,6 +192,41 @@ const ProdusSlugRoute = ProdusSlugRouteImport.update({
   path: '/produs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffCategoriiRoute = StaffCategoriiRouteImport.update({
+  id: '/categorii',
+  path: '/categorii',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffComenziRoute = StaffComenziRouteImport.update({
+  id: '/comenzi',
+  path: '/comenzi',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffContinutRoute = StaffContinutRouteImport.update({
+  id: '/continut',
+  path: '/continut',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffMesajeRoute = StaffMesajeRouteImport.update({
+  id: '/mesaje',
+  path: '/mesaje',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffProduseRoute = StaffProduseRouteImport.update({
+  id: '/produse',
+  path: '/produse',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffRetururiRoute = StaffRetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
+  getParentRoute: () => StaffRoute,
+} as any)
 const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
   id: '/api/public/img/$',
   path: '/api/public/img/$',
@@ -140,70 +236,117 @@ const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ajutor-comanda': typeof AjutorComandaRoute
   '/checkout': typeof CheckoutRoute
+  '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
+  '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
+  '/magazin': typeof MagazinRoute
+  '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
+  '/retururi': typeof RetururiRoute
+  '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/retururi': typeof AdminRetururiRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/staff/categorii': typeof StaffCategoriiRoute
+  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/continut': typeof StaffContinutRoute
+  '/staff/mesaje': typeof StaffMesajeRoute
+  '/staff/produse': typeof StaffProduseRoute
+  '/staff/retururi': typeof StaffRetururiRoute
   '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ajutor-comanda': typeof AjutorComandaRoute
   '/checkout': typeof CheckoutRoute
+  '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
+  '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
+  '/magazin': typeof MagazinRoute
+  '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
+  '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/retururi': typeof AdminRetururiRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/staff/categorii': typeof StaffCategoriiRoute
+  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/continut': typeof StaffContinutRoute
+  '/staff/mesaje': typeof StaffMesajeRoute
+  '/staff/produse': typeof StaffProduseRoute
+  '/staff/retururi': typeof StaffRetururiRoute
   '/admin': typeof AdminIndexRoute
+  '/staff': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ajutor-comanda': typeof AjutorComandaRoute
   '/checkout': typeof CheckoutRoute
+  '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
+  '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/livrare': typeof LivrareRoute
+  '/magazin': typeof MagazinRoute
+  '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
+  '/retururi': typeof RetururiRoute
+  '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
+  '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/retururi': typeof AdminRetururiRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
+  '/staff/categorii': typeof StaffCategoriiRoute
+  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/continut': typeof StaffContinutRoute
+  '/staff/mesaje': typeof StaffMesajeRoute
+  '/staff/produse': typeof StaffProduseRoute
+  '/staff/retururi': typeof StaffRetururiRoute
   '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRouteTypes {
@@ -211,83 +354,137 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/ajutor-comanda'
     | '/checkout'
+    | '/comenzile-mele'
     | '/confidentialitate'
+    | '/cont'
     | '/contact'
     | '/cos'
     | '/despre'
     | '/livrare'
+    | '/magazin'
+    | '/parola-noua'
     | '/produse'
     | '/retur'
+    | '/retururi'
+    | '/staff'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
+    | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/retururi'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/staff/categorii'
+    | '/staff/comenzi'
+    | '/staff/continut'
+    | '/staff/mesaje'
+    | '/staff/produse'
+    | '/staff/retururi'
     | '/admin/'
+    | '/staff/'
     | '/api/public/img/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ajutor-comanda'
     | '/checkout'
+    | '/comenzile-mele'
     | '/confidentialitate'
+    | '/cont'
     | '/contact'
     | '/cos'
     | '/despre'
     | '/livrare'
+    | '/magazin'
+    | '/parola-noua'
     | '/produse'
     | '/retur'
+    | '/retururi'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
+    | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/retururi'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/staff/categorii'
+    | '/staff/comenzi'
+    | '/staff/continut'
+    | '/staff/mesaje'
+    | '/staff/produse'
+    | '/staff/retururi'
     | '/admin'
+    | '/staff'
     | '/api/public/img/$'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/ajutor-comanda'
     | '/checkout'
+    | '/comenzile-mele'
     | '/confidentialitate'
+    | '/cont'
     | '/contact'
     | '/cos'
     | '/despre'
     | '/livrare'
+    | '/magazin'
+    | '/parola-noua'
     | '/produse'
     | '/retur'
+    | '/retururi'
+    | '/staff'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
+    | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/retururi'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
+    | '/staff/categorii'
+    | '/staff/comenzi'
+    | '/staff/continut'
+    | '/staff/mesaje'
+    | '/staff/produse'
+    | '/staff/retururi'
     | '/admin/'
+    | '/staff/'
     | '/api/public/img/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AjutorComandaRoute: typeof AjutorComandaRoute
   CheckoutRoute: typeof CheckoutRoute
+  ComenzileMeleRoute: typeof ComenzileMeleRoute
   ConfidentialitateRoute: typeof ConfidentialitateRoute
+  ContRoute: typeof ContRoute
   ContactRoute: typeof ContactRoute
   CosRoute: typeof CosRoute
   DespreRoute: typeof DespreRoute
   LivrareRoute: typeof LivrareRoute
+  MagazinRoute: typeof MagazinRoute
+  ParolaNouaRoute: typeof ParolaNouaRoute
   ProduseRoute: typeof ProduseRoute
   ReturRoute: typeof ReturRoute
+  RetururiRoute: typeof RetururiRoute
+  StaffRoute: typeof StaffRouteWithChildren
   TermeniRoute: typeof TermeniRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
@@ -311,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ajutor-comanda': {
+      id: '/ajutor-comanda'
+      path: '/ajutor-comanda'
+      fullPath: '/ajutor-comanda'
+      preLoaderRoute: typeof AjutorComandaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
@@ -318,11 +522,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comenzile-mele': {
+      id: '/comenzile-mele'
+      path: '/comenzile-mele'
+      fullPath: '/comenzile-mele'
+      preLoaderRoute: typeof ComenzileMeleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/confidentialitate': {
       id: '/confidentialitate'
       path: '/confidentialitate'
       fullPath: '/confidentialitate'
       preLoaderRoute: typeof ConfidentialitateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cont': {
+      id: '/cont'
+      path: '/cont'
+      fullPath: '/cont'
+      preLoaderRoute: typeof ContRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -353,6 +571,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LivrareRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/magazin': {
+      id: '/magazin'
+      path: '/magazin'
+      fullPath: '/magazin'
+      preLoaderRoute: typeof MagazinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-noua': {
+      id: '/parola-noua'
+      path: '/parola-noua'
+      fullPath: '/parola-noua'
+      preLoaderRoute: typeof ParolaNouaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produse': {
       id: '/produse'
       path: '/produse'
@@ -365,6 +597,20 @@ declare module '@tanstack/react-router' {
       path: '/retur'
       fullPath: '/retur'
       preLoaderRoute: typeof ReturRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retururi': {
+      id: '/retururi'
+      path: '/retururi'
+      fullPath: '/retururi'
+      preLoaderRoute: typeof RetururiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/termeni': {
@@ -402,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGuideRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/mesaje': {
+      id: '/admin/mesaje'
+      path: '/mesaje'
+      fullPath: '/admin/mesaje'
+      preLoaderRoute: typeof AdminMesajeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders': {
       id: '/admin/orders'
       path: '/orders'
@@ -414,6 +667,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/admin/products'
       preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/retururi': {
+      id: '/admin/retururi'
+      path: '/retururi'
+      fullPath: '/admin/retururi'
+      preLoaderRoute: typeof AdminRetururiRouteImport
       parentRoute: typeof AdminRoute
     }
     '/categorie/$slug': {
@@ -437,6 +697,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdusSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staff/': {
+      id: '/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/categorii': {
+      id: '/staff/categorii'
+      path: '/categorii'
+      fullPath: '/staff/categorii'
+      preLoaderRoute: typeof StaffCategoriiRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/comenzi': {
+      id: '/staff/comenzi'
+      path: '/comenzi'
+      fullPath: '/staff/comenzi'
+      preLoaderRoute: typeof StaffComenziRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/continut': {
+      id: '/staff/continut'
+      path: '/continut'
+      fullPath: '/staff/continut'
+      preLoaderRoute: typeof StaffContinutRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/mesaje': {
+      id: '/staff/mesaje'
+      path: '/mesaje'
+      fullPath: '/staff/mesaje'
+      preLoaderRoute: typeof StaffMesajeRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/produse': {
+      id: '/staff/produse'
+      path: '/produse'
+      fullPath: '/staff/produse'
+      preLoaderRoute: typeof StaffProduseRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/retururi': {
+      id: '/staff/retururi'
+      path: '/retururi'
+      fullPath: '/staff/retururi'
+      preLoaderRoute: typeof StaffRetururiRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/api/public/img/$': {
       id: '/api/public/img/$'
       path: '/api/public/img/$'
@@ -451,8 +760,10 @@ interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminGuideRoute: typeof AdminGuideRoute
+  AdminMesajeRoute: typeof AdminMesajeRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminRetururiRoute: typeof AdminRetururiRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -460,24 +771,55 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminContentRoute: AdminContentRoute,
   AdminGuideRoute: AdminGuideRoute,
+  AdminMesajeRoute: AdminMesajeRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
+  AdminRetururiRoute: AdminRetururiRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface StaffRouteChildren {
+  StaffCategoriiRoute: typeof StaffCategoriiRoute
+  StaffComenziRoute: typeof StaffComenziRoute
+  StaffContinutRoute: typeof StaffContinutRoute
+  StaffMesajeRoute: typeof StaffMesajeRoute
+  StaffProduseRoute: typeof StaffProduseRoute
+  StaffRetururiRoute: typeof StaffRetururiRoute
+  StaffIndexRoute: typeof StaffIndexRoute
+}
+
+const StaffRouteChildren: StaffRouteChildren = {
+  StaffCategoriiRoute: StaffCategoriiRoute,
+  StaffComenziRoute: StaffComenziRoute,
+  StaffContinutRoute: StaffContinutRoute,
+  StaffMesajeRoute: StaffMesajeRoute,
+  StaffProduseRoute: StaffProduseRoute,
+  StaffRetururiRoute: StaffRetururiRoute,
+  StaffIndexRoute: StaffIndexRoute,
+}
+
+const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AjutorComandaRoute: AjutorComandaRoute,
   CheckoutRoute: CheckoutRoute,
+  ComenzileMeleRoute: ComenzileMeleRoute,
   ConfidentialitateRoute: ConfidentialitateRoute,
+  ContRoute: ContRoute,
   ContactRoute: ContactRoute,
   CosRoute: CosRoute,
   DespreRoute: DespreRoute,
   LivrareRoute: LivrareRoute,
+  MagazinRoute: MagazinRoute,
+  ParolaNouaRoute: ParolaNouaRoute,
   ProduseRoute: ProduseRoute,
   ReturRoute: ReturRoute,
+  RetururiRoute: RetururiRoute,
+  StaffRoute: StaffRouteWithChildren,
   TermeniRoute: TermeniRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,

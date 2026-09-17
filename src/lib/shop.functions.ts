@@ -35,6 +35,61 @@ export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
   .handler(async ({ data }): Promise<PlaceOrderResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { checkRateLimit } = await import("./rate-limit.server");
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+
+    const email = data.customer.email.trim().toLowerCase();
+
+    const throttle = await checkRateLimit("checkout", email, 10, 900);
+    if (!throttle.allowed) {
+      return { ok: false, error: "Prea multe încercări de comandă. Te rugăm să reîncerci mai târziu." };
+    }
+
+    // Identify the signed-in customer from the bearer token, if any.
+    let userId: string | null = null;
+    let userEmail: string | null = null;
+    const authHeader = getRequestHeader("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      const { data: authUser } = await supabaseAdmin.auth.getUser(token);
+      if (authUser?.user) {
+        userId = authUser.user.id;
+        userEmail = authUser.user.email ?? null;
+      }
+    }
+
+    const distinctProducts = new Set(data.lines.map((l) => l.productId)).size;
+
+    if (!userId) {
+      // Guests: configurable distinct-product limit, enforced server-side.
+      const { data: limitRow } = await supabaseAdmin
+        .from("site_settings")
+        .select("value")
+        .eq("key", "guest_cart_max_distinct_products")
+        .maybeSingle();
+      const raw = (limitRow?.value ?? {}) as Record<string, unknown>;
+      const maxDistinct = typeof raw["value"] === "number" ? (raw["value"] as number) : 3;
+      if (distinctProducts > maxDistinct) {
+        return {
+          ok: false,
+          error: `Fără cont poți comanda maximum ${maxDistinct} produse diferite. Creează un cont pentru comenzi nelimitate.`,
+        };
+      }
+
+      // One guest order per email address, enforced in the database.
+      const { data: used } = await supabaseAdmin
+        .from("guest_checkout_usage")
+        .select("email")
+        .eq("email", email)
+        .maybeSingle();
+      if (used) {
+        return {
+          ok: false,
+          error:
+            "Această adresă de e-mail a folosit deja comanda fără cont. Autentifică-te sau creează un cont pentru a comanda din nou.",
+        };
+      }
+    }
 
     // Idempotency: a repeated submit returns the existing order.
     const reference = `chk_${data.idempotencyKey}`;
@@ -164,6 +219,9 @@ export const placeOrder = createServerFn({ method: "POST" })
         county: data.customer.county ?? null,
         postal_code: data.customer.postal_code ?? null,
         notes: data.customer.notes ?? null,
+        user_id: userId,
+        is_guest: !userId,
+        email_verified: !!userId && !!userEmail && userEmail.toLowerCase() === email,
         payment_reference: reference,
         subtotal,
         shipping_total: shipping,
@@ -202,6 +260,12 @@ export const placeOrder = createServerFn({ method: "POST" })
       return { ok: false, error: "Comanda nu a putut fi salvată." };
     }
 
+    if (!userId) {
+      await supabaseAdmin
+        .from("guest_checkout_usage")
+        .upsert({ email, first_order_id: order.id }, { onConflict: "email" });
+    }
+
     return {
       ok: true,
       orderNumber: order.order_number,
@@ -226,7 +290,13 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin
       .from("user_roles")
-      .upsert({ user_id: data.userId, role: "admin" }, { onConflict: "user_id,role" });
+      .upsert(
+        [
+          { user_id: data.userId, role: "owner" as const },
+          { user_id: data.userId, role: "admin" as const },
+        ],
+        { onConflict: "user_id,role" },
+      );
     if (error) return { ok: false, error: "Nu am putut acorda accesul." };
     return { ok: true };
   });

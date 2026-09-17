@@ -1,0 +1,14 @@
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.block_audit_mutation() from public, anon, authenticated;
+revoke execute on function public.audit_product_change() from public, anon, authenticated;
+revoke execute on function public.audit_order_change() from public, anon, authenticated;
+revoke execute on function public.audit_role_change() from public, anon, authenticated;
+revoke execute on function public.set_updated_at() from public, anon, authenticated;
+revoke execute on function public.is_admin() from public;
+revoke execute on function public.is_owner() from public;
+revoke execute on function public.is_staff() from public;
+grant execute on function public.is_admin() to authenticated;
+grant execute on function public.is_owner() to authenticated;
+grant execute on function public.is_staff() to authenticated;
+comment on table public.guest_checkout_usage is 'Server-only table: no policies, reachable only through secure server code.';
+comment on table public.rate_limits is 'Server-only table: no policies, reachable only through secure server code.';
