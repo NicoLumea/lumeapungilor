@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity: string
+          entity_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity: string
+          entity_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -47,6 +80,135 @@ export type Database = {
           slug?: string
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      contact_requests: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string
+          subject: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      content_sections: {
+        Row: {
+          draft: Json
+          key: string
+          published: Json | null
+          published_at: string | null
+          published_by: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          draft?: Json
+          key: string
+          published?: Json | null
+          published_at?: string | null
+          published_by?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          draft?: Json
+          key?: string
+          published?: Json | null
+          published_at?: string | null
+          published_by?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      employee_requests: {
+        Row: {
+          created_at: string
+          decision_note: string | null
+          email: string
+          id: string
+          message: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision_note?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision_note?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      guest_checkout_usage: {
+        Row: {
+          email: string
+          first_order_at: string
+          first_order_id: string | null
+          order_count: number
+        }
+        Insert: {
+          email: string
+          first_order_at?: string
+          first_order_id?: string | null
+          order_count?: number
+        }
+        Update: {
+          email?: string
+          first_order_at?: string
+          first_order_id?: string | null
+          order_count?: number
         }
         Relationships: []
       }
@@ -105,6 +267,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          archived_at: string | null
           billing_address: string | null
           city: string | null
           company_name: string | null
@@ -115,8 +278,10 @@ export type Database = {
           currency: string
           delivery_address: string | null
           email: string
+          email_verified: boolean
           id: string
           internal_notes: string | null
+          is_guest: boolean
           is_test: boolean
           notes: string | null
           order_number: string
@@ -134,6 +299,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          archived_at?: string | null
           billing_address?: string | null
           city?: string | null
           company_name?: string | null
@@ -144,8 +310,10 @@ export type Database = {
           currency?: string
           delivery_address?: string | null
           email: string
+          email_verified?: boolean
           id?: string
           internal_notes?: string | null
+          is_guest?: boolean
           is_test?: boolean
           notes?: string | null
           order_number?: string
@@ -163,6 +331,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          archived_at?: string | null
           billing_address?: string | null
           city?: string | null
           company_name?: string | null
@@ -173,8 +342,10 @@ export type Database = {
           currency?: string
           delivery_address?: string | null
           email?: string
+          email_verified?: boolean
           id?: string
           internal_notes?: string | null
+          is_guest?: boolean
           is_test?: boolean
           notes?: string | null
           order_number?: string
@@ -352,6 +523,176 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          billing_address: string | null
+          city: string | null
+          company_name: string | null
+          county: string | null
+          created_at: string
+          cui: string | null
+          deletion_requested_at: string | null
+          delivery_address: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          postal_code: string | null
+          reg_com: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_address?: string | null
+          city?: string | null
+          company_name?: string | null
+          county?: string | null
+          created_at?: string
+          cui?: string | null
+          deletion_requested_at?: string | null
+          delivery_address?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          postal_code?: string | null
+          reg_com?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_address?: string | null
+          city?: string | null
+          company_name?: string | null
+          county?: string | null
+          created_at?: string
+          cui?: string | null
+          deletion_requested_at?: string | null
+          delivery_address?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          postal_code?: string | null
+          reg_com?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          bucket: string
+          hits: number
+          identifier: string
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          hits?: number
+          identifier: string
+          window_start?: string
+        }
+        Update: {
+          bucket?: string
+          hits?: number
+          identifier?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      return_requests: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          email: string
+          id: string
+          kind: string
+          message: string
+          order_id: string | null
+          order_number: string | null
+          resolution: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          kind?: string
+          message: string
+          order_id?: string | null
+          order_number?: string | null
+          resolution?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          kind?: string
+          message?: string
+          order_id?: string | null
+          order_number?: string | null
+          resolution?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_change_requests: {
+        Row: {
+          candidate_email: string
+          candidate_user_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          requested_by: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          requester_email: string | null
+          status: string
+        }
+        Insert: {
+          candidate_email: string
+          candidate_user_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          requested_by: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          requester_email?: string | null
+          status?: string
+        }
+        Update: {
+          candidate_email?: string
+          candidate_user_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          requested_by?: string
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          requester_email?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           key: string
@@ -364,6 +705,27 @@ export type Database = {
           value?: Json
         }
         Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          is_public: boolean
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          is_public?: boolean
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          is_public?: boolean
           key?: string
           updated_at?: string
           value?: Json
@@ -404,6 +766,17 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_owner: { Args: never; Returns: boolean }
+      is_staff: { Args: never; Returns: boolean }
+      write_audit: {
+        Args: {
+          _action: string
+          _details: Json
+          _entity: string
+          _entity_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "customer" | "employee" | "owner"
