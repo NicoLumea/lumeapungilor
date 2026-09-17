@@ -50,7 +50,7 @@ function Home() {
             {ctaLabel ? (
               <a
                 href={ctaHref}
-                className="micro mt-10 inline-flex border border-foreground px-8 py-4 transition-colors hover:bg-foreground hover:text-background"
+                className="micro mt-7 inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background sm:mt-10 sm:px-8 sm:py-4"
               >
                 {ctaLabel}
               </a>
@@ -69,20 +69,25 @@ function Home() {
       </section>
 
       {(categories ?? []).length > 0 ? (
-        <section className="site-container py-20">
+        <section className="site-container py-8 md:py-20">
           <p className="micro-sm text-muted-foreground">Categorii</p>
-          <div className="mt-8 grid grid-cols-2 gap-x-[clamp(16px,2vw,32px)] gap-y-10 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 md:mt-8 md:gap-x-[clamp(16px,2vw,32px)] md:gap-y-10 lg:grid-cols-4">
             {(categories ?? []).map((c) => {
               const img = imageUrl(c.image_url);
               return (
-                <Link key={c.id} to="/categorie/$slug" params={{ slug: c.slug }} className="group block">
-                  <div className="product-field">
+                <Link
+                  key={c.id}
+                  to="/categorie/$slug"
+                  params={{ slug: c.slug }}
+                  className="group block min-w-0 active:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-field">
                     {img ? (
                       <img
                         src={img}
                         alt={c.name}
                         loading="lazy"
-                        className="absolute inset-0 size-full object-contain p-6 transition-transform duration-500 group-hover:scale-[1.02]"
+                        className="absolute inset-0 size-full object-contain p-3 transition-transform duration-500 motion-reduce:transition-none sm:p-6 sm:group-hover:scale-[1.02]"
                       />
                     ) : (
                       <div className="flex size-full items-center justify-center">
@@ -90,9 +95,11 @@ function Home() {
                       </div>
                     )}
                   </div>
-                  <p className="micro mt-3">{c.name}</p>
+                  <p className="mt-2 line-clamp-2 min-h-8 text-center text-xs font-medium uppercase leading-4 sm:mt-3 sm:text-left sm:text-[0.6875rem] sm:leading-[1.2]">
+                    {c.name}
+                  </p>
                   {c.description ? (
-                    <p className="mt-1 text-sm text-muted-foreground">{c.description}</p>
+                    <p className="mt-1 hidden text-sm text-muted-foreground md:block">{c.description}</p>
                   ) : null}
                 </Link>
               );
@@ -103,7 +110,7 @@ function Home() {
 
       {edTitle || edBody || edImage ? (
         <section className="rule-t">
-          <div className="site-container grid items-center gap-12 py-24 md:grid-cols-2">
+          <div className="site-container grid items-center gap-8 py-8 md:grid-cols-2 md:gap-12 md:py-24">
             <div>
               {edTitle ? <h2 className="display text-3xl md:text-5xl">{edTitle}</h2> : null}
               {edBody ? (
@@ -113,7 +120,7 @@ function Home() {
               ) : null}
               <Link
                 to="/produse"
-                className="micro mt-10 inline-flex border border-foreground px-8 py-4 transition-colors hover:bg-foreground hover:text-background"
+                className="micro mt-7 inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background sm:mt-10 sm:px-8 sm:py-4"
               >
                 Vezi catalogul
               </Link>
