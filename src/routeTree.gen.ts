@@ -28,6 +28,7 @@ import { Route as RetururiRouteImport } from './routes/retururi'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
@@ -142,6 +143,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
@@ -329,6 +337,7 @@ export interface FileRoutesById {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
@@ -370,6 +379,7 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
+    | '/admin/audit'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/retur'
     | '/retururi'
     | '/termeni'
+    | '/admin/audit'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
+    | '/admin/audit'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/guide'
@@ -627,6 +639,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -757,6 +776,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminGuideRoute: typeof AdminGuideRoute
@@ -768,6 +788,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminContentRoute: AdminContentRoute,
   AdminGuideRoute: AdminGuideRoute,
