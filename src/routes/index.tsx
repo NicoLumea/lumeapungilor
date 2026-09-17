@@ -81,7 +81,7 @@ function Home() {
                   params={{ slug: c.slug }}
                   className="group block min-w-0 active:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden bg-field">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
                     {img ? (
                       <img
                         src={img}
