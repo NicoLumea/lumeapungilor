@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ComenzileMeleRouteImport } from './routes/comenzile-mele'
 import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
 import { Route as ContRouteImport } from './routes/cont'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -21,6 +22,7 @@ import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ReturRouteImport } from './routes/retur'
+import { Route as RetururiRouteImport } from './routes/retururi'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -46,6 +48,11 @@ const AdminRoute = AdminRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComenzileMeleRoute = ComenzileMeleRouteImport.update({
+  id: '/comenzile-mele',
+  path: '/comenzile-mele',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfidentialitateRoute = ConfidentialitateRouteImport.update({
@@ -91,6 +98,11 @@ const ProduseRoute = ProduseRouteImport.update({
 const ReturRoute = ReturRouteImport.update({
   id: '/retur',
   path: '/retur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetururiRoute = RetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermeniRoute = TermeniRouteImport.update({
@@ -153,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
+  '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
   '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
@@ -162,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/magazin': typeof MagazinRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
+  '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
@@ -177,6 +191,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout': typeof CheckoutRoute
+  '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
   '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
@@ -186,6 +201,7 @@ export interface FileRoutesByTo {
   '/magazin': typeof MagazinRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
+  '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
@@ -203,6 +219,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
+  '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
   '/cont': typeof ContRoute
   '/contact': typeof ContactRoute
@@ -212,6 +229,7 @@ export interface FileRoutesById {
   '/magazin': typeof MagazinRoute
   '/produse': typeof ProduseRoute
   '/retur': typeof ReturRoute
+  '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
@@ -230,6 +248,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/checkout'
+    | '/comenzile-mele'
     | '/confidentialitate'
     | '/cont'
     | '/contact'
@@ -239,6 +258,7 @@ export interface FileRouteTypes {
     | '/magazin'
     | '/produse'
     | '/retur'
+    | '/retururi'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
@@ -254,6 +274,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/checkout'
+    | '/comenzile-mele'
     | '/confidentialitate'
     | '/cont'
     | '/contact'
@@ -263,6 +284,7 @@ export interface FileRouteTypes {
     | '/magazin'
     | '/produse'
     | '/retur'
+    | '/retururi'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
@@ -279,6 +301,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/checkout'
+    | '/comenzile-mele'
     | '/confidentialitate'
     | '/cont'
     | '/contact'
@@ -288,6 +311,7 @@ export interface FileRouteTypes {
     | '/magazin'
     | '/produse'
     | '/retur'
+    | '/retururi'
     | '/termeni'
     | '/admin/categories'
     | '/admin/content'
@@ -305,6 +329,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
+  ComenzileMeleRoute: typeof ComenzileMeleRoute
   ConfidentialitateRoute: typeof ConfidentialitateRoute
   ContRoute: typeof ContRoute
   ContactRoute: typeof ContactRoute
@@ -314,6 +339,7 @@ export interface RootRouteChildren {
   MagazinRoute: typeof MagazinRoute
   ProduseRoute: typeof ProduseRoute
   ReturRoute: typeof ReturRoute
+  RetururiRoute: typeof RetururiRoute
   TermeniRoute: typeof TermeniRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
@@ -342,6 +368,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comenzile-mele': {
+      id: '/comenzile-mele'
+      path: '/comenzile-mele'
+      fullPath: '/comenzile-mele'
+      preLoaderRoute: typeof ComenzileMeleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/confidentialitate': {
@@ -405,6 +438,13 @@ declare module '@tanstack/react-router' {
       path: '/retur'
       fullPath: '/retur'
       preLoaderRoute: typeof ReturRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retururi': {
+      id: '/retururi'
+      path: '/retururi'
+      fullPath: '/retururi'
+      preLoaderRoute: typeof RetururiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/termeni': {
@@ -511,6 +551,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
+  ComenzileMeleRoute: ComenzileMeleRoute,
   ConfidentialitateRoute: ConfidentialitateRoute,
   ContRoute: ContRoute,
   ContactRoute: ContactRoute,
@@ -520,6 +561,7 @@ const rootRouteChildren: RootRouteChildren = {
   MagazinRoute: MagazinRoute,
   ProduseRoute: ProduseRoute,
   ReturRoute: ReturRoute,
+  RetururiRoute: RetururiRoute,
   TermeniRoute: TermeniRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
