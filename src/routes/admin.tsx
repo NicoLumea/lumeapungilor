@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdmin } from "@/lib/use-admin";
+import { useAuth } from "@/lib/use-auth";
 import { claimOwnerAccess } from "@/lib/shop.functions";
 
 export const Route = createFileRoute("/admin")({
@@ -19,17 +19,23 @@ export const Route = createFileRoute("/admin")({
 });
 
 const NAV: { to: string; label: string; exact: boolean }[] = [
-  { to: "/admin", label: "Panou", exact: true },
+  { to: "/admin", label: "Prezentare", exact: true },
   { to: "/admin/products", label: "Produse", exact: false },
   { to: "/admin/categories", label: "Categorii", exact: false },
-  { to: "/admin/content", label: "Conținut site", exact: false },
   { to: "/admin/orders", label: "Comenzi", exact: false },
+  { to: "/admin/clienti", label: "Clienți", exact: false },
+  { to: "/admin/roluri", label: "Angajați și accese", exact: false },
+  { to: "/admin/retururi", label: "Retururi", exact: false },
+  { to: "/admin/mesaje", label: "Mesaje", exact: false },
+  { to: "/admin/content", label: "Conținut site", exact: false },
+  { to: "/admin/setari", label: "Setări", exact: false },
+  { to: "/admin/audit", label: "Jurnal de audit", exact: false },
   { to: "/admin/guide", label: "Ghid", exact: false },
 ];
 
 
 function AdminLayout() {
-  const { user, isAdmin, loading, refresh } = useAdmin();
+  const { user, isAdmin, loading, refresh } = useAuth();
 
   if (loading) {
     return <p className="py-32 text-center text-sm text-muted-foreground">Se încarcă…</p>;
