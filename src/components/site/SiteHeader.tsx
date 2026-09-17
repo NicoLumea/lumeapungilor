@@ -1,15 +1,33 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, Search, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
+import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const { count } = useCart();
   const { data: categories } = useCategories();
   const { data: content } = useContent();
   const [open, setOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    let scheduled = false;
+    const update = () => {
+      setCompact(window.scrollY > 72);
+      scheduled = false;
+    };
+    const onScroll = () => {
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const company = content?.["company"];
   const name = text(company, "name") ?? "Lumea Pungilor";
@@ -28,8 +46,13 @@ export function SiteHeader() {
   ));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <div className="site-container grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 lg:flex">
+    <header
+      className={cn(
+        "site-header sticky top-0 z-40 border-b",
+        compact ? "is-compact border-foreground/10 bg-background/90 backdrop-blur-[10px]" : "border-border bg-background",
+      )}
+    >
+      <div className="site-header-inner site-container grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 lg:flex">
         <div className="flex min-w-0 items-center gap-[clamp(18px,1.8vw,32px)] lg:shrink-0">
           <button
             type="button"
