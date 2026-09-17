@@ -28,13 +28,17 @@ import { Route as RetururiRouteImport } from './routes/retururi'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminClientiRouteImport } from './routes/admin.clienti'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminGuideRouteImport } from './routes/admin.guide'
 import { Route as AdminMesajeRouteImport } from './routes/admin.mesaje'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminRetururiRouteImport } from './routes/admin.retururi'
+import { Route as AdminRoluriRouteImport } from './routes/admin.roluri'
+import { Route as AdminSetariRouteImport } from './routes/admin.setari'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
@@ -142,9 +146,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClientiRoute = AdminClientiRouteImport.update({
+  id: '/clienti',
+  path: '/clienti',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminContentRoute = AdminContentRouteImport.update({
@@ -175,6 +189,16 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
 const AdminRetururiRoute = AdminRetururiRouteImport.update({
   id: '/retururi',
   path: '/retururi',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRoluriRoute = AdminRoluriRouteImport.update({
+  id: '/roluri',
+  path: '/roluri',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSetariRoute = AdminSetariRouteImport.update({
+  id: '/setari',
+  path: '/setari',
   getParentRoute: () => AdminRoute,
 } as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
@@ -252,13 +276,17 @@ export interface FileRoutesByFullPath {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/clienti': typeof AdminClientiRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
   '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/retururi': typeof AdminRetururiRoute
+  '/admin/roluri': typeof AdminRoluriRoute
+  '/admin/setari': typeof AdminSetariRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -289,13 +317,17 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/clienti': typeof AdminClientiRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
   '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/retururi': typeof AdminRetururiRoute
+  '/admin/roluri': typeof AdminRoluriRoute
+  '/admin/setari': typeof AdminSetariRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -329,13 +361,17 @@ export interface FileRoutesById {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/clienti': typeof AdminClientiRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/guide': typeof AdminGuideRoute
   '/admin/mesaje': typeof AdminMesajeRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/retururi': typeof AdminRetururiRoute
+  '/admin/roluri': typeof AdminRoluriRoute
+  '/admin/setari': typeof AdminSetariRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -370,13 +406,17 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
+    | '/admin/audit'
     | '/admin/categories'
+    | '/admin/clienti'
     | '/admin/content'
     | '/admin/guide'
     | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/retururi'
+    | '/admin/roluri'
+    | '/admin/setari'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -407,13 +447,17 @@ export interface FileRouteTypes {
     | '/retur'
     | '/retururi'
     | '/termeni'
+    | '/admin/audit'
     | '/admin/categories'
+    | '/admin/clienti'
     | '/admin/content'
     | '/admin/guide'
     | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/retururi'
+    | '/admin/roluri'
+    | '/admin/setari'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -446,13 +490,17 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
+    | '/admin/audit'
     | '/admin/categories'
+    | '/admin/clienti'
     | '/admin/content'
     | '/admin/guide'
     | '/admin/mesaje'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/retururi'
+    | '/admin/roluri'
+    | '/admin/setari'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -627,11 +675,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
       fullPath: '/admin/categories'
       preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clienti': {
+      id: '/admin/clienti'
+      path: '/clienti'
+      fullPath: '/admin/clienti'
+      preLoaderRoute: typeof AdminClientiRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/content': {
@@ -674,6 +736,20 @@ declare module '@tanstack/react-router' {
       path: '/retururi'
       fullPath: '/admin/retururi'
       preLoaderRoute: typeof AdminRetururiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/roluri': {
+      id: '/admin/roluri'
+      path: '/roluri'
+      fullPath: '/admin/roluri'
+      preLoaderRoute: typeof AdminRoluriRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/setari': {
+      id: '/admin/setari'
+      path: '/setari'
+      fullPath: '/admin/setari'
+      preLoaderRoute: typeof AdminSetariRouteImport
       parentRoute: typeof AdminRoute
     }
     '/categorie/$slug': {
@@ -757,24 +833,32 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminClientiRoute: typeof AdminClientiRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminGuideRoute: typeof AdminGuideRoute
   AdminMesajeRoute: typeof AdminMesajeRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminRetururiRoute: typeof AdminRetururiRoute
+  AdminRoluriRoute: typeof AdminRoluriRoute
+  AdminSetariRoute: typeof AdminSetariRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminClientiRoute: AdminClientiRoute,
   AdminContentRoute: AdminContentRoute,
   AdminGuideRoute: AdminGuideRoute,
   AdminMesajeRoute: AdminMesajeRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminRetururiRoute: AdminRetururiRoute,
+  AdminRoluriRoute: AdminRoluriRoute,
+  AdminSetariRoute: AdminSetariRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

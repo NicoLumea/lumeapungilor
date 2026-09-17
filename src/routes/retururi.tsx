@@ -31,7 +31,7 @@ const STATUS_LABEL: Record<string, string> = {
   respins: "Respins",
 };
 
-function MyReturns({ userId, email }: { userId: string; email: string }) {
+function MyReturns({ userId }: { userId: string; email: string }) {
   const qc = useQueryClient();
   const { data, isLoading } = useMyReturns(userId);
   const submit = useServerFn(submitReturnRequest);
@@ -44,8 +44,7 @@ function MyReturns({ userId, email }: { userId: string; email: string }) {
     try {
       const res = await submit({
         data: {
-          orderNumber: form.orderNumber || undefined,
-          email,
+          orderNumber: form.orderNumber,
           kind: form.kind as "retur",
           message: form.message,
         },
@@ -71,8 +70,9 @@ function MyReturns({ userId, email }: { userId: string; email: string }) {
 
       <form onSubmit={onSubmit} className="mt-8 max-w-xl space-y-5 border border-border p-6">
         <label className="block">
-          <span className="micro-sm text-muted-foreground">Număr comandă (opțional)</span>
+          <span className="micro-sm text-muted-foreground">Număr comandă</span>
           <input
+            required
             value={form.orderNumber}
             onChange={(e) => setForm((f) => ({ ...f, orderNumber: e.target.value }))}
             className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"

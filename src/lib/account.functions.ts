@@ -361,6 +361,45 @@ export const submitReturnRequest = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Guests keep their legal return/complaint rights: order number + email proves ownership. */
+export const submitGuestReturnRequest = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        orderNumber: z.string().trim().min(3).max(40),
+        email: z.string().trim().email().max(200),
+        kind: z.enum(["retur", "retragere", "reclamatie", "defect"]),
+        message: z.string().trim().min(10).max(2000),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }): Promise<ActionResult> => {
+    const { checkRateLimit } = await import("./rate-limit.server");
+    const limit = await checkRateLimit("guest_return", data.email, 5, 3600);
+    if (!limit.allowed)
+      return { ok: false, error: "Prea multe cereri. Te rugăm să reîncerci mai târziu." };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: order } = await supabaseAdmin
+      .from("orders")
+      .select("id, user_id, email")
+      .eq("order_number", data.orderNumber.trim().toUpperCase())
+      .ilike("email", data.email)
+      .maybeSingle();
+    if (!order) return { ok: false, error: "Nu am găsit o comandă cu aceste date." };
+
+    const { error } = await supabaseAdmin.from("return_requests").insert({
+      order_id: order.id,
+      order_number: data.orderNumber.trim().toUpperCase(),
+      user_id: order.user_id,
+      email: data.email,
+      kind: data.kind,
+      message: data.message,
+    });
+    if (error) return { ok: false, error: "Cererea nu a putut fi trimisă." };
+    return { ok: true };
+  });
+
 export const submitContactRequest = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z

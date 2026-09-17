@@ -5,8 +5,10 @@ import { useCart } from "@/lib/cart";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/use-auth";
 
 export function SiteHeader() {
+  const auth = useAuth();
   const { count } = useCart();
   const { data: categories } = useCategories();
   const { data: content } = useContent();
@@ -82,6 +84,15 @@ export function SiteHeader() {
           <Link to="/produse" aria-label="Caută" className="hidden shrink-0 lg:block">
             <Search className="size-4" />
           </Link>
+          {auth.user ? (
+            <Link to="/cont" className="micro hidden shrink-0 link-underline sm:block">
+              Contul meu
+            </Link>
+          ) : (
+            <Link to="/" hash="cont" className="micro hidden shrink-0 link-underline sm:block">
+              Cont
+            </Link>
+          )}
           <Link to="/cos" className="micro shrink-0 link-underline">
             Coș ({count})
           </Link>
