@@ -49,9 +49,25 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
     title: "Livrare, TVA și plăți",
     note: "Aceste valori se folosesc la calculul comenzii.",
     fields: [
-      { name: "shipping_flat", label: "Cost livrare (RON)", kind: "number", hint: "Lasă gol dacă se stabilește manual." },
+      {
+        name: "shipping_flat",
+        label: "Cost livrare (RON)",
+        kind: "number",
+        hint: "Lasă gol dacă se stabilește manual.",
+      },
       { name: "free_shipping_over", label: "Livrare gratuită peste (RON)", kind: "number" },
-      { name: "vat_rate", label: "Cotă TVA (%)", kind: "number", hint: "Lasă gol dacă prețurile includ deja TVA." },
+      {
+        name: "vat_rate",
+        label: "Cotă TVA (%)",
+        kind: "number",
+        hint: "Completează cota aplicabilă; este necesară și pentru prețurile cu TVA inclus.",
+      },
+      { name: "prices_include_vat", label: "Prețurile produselor includ TVA", kind: "boolean" },
+      {
+        name: "shipping_taxable",
+        label: "Livrarea este taxabilă cu aceeași cotă TVA",
+        kind: "boolean",
+      },
       {
         name: "payments_configured",
         label: "Plăți online activate",

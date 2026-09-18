@@ -6,6 +6,8 @@ import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
 import { normalizeQty, sortedImages } from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/use-auth";
+import { useGuestCartLimit } from "@/lib/dashboard-data";
 
 export const Route = createFileRoute("/produs/$slug")({
   head: ({ params }) => ({
@@ -22,7 +24,9 @@ export const Route = createFileRoute("/produs/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const { data: product, isLoading } = useProduct(slug);
-  const { add } = useCart();
+  const { add, lines: cartLines } = useCart();
+  const auth = useAuth();
+  const { data: guestLimit } = useGuestCartLimit();
   const [active, setActive] = useState(0);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [qty, setQty] = useState<number | null>(null);
@@ -57,13 +61,35 @@ function ProductPage() {
   const step = Math.max(1, product.qty_increment || 1);
   const quantity = qty ?? min;
   const perPiece =
-    product.units_per_pack && product.units_per_pack > 0 ? unitPrice / product.units_per_pack : null;
+    product.units_per_pack && product.units_per_pack > 0
+      ? unitPrice / product.units_per_pack
+      : null;
 
   function addToCart() {
     if (!product) return;
+    if (variants.length > 0 && !variantId) {
+      toast.error("Selectează o variantă.");
+      return;
+    }
     const safeQty = normalizeQty(product, quantity);
-    if (product.track_stock && safeQty > stock) {
+    if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100000) {
+      toast.error("Introdu o cantitate validă de seturi.");
+      return;
+    }
+    const existingQty =
+      cartLines.find((line) => line.productId === product.id && line.variantId === variantId)
+        ?.qty ?? 0;
+    if (product.track_stock && safeQty + existingQty > stock) {
       toast.error("Stoc insuficient pentru cantitatea aleasă.");
+      return;
+    }
+    if (
+      !auth.user &&
+      !cartLines.some((line) => line.productId === product.id) &&
+      typeof guestLimit === "number" &&
+      new Set(cartLines.map((line) => line.productId)).size >= guestLimit
+    ) {
+      toast.error(`Fără cont poți adăuga maximum ${guestLimit} produse diferite.`);
       return;
     }
     add({ productId: product.id, variantId, qty: safeQty });
@@ -115,7 +141,10 @@ function ProductPage() {
                 <button
                   key={img.id}
                   type="button"
-                  onClick={() => { setActive(i); setMainFailed(false); }}
+                  onClick={() => {
+                    setActive(i);
+                    setMainFailed(false);
+                  }}
                   aria-label={`Imaginea ${i + 1}`}
                   aria-current={i === active}
                   className="size-20 border bg-field p-2"
@@ -163,7 +192,9 @@ function ProductPage() {
                 onChange={(e) => setVariantId(e.target.value || null)}
                 className="mt-2 w-full border border-input bg-background px-3 py-3 text-sm outline-none focus:border-foreground"
               >
-                <option value="">Standard</option>
+                <option value="" disabled>
+                  Alege o variantă
+                </option>
                 {variants.map((v) => (
                   <option key={v.id} value={v.id}>
                     {v.name}

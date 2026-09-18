@@ -1,16 +1,27 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  addCartLine,
+  CART_STORAGE_KEY,
+  normalizeCart,
+  parseCartStorage,
+  updateCartQty,
+  type CartLine,
+} from "./cart-data";
 
-export type CartLine = {
-  productId: string;
-  variantId: string | null;
-  qty: number;
-};
-
-const STORAGE_KEY = "lp-cart-v1";
+export type { CartLine } from "./cart-data";
 
 type CartContextValue = {
   lines: CartLine[];
   count: number;
+  ready: boolean;
   add: (line: CartLine) => void;
   setQty: (productId: string, variantId: string | null, qty: number) => void;
   remove: (productId: string, variantId: string | null) => void;
@@ -29,35 +40,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setLines(JSON.parse(raw) as CartLine[]);
+      const current = localStorage.getItem(CART_STORAGE_KEY);
+      if (current) setLines(parseCartStorage(current));
+      else setLines(normalizeCart(JSON.parse(localStorage.getItem("lp-cart-v1") || "[]")));
     } catch {
-      /* ignore malformed cart */
+      setLines([]);
     }
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ version: 2, lines }));
+      localStorage.removeItem("lp-cart-v1");
+    } catch {
+      /* Storage can be unavailable in private browsing. The in-memory cart still works. */
+    }
   }, [lines, hydrated]);
 
   const add = useCallback((line: CartLine) => {
-    setLines((prev) => {
-      const existing = prev.find((l) => sameLine(l, line.productId, line.variantId));
-      if (existing) {
-        return prev.map((l) =>
-          sameLine(l, line.productId, line.variantId) ? { ...l, qty: l.qty + line.qty } : l,
-        );
-      }
-      return [...prev, { ...line, variantId: line.variantId ?? null }];
-    });
+    setLines((prev) => addCartLine(prev, line));
   }, []);
 
   const setQty = useCallback((productId: string, variantId: string | null, qty: number) => {
-    setLines((prev) =>
-      prev.map((l) => (sameLine(l, productId, variantId) ? { ...l, qty } : l)),
-    );
+    setLines((prev) => updateCartQty(prev, productId, variantId, qty));
   }, []);
 
   const remove = useCallback((productId: string, variantId: string | null) => {
@@ -70,12 +77,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => ({
       lines,
       count: lines.reduce((sum, l) => sum + l.qty, 0),
+      ready: hydrated,
       add,
       setQty,
       remove,
       clear,
     }),
-    [lines, add, setQty, remove, clear],
+    [lines, hydrated, add, setQty, remove, clear],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

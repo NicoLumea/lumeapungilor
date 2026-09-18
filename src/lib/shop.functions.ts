@@ -1,35 +1,69 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { checkoutCustomerSchema, normalizedCustomer } from "./checkout-schema";
 
 const lineSchema = z.object({
   productId: z.string().uuid(),
-  variantId: z.string().uuid().nullable().optional(),
+  variantId: z.string().uuid().nullable(),
   qty: z.number().int().positive().max(100000),
 });
-
-const orderSchema = z.object({
-  idempotencyKey: z.string().min(8).max(80),
-  expectedTotal: z.number().nonnegative().optional(),
-  customer: z.object({
-    contact_name: z.string().trim().min(2).max(120),
-    email: z.string().trim().email().max(200),
-    phone: z.string().trim().max(40).optional().nullable(),
-    company_name: z.string().trim().max(160).optional().nullable(),
-    cui: z.string().trim().max(40).optional().nullable(),
-    reg_com: z.string().trim().max(60).optional().nullable(),
-    billing_address: z.string().trim().max(400).optional().nullable(),
-    delivery_address: z.string().trim().max(400).optional().nullable(),
-    city: z.string().trim().max(120).optional().nullable(),
-    county: z.string().trim().max(120).optional().nullable(),
-    postal_code: z.string().trim().max(20).optional().nullable(),
-    notes: z.string().trim().max(1000).optional().nullable(),
-  }),
-  lines: z.array(lineSchema).min(1).max(100),
-});
+const orderSchema = z
+  .object({
+    idempotencyKey: z.string().uuid(),
+    expectedTotal: z.number().finite().nonnegative().optional(),
+    customer: checkoutCustomerSchema,
+    lines: z.array(lineSchema).min(1).max(100),
+  })
+  .superRefine((value, context) => {
+    const seen = new Set<string>();
+    for (const [index, line] of value.lines.entries()) {
+      const key = `${line.productId}:${line.variantId ?? "standard"}`;
+      if (seen.has(key)) {
+        context.addIssue({
+          code: "custom",
+          path: ["lines", index],
+          message: "Produsul apare de două ori în coș.",
+        });
+      }
+      seen.add(key);
+    }
+  });
 
 export type PlaceOrderResult =
-  | { ok: true; orderNumber: string; total: number; isTest: boolean }
-  | { ok: false; error: string };
+  | { ok: true; orderNumber: string; token: string; total: number; isTest: true }
+  | { ok: false; error: string; refreshCart?: boolean };
+
+const ORDER_ERRORS: Record<string, { error: string; refreshCart?: boolean }> = {
+  EMPTY_CART: { error: "Coșul este gol." },
+  INVALID_CUSTOMER: { error: "Verifică datele de contact și adresa." },
+  GUEST_LIMIT: { error: "Ai prea multe produse diferite pentru o comandă fără cont." },
+  GUEST_USED: {
+    error:
+      "Această adresă de e-mail a fost deja folosită pentru o comandă fără cont. Autentifică-te pentru a comanda din nou.",
+  },
+  CHECKOUT_CONFIG_MISSING: {
+    error:
+      "Finalizarea comenzii este temporar indisponibilă. Configurația de livrare și TVA trebuie completată.",
+  },
+  CHECKOUT_CONFIG_INVALID: {
+    error:
+      "Finalizarea comenzii este temporar indisponibilă. Configurația de livrare și TVA trebuie verificată.",
+  },
+  PRODUCT_UNAVAILABLE: { error: "Un produs din coș nu mai este disponibil.", refreshCart: true },
+  VARIANT_UNAVAILABLE: { error: "O variantă din coș nu mai este disponibilă.", refreshCart: true },
+  VARIANT_REQUIRED: { error: "Selectează o variantă pentru fiecare produs.", refreshCart: true },
+  STOCK_CHANGED: { error: "Stocul s-a modificat. Verifică din nou coșul.", refreshCart: true },
+  PRICE_CHANGED: {
+    error:
+      "Prețul sau costul livrării s-a modificat. Verifică noul total înainte de a trimite comanda.",
+    refreshCart: true,
+  },
+  INVALID_QUANTITY: { error: "Verifică numărul de seturi din coș.", refreshCart: true },
+  IDEMPOTENCY_CONFLICT: {
+    error:
+      "Această încercare de comandă a fost deja folosită. Reîncarcă pagina și încearcă din nou.",
+  },
+};
 
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
@@ -39,238 +73,101 @@ export const placeOrder = createServerFn({ method: "POST" })
     const { getRequestHeader } = await import("@tanstack/react-start/server");
 
     const email = data.customer.email.trim().toLowerCase();
-
-    const throttle = await checkRateLimit("checkout", email, 10, 900);
+    const throttle = await checkRateLimit("checkout", email, 20, 900);
     if (!throttle.allowed) {
-      return { ok: false, error: "Prea multe încercări de comandă. Te rugăm să reîncerci mai târziu." };
-    }
-
-    // Identify the signed-in customer from the bearer token, if any.
-    let userId: string | null = null;
-    let userEmail: string | null = null;
-    const authHeader = getRequestHeader("authorization");
-    if (authHeader?.startsWith("Bearer ")) {
-      const token = authHeader.slice(7);
-      const { data: authUser } = await supabaseAdmin.auth.getUser(token);
-      if (authUser?.user) {
-        userId = authUser.user.id;
-        userEmail = authUser.user.email ?? null;
-      }
-    }
-
-    const distinctProducts = new Set(data.lines.map((l) => l.productId)).size;
-
-    if (!userId) {
-      // Guests: configurable distinct-product limit, enforced server-side.
-      const { data: limitRow } = await supabaseAdmin
-        .from("site_settings")
-        .select("value")
-        .eq("key", "guest_cart_max_distinct_products")
-        .maybeSingle();
-      const raw = (limitRow?.value ?? {}) as Record<string, unknown>;
-      const maxDistinct = typeof raw["value"] === "number" ? (raw["value"] as number) : 3;
-      if (distinctProducts > maxDistinct) {
-        return {
-          ok: false,
-          error: `Fără cont poți comanda maximum ${maxDistinct} produse diferite. Creează un cont pentru comenzi nelimitate.`,
-        };
-      }
-
-      // One guest order per email address, enforced in the database.
-      const { data: used } = await supabaseAdmin
-        .from("guest_checkout_usage")
-        .select("email")
-        .eq("email", email)
-        .maybeSingle();
-      if (used) {
-        return {
-          ok: false,
-          error:
-            "Această adresă de e-mail a folosit deja comanda fără cont. Autentifică-te sau creează un cont pentru a comanda din nou.",
-        };
-      }
-    }
-
-    // Idempotency: a repeated submit returns the existing order.
-    const reference = `chk_${data.idempotencyKey}`;
-    const existing = await supabaseAdmin
-      .from("orders")
-      .select("order_number,total,is_test")
-      .eq("payment_reference", reference)
-      .maybeSingle();
-    if (existing.data) {
-      return {
-        ok: true,
-        orderNumber: existing.data.order_number,
-        total: Number(existing.data.total),
-        isTest: existing.data.is_test,
-      };
-    }
-
-    const ids = [...new Set(data.lines.map((l) => l.productId))];
-    const { data: products, error: pErr } = await supabaseAdmin
-      .from("products")
-      .select("*, product_variants(*)")
-      .in("id", ids);
-    if (pErr) return { ok: false, error: "Nu am putut verifica produsele." };
-
-    type OrderItemInsert = {
-      product_id: string;
-      variant_id: string | null;
-      product_name: string;
-      variant_name: string | null;
-      sku: string | null;
-      selling_unit: string | null;
-      units_per_pack: number | null;
-      quantity: number;
-      unit_price: number;
-      line_total: number;
-    };
-    const items: OrderItemInsert[] = [];
-    let subtotal = 0;
-
-    for (const line of data.lines) {
-      const product = (products ?? []).find((p) => p.id === line.productId);
-      if (!product || product.status !== "published" || product.is_archived) {
-        return { ok: false, error: "Un produs din coș nu mai este disponibil." };
-      }
-      const min = Math.max(1, product.min_order_qty || 1);
-      const step = Math.max(1, product.qty_increment || 1);
-      if (line.qty < min || (line.qty - min) % step !== 0) {
-        return {
-          ok: false,
-          error: `Cantitatea pentru „${product.name}” trebuie să pornească de la ${min} și să crească din ${step} în ${step}.`,
-        };
-      }
-
-      const variants = (product.product_variants ?? []) as Array<{
-        id: string;
-        name: string;
-        sku: string | null;
-        price: number | null;
-        stock: number;
-      }>;
-      const variant = line.variantId ? variants.find((v) => v.id === line.variantId) : null;
-      if (line.variantId && !variant) {
-        return { ok: false, error: "O opțiune selectată nu mai există." };
-      }
-
-      const stock = variant ? variant.stock : product.stock;
-      if (product.track_stock && line.qty > stock) {
-        return { ok: false, error: `Stoc insuficient pentru „${product.name}”.` };
-      }
-
-      const unitPrice = Number(variant?.price ?? product.price);
-      const lineTotal = Math.round(unitPrice * line.qty * 100) / 100;
-      subtotal += lineTotal;
-
-      items.push({
-        product_id: product.id,
-        variant_id: variant?.id ?? null,
-        product_name: product.name,
-        variant_name: variant?.name ?? null,
-        sku: variant?.sku ?? product.sku,
-        selling_unit: product.selling_unit,
-        units_per_pack: product.units_per_pack,
-        quantity: line.qty,
-        unit_price: unitPrice,
-        line_total: lineTotal,
-      });
-    }
-
-    subtotal = Math.round(subtotal * 100) / 100;
-
-    const { data: settingsRow } = await supabaseAdmin
-      .from("site_content")
-      .select("value")
-      .eq("key", "settings")
-      .maybeSingle();
-    const settings = (settingsRow?.value ?? {}) as Record<string, unknown>;
-    const toNum = (v: unknown) => (typeof v === "number" ? v : typeof v === "string" && v !== "" && Number.isFinite(Number(v)) ? Number(v) : null);
-
-    const flat = toNum(settings["shipping_flat"]);
-    const freeOver = toNum(settings["free_shipping_over"]);
-    const vatRate = toNum(settings["vat_rate"]);
-    const paymentsConfigured = settings["payments_configured"] === true;
-
-    const shipping = flat === null ? 0 : freeOver !== null && subtotal >= freeOver ? 0 : flat;
-    const tax = vatRate === null ? 0 : Math.round(subtotal * (vatRate / 100) * 100) / 100;
-    const total = Math.round((subtotal + shipping + tax) * 100) / 100;
-
-    if (data.expectedTotal !== undefined && Math.abs(data.expectedTotal - total) > 0.01) {
       return {
         ok: false,
-        error: "Prețurile s-au actualizat între timp. Te rugăm să reîncarci coșul.",
+        error: "Prea multe încercări de comandă. Te rugăm să reîncerci mai târziu.",
       };
     }
 
-    const { data: order, error: oErr } = await supabaseAdmin
-      .from("orders")
-      .insert({
-        contact_name: data.customer.contact_name,
-        email: data.customer.email,
-        phone: data.customer.phone ?? null,
-        company_name: data.customer.company_name ?? null,
-        cui: data.customer.cui ?? null,
-        reg_com: data.customer.reg_com ?? null,
-        billing_address: data.customer.billing_address ?? null,
-        delivery_address: data.customer.delivery_address ?? null,
-        city: data.customer.city ?? null,
-        county: data.customer.county ?? null,
-        postal_code: data.customer.postal_code ?? null,
-        notes: data.customer.notes ?? null,
-        user_id: userId,
-        is_guest: !userId,
-        email_verified: !!userId && !!userEmail && userEmail.toLowerCase() === email,
-        payment_reference: reference,
-        subtotal,
-        shipping_total: shipping,
-        tax_total: tax,
-        total,
-        is_test: !paymentsConfigured,
-        status: "nou",
-        payment_status: paymentsConfigured ? "in_asteptare" : "neplatit",
-      })
-      .select("id, order_number, total, is_test")
-      .single();
-
-    if (oErr || !order) {
-      // Unique violation means a parallel submit already created it.
-      const retry = await supabaseAdmin
-        .from("orders")
-        .select("order_number,total,is_test")
-        .eq("payment_reference", reference)
-        .maybeSingle();
-      if (retry.data) {
-        return {
-          ok: true,
-          orderNumber: retry.data.order_number,
-          total: Number(retry.data.total),
-          isTest: retry.data.is_test,
-        };
+    let userId: string | null = null;
+    const authHeader = getRequestHeader("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.getUser(
+        authHeader.slice(7),
+      );
+      if (authError || !authUser.user) {
+        return { ok: false, error: "Sesiunea a expirat. Autentifică-te din nou." };
       }
-      return { ok: false, error: "Comanda nu a putut fi salvată." };
+      userId = authUser.user.id;
     }
 
-    const { error: iErr } = await supabaseAdmin
-      .from("order_items")
-      .insert(items.map((i) => ({ ...i, order_id: order.id })));
-    if (iErr) {
-      await supabaseAdmin.from("orders").delete().eq("id", order.id);
-      return { ok: false, error: "Comanda nu a putut fi salvată." };
+    const { data: result, error } = await supabaseAdmin.rpc(
+      "checkout_place" as never,
+      {
+        p_lines: data.lines,
+        p_customer: normalizedCustomer(data.customer),
+        p_user_id: userId,
+        p_idempotency_key: data.idempotencyKey,
+        p_expected_total: data.expectedTotal ?? null,
+      } as never,
+    );
+    if (error) {
+      const code = Object.keys(ORDER_ERRORS).find((key) => error.message.includes(key));
+      const mapped = code ? ORDER_ERRORS[code] : undefined;
+      if (mapped)
+        return {
+          ok: false,
+          error: mapped.error,
+          ...(mapped.refreshCart ? { refreshCart: true } : {}),
+        };
+      return { ok: false, error: "Comanda nu a putut fi înregistrată. Încearcă din nou." };
     }
-
-    if (!userId) {
-      await supabaseAdmin
-        .from("guest_checkout_usage")
-        .upsert({ email, first_order_id: order.id }, { onConflict: "email" });
+    const order = result as unknown as { orderNumber?: string; token?: string; total?: number };
+    if (!order?.orderNumber || !order.token || typeof order.total !== "number") {
+      return {
+        ok: false,
+        error:
+          "Confirmarea comenzii nu este disponibilă. Contactează magazinul înainte de a retrimite.",
+      };
     }
-
     return {
       ok: true,
+      orderNumber: order.orderNumber,
+      token: order.token,
+      total: order.total,
+      isTest: true,
+    };
+  });
+
+export const getOrderConfirmation = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        orderNumber: z.string().regex(/^LP-\d+$/),
+        token: z.string().uuid(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: order, error } = await supabaseAdmin
+      .from("orders")
+      .select(
+        "id,order_number,subtotal,shipping_total,tax_total,total,vat_rate,prices_include_vat,is_test",
+      )
+      .eq("order_number", data.orderNumber)
+      .eq("confirmation_token", data.token)
+      .maybeSingle();
+    if (error || !order) return null;
+    const { data: items, error: itemsError } = await supabaseAdmin
+      .from("order_items")
+      .select(
+        "product_name,variant_name,selling_unit,units_per_pack,quantity,unit_price,line_total",
+      )
+      .eq("order_id", order.id);
+    if (itemsError) return null;
+    return {
       orderNumber: order.order_number,
+      subtotal: Number(order.subtotal),
+      shipping: Number(order.shipping_total),
+      vat: Number(order.tax_total),
+      vatRate: Number(order.vat_rate),
+      pricesIncludeVat: order.prices_include_vat,
       total: Number(order.total),
       isTest: order.is_test,
+      items: items ?? [],
     };
   });
 
@@ -288,15 +185,13 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
     const { data: user, error: uErr } = await supabaseAdmin.auth.admin.getUserById(data.userId);
     if (uErr || !user?.user) return { ok: false, error: "Cont inexistent." };
 
-    const { error } = await supabaseAdmin
-      .from("user_roles")
-      .upsert(
-        [
-          { user_id: data.userId, role: "owner" as const },
-          { user_id: data.userId, role: "admin" as const },
-        ],
-        { onConflict: "user_id,role" },
-      );
+    const { error } = await supabaseAdmin.from("user_roles").upsert(
+      [
+        { user_id: data.userId, role: "owner" as const },
+        { user_id: data.userId, role: "admin" as const },
+      ],
+      { onConflict: "user_id,role" },
+    );
     if (error) return { ok: false, error: "Nu am putut acorda accesul." };
     return { ok: true };
   });
