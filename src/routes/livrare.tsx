@@ -10,5 +10,5 @@ export const Route = createFileRoute("/livrare")({
       { property: "og:description", content: "Condiții de livrare și termene de expediere." },
     ],
   }),
-  component: () => <ContentPage contentKey="shipping" fallbackTitle="Livrare" />,
+  component: () => <ContentPage contentKey="shipping" fallbackTitle="Livrare" showCompany />,
 });

@@ -10,5 +10,5 @@ export const Route = createFileRoute("/retur")({
       { property: "og:description", content: "Politica de retur și schimb al produselor." },
     ],
   }),
-  component: () => <ContentPage contentKey="returns" fallbackTitle="Retur" />,
+  component: () => <ContentPage contentKey="returns" fallbackTitle="Retur" showCompany />,
 });

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
 export const Route = createFileRoute("/comanda/$number")({
   head: () => ({
@@ -26,6 +27,10 @@ function OrderConfirmation() {
       <p className="mt-4 text-sm text-muted-foreground">
         Plata online nu este activată, deci nu a fost efectuată nicio plată.
       </p>
+      <div className="mx-auto mt-8 max-w-xl border-y border-border py-5 text-left">
+        <p className="micro-sm mb-3 text-muted-foreground">Datele vânzătorului</p>
+        <CompanyIdentity sellerLabel showPhones />
+      </div>
       <Link
         to="/produse"
         className="micro mt-10 inline-flex border border-foreground px-8 py-4 transition-colors hover:bg-foreground hover:text-background"

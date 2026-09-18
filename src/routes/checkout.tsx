@@ -8,6 +8,7 @@ import { formatRon } from "@/lib/format";
 import { placeOrder } from "@/lib/shop.functions";
 import { useAuth } from "@/lib/use-auth";
 import { useGuestCartLimit } from "@/lib/dashboard-data";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -236,6 +237,10 @@ function CheckoutPage() {
           >
             {busy ? "Se trimite…" : paymentsConfigured ? "Plătește" : "Trimite comanda (test)"}
           </button>
+          <div className="mt-6 border-t border-border pt-5">
+            <p className="micro-sm mb-3 text-muted-foreground">Datele vânzătorului</p>
+            <CompanyIdentity sellerLabel showPhones />
+          </div>
         </aside>
       </form>
     </div>

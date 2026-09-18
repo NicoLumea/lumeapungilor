@@ -10,5 +10,5 @@ export const Route = createFileRoute("/termeni")({
       { property: "og:description", content: "Termenii și condițiile de utilizare a magazinului." },
     ],
   }),
-  component: () => <ContentPage contentKey="terms" fallbackTitle="Termeni și condiții" />,
+  component: () => <ContentPage contentKey="terms" fallbackTitle="Termeni și condiții" showCompany />,
 });

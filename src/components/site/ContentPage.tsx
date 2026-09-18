@@ -5,7 +5,7 @@ import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 export function ContentPage({
   contentKey,
   fallbackTitle,
-  showCompany = true,
+  showCompany = false,
 }: {
   contentKey: string;
   fallbackTitle: string;

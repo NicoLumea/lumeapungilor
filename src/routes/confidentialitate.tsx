@@ -10,5 +10,5 @@ export const Route = createFileRoute("/confidentialitate")({
       { property: "og:description", content: "Cum sunt prelucrate datele personale." },
     ],
   }),
-  component: () => <ContentPage contentKey="privacy" fallbackTitle="Confidențialitate" />,
+  component: () => <ContentPage contentKey="privacy" fallbackTitle="Confidențialitate" showCompany />,
 });
