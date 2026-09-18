@@ -1,10 +1,11 @@
 import { useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
 export function ContentPage({
   contentKey,
   fallbackTitle,
-  showCompany,
+  showCompany = true,
 }: {
   contentKey: string;
   fallbackTitle: string;
@@ -12,21 +13,9 @@ export function ContentPage({
 }) {
   const { data, isLoading } = useContent();
   const block = data?.[contentKey];
-  const company = data?.["company"];
   const title = text(block, "title") ?? fallbackTitle;
   const body = text(block, "body");
   const image = imageUrl(text(block, "image_url"));
-  const details = showCompany
-    ? ([
-        ["Firmă", text(company, "name")],
-        ["E-mail", text(company, "email")],
-        ["Telefon", text(company, "phone")],
-        ["Adresă", text(company, "address")],
-        ["CUI", text(company, "cui")],
-        ["Reg. Com.", text(company, "reg_com")],
-        ["Program", text(company, "hours")],
-      ].filter(([, v]) => Boolean(v)) as [string, string][])
-    : [];
 
 
   return (
@@ -50,15 +39,11 @@ export function ContentPage({
           Lumea Pungilor | versiune de lucru
         </p>
       )}
-      {details.length > 0 ? (
-        <dl className="mt-12 divide-y divide-border border-y border-border">
-          {details.map(([label, value]) => (
-            <div key={label} className="flex justify-between gap-6 py-3 text-sm">
-              <dt className="text-muted-foreground">{label}</dt>
-              <dd className="text-right">{value}</dd>
-            </div>
-          ))}
-        </dl>
+      {showCompany ? (
+        <aside className="mt-12 border-y border-border py-6">
+          <p className="micro-sm mb-4 text-muted-foreground">Datele operatorului</p>
+          <CompanyIdentity />
+        </aside>
       ) : null}
     </article>
 
