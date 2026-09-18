@@ -1,4 +1,4 @@
-import { companyInfo, telephoneHref } from "@/lib/company";
+import { companyInfo, internationalTelephone } from "@/lib/company";
 import { useContent } from "@/lib/content";
 
 export function OrganizationStructuredData() {
@@ -6,8 +6,8 @@ export function OrganizationStructuredData() {
   const company = companyInfo(data);
   if (!company.brandName || !company.legalName || !company.address) return null;
 
-  const primary = telephoneHref(company.phonePrimary)?.replace("tel:", "");
-  const secondary = telephoneHref(company.phoneSecondary)?.replace("tel:", "");
+  const primary = internationalTelephone(company.phonePrimary);
+  const secondary = internationalTelephone(company.phoneSecondary);
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
