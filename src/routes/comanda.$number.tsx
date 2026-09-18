@@ -8,6 +8,8 @@ export const Route = createFileRoute("/comanda/$number")({
       { name: "description", content: "Confirmarea comenzii tale." },
       { property: "og:title", content: "Comandă înregistrată — Lumea Pungilor" },
       { property: "og:description", content: "Confirmarea comenzii tale." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

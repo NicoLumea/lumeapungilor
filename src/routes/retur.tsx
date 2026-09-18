@@ -8,6 +8,8 @@ export const Route = createFileRoute("/retur")({
       { name: "description", content: "Politica de retur și schimb al produselor." },
       { property: "og:title", content: "Retur — Lumea Pungilor" },
       { property: "og:description", content: "Politica de retur și schimb al produselor." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: () => <ContentPage contentKey="returns" fallbackTitle="Retur" showCompany />,

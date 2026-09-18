@@ -12,6 +12,8 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "Date de contact pentru comenzi și oferte." },
       { property: "og:title", content: "Contact — Lumea Pungilor" },
       { property: "og:description", content: "Date de contact pentru comenzi și oferte." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContactPage,

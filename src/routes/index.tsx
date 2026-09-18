@@ -5,6 +5,7 @@ import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { usePublishedProducts } from "@/lib/products";
 import { useAuth } from "@/lib/use-auth";
+import { companyInfo, telephoneHref } from "@/lib/company";
 
 type EntrySearch = { redirect?: string };
 
@@ -49,6 +50,7 @@ function EntryPage() {
   const { data: products } = usePublishedProducts();
 
   const company = content?.["company"];
+  const verifiedCompany = companyInfo(content);
   const home = content?.["home"];
   const available = (products ?? []).filter((p) => !p.track_stock || p.stock > 0);
   const featured = [
@@ -212,13 +214,17 @@ function EntryPage() {
         <div className="site-container grid gap-8 py-10 text-sm md:grid-cols-3 md:py-16">
           <div>
             <p className="micro-sm text-muted-foreground">Contact</p>
-            {text(company, "email") ? <p className="mt-3">{text(company, "email")}</p> : null}
-            {text(company, "phone") ? <p className="mt-1">{text(company, "phone")}</p> : null}
-            {text(company, "address") ? (
-              <p className="mt-1 whitespace-pre-line text-muted-foreground">
-                {text(company, "address")}
-              </p>
-            ) : null}
+            <div className="mt-2 flex flex-col items-start">
+              {[verifiedCompany.phonePrimary, verifiedCompany.phoneSecondary]
+                .filter((phone): phone is string => Boolean(phone))
+                .map((phone) => (
+                  <a key={phone} href={telephoneHref(phone)} className="inline-flex min-h-11 items-center link-underline">
+                    {phone}
+                  </a>
+                ))}
+            </div>
+            {verifiedCompany.operatingDays ? <p className="mt-3 text-muted-foreground">{verifiedCompany.operatingDays}</p> : null}
+            {verifiedCompany.operatingHours ? <p className="mt-1 text-muted-foreground">{verifiedCompany.operatingHours}</p> : null}
           </div>
           <div>
             <p className="micro-sm text-muted-foreground">Informații</p>

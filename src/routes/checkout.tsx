@@ -17,6 +17,8 @@ export const Route = createFileRoute("/checkout")({
       { name: "description", content: "Date de contact, livrare și facturare." },
       { property: "og:title", content: "Finalizare comandă — Lumea Pungilor" },
       { property: "og:description", content: "Date de contact, livrare și facturare." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CheckoutPage,
