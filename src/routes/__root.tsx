@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { OrganizationStructuredData } from "@/components/site/OrganizationStructuredData";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -130,6 +131,7 @@ function RootComponent() {
         ) : (
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
+            <OrganizationStructuredData />
             <main className="flex-1">
               {/* Required: nested routes render here. */}
               <Outlet />

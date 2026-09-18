@@ -1,20 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { useCategories, useContent, text } from "@/lib/content";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
+import { companyInfo, telephoneHref } from "@/lib/company";
 
 export function SiteFooter() {
   const { data: content } = useContent();
   const { data: categories } = useCategories();
-  const company = content?.["company"];
-
-  const name = text(company, "name") ?? "Lumea Pungilor";
-  const email = text(company, "email");
-  const phone = text(company, "phone");
-  const address = text(company, "address");
-  const cui = text(company, "cui");
-  const regCom = text(company, "reg_com");
-  const facebook = text(company, "facebook");
-  const instagram = text(company, "instagram");
-  const footerText = text(company, "footer_text");
+  const companyBlock = content?.["company"];
+  const company = companyInfo(content);
+  const name = company.brandName ?? "Lumea Pungilor";
+  const facebook = text(companyBlock, "facebook");
+  const instagram = text(companyBlock, "instagram");
+  const footerText = text(companyBlock, "footer_text");
 
   return (
     <footer className="mt-24 border-t border-border">
@@ -82,24 +79,24 @@ export function SiteFooter() {
 
         <div>
           <p className="micro-sm text-muted-foreground">Contact</p>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            {email ? (
+          <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
+            {company.phonePrimary ? (
               <li>
-                <a href={`mailto:${email}`} className="link-underline text-foreground">
-                  {email}
+                <a href={telephoneHref(company.phonePrimary)} className="inline-flex min-h-11 items-center link-underline text-foreground">
+                  {company.phonePrimary}
                 </a>
               </li>
             ) : null}
-            {phone ? (
+            {company.phoneSecondary ? (
               <li>
-                <a href={`tel:${phone}`} className="link-underline text-foreground">
-                  {phone}
+                <a href={telephoneHref(company.phoneSecondary)} className="inline-flex min-h-11 items-center link-underline text-foreground">
+                  {company.phoneSecondary}
                 </a>
+                {company.secondaryPhoneNote ? <span className="block text-xs">{company.secondaryPhoneNote}</span> : null}
               </li>
             ) : null}
-            {address ? <li>{address}</li> : null}
-            {cui ? <li>CUI {cui}</li> : null}
-            {regCom ? <li>Reg. com. {regCom}</li> : null}
+            {company.operatingDays ? <li className="pt-4 text-foreground">{company.operatingDays}</li> : null}
+            {company.operatingHours ? <li>{company.operatingHours}</li> : null}
           </ul>
           {facebook || instagram ? (
             <ul className="mt-4 flex gap-4">
@@ -123,13 +120,16 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-border">
-        <div className="site-container flex flex-wrap items-center justify-between gap-3 py-5">
+        <div className="site-container grid gap-6 py-6 md:grid-cols-[1fr_auto] md:items-end">
+          <CompanyIdentity />
+          <div className="flex flex-wrap items-center gap-5 md:justify-end">
           <p className="micro-sm text-muted-foreground">
             © {new Date().getFullYear()} {name}
           </p>
           <Link to="/admin" className="micro-sm text-muted-foreground link-underline">
             Administrare
           </Link>
+          </div>
         </div>
       </div>
     </footer>

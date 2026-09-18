@@ -8,7 +8,9 @@ export const Route = createFileRoute("/confidentialitate")({
       { name: "description", content: "Cum sunt prelucrate datele personale." },
       { property: "og:title", content: "Confidențialitate — Lumea Pungilor" },
       { property: "og:description", content: "Cum sunt prelucrate datele personale." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <ContentPage contentKey="privacy" fallbackTitle="Confidențialitate" />,
+  component: () => <ContentPage contentKey="privacy" fallbackTitle="Confidențialitate" showCompany />,
 });

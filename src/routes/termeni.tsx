@@ -8,7 +8,9 @@ export const Route = createFileRoute("/termeni")({
       { name: "description", content: "Termenii și condițiile de utilizare a magazinului." },
       { property: "og:title", content: "Termeni și condiții — Lumea Pungilor" },
       { property: "og:description", content: "Termenii și condițiile de utilizare a magazinului." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <ContentPage contentKey="terms" fallbackTitle="Termeni și condiții" />,
+  component: () => <ContentPage contentKey="terms" fallbackTitle="Termeni și condiții" showCompany />,
 });
