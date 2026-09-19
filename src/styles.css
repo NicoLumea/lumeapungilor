@@ -362,7 +362,18 @@
 }
 
 .site-header.is-compact .site-header-inner {
-  height: 3rem;
+  height: 3.5rem;
+}
+
+.site-header .utility-bar {
+  transition-property: height, opacity;
+  transition-duration: 280ms;
+}
+
+.site-header.is-compact .utility-bar {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -419,7 +430,8 @@
   .featured-product-name,
   .featured-product-link,
   .site-header,
-  .site-header-inner {
+  .site-header-inner,
+  .site-header .utility-bar {
     transition-duration: 0.01ms;
     transition-delay: 0ms;
   }
