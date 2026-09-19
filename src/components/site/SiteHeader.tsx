@@ -82,13 +82,15 @@ export function SiteHeader() {
           <Link to="/ajutor-comanda" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             Ajutor
           </Link>
-          <Link
-            to={accountDestination}
-            hash={auth.user ? undefined : "cont"}
-            className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Contul meu
-          </Link>
+          {auth.user ? (
+            <Link to="/cont" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              Contul meu
+            </Link>
+          ) : (
+            <Link to="/" hash="cont" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              Contul meu
+            </Link>
+          )}
         </div>
       </div>
 
@@ -120,10 +122,17 @@ export function SiteHeader() {
                   <Link to="/ajutor-comanda" className="py-3 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Ajutor</Link>
                 </SheetClose>
                 <SheetClose asChild>
-                  <Link to={accountDestination} hash={auth.user ? undefined : "cont"} className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                    <UserRound className="size-4" aria-hidden="true" />
-                    Contul meu
-                  </Link>
+                  {auth.user ? (
+                    <Link to="/cont" className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                      <UserRound className="size-4" aria-hidden="true" />
+                      Contul meu
+                    </Link>
+                  ) : (
+                    <Link to="/" hash="cont" className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                      <UserRound className="size-4" aria-hidden="true" />
+                      Contul meu
+                    </Link>
+                  )}
                 </SheetClose>
               </div>
             </SheetContent>
