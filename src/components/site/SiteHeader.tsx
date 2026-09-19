@@ -16,6 +16,12 @@ import { useCategories, useContent } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/use-auth";
 
+function headerCategoryLabel(name: string): string {
+  return name
+    .replace(/\bFARA\b/gi, "FĂRĂ")
+    .replace(/\bMANER\b/gi, "MÂNER");
+}
+
 export function SiteHeader() {
   const auth = useAuth();
   const { count } = useCart();
@@ -50,7 +56,7 @@ export function SiteHeader() {
       className="link-underline shrink-0 text-[0.8125rem] font-medium uppercase leading-none tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
       activeProps={{ className: "bg-[length:100%_1px]" }}
     >
-      {c.name}
+      {headerCategoryLabel(c.name)}
     </Link>
   ));
 
@@ -61,7 +67,7 @@ export function SiteHeader() {
         params={{ slug: c.slug }}
         className="border-b border-border py-4 text-sm font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
-        {c.name}
+        {headerCategoryLabel(c.name)}
       </Link>
     </SheetClose>
   ));

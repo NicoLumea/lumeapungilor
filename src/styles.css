@@ -430,7 +430,8 @@
   .featured-product-name,
   .featured-product-link,
   .site-header,
-  .site-header-inner {
+  .site-header-inner,
+  .site-header .utility-bar {
     transition-duration: 0.01ms;
     transition-delay: 0ms;
   }
