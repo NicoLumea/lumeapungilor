@@ -41,7 +41,6 @@ export function SiteHeader() {
   }, []);
 
   const name = companyInfo(content).brandName ?? "Lumea Pungilor";
-  const accountDestination = auth.user ? "/cont" : "/";
 
   const desktopCategories = (categories ?? []).map((c) => (
     <Link
