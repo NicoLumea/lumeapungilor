@@ -3,3 +3,17 @@
 - [x] Add compact store homepage introduction
 - [x] Update Contact introduction and footer description
 - [x] Verify links, FAQ data, mobile and desktop layouts
+- [x] Public browsing without the access gate; admin link hidden from public areas
+- [x] Category rename + permanent redirect /categorie/pungi-hartie → /categorie/pungi-fara-maner
+- [x] Catalog search (name, code, dimensions, diacritic-insensitive) + 24-per-page loading
+- [x] Back-in-stock requests, unsubscribe page, employee/admin review panel with CSV export
+- [x] Shorter hero, reassurance strip, data-driven recommendations (max 5)
+- [x] Checkout: back-to-cart, saved form, help line, atomic server-side order creation
+- [x] Account forms: show/hide password, live rules, inline validation, privacy consent
+- [x] 404 page, back-to-top control, support e-mail and ANPC/SAL information
+- [x] Payment/delivery methods configurable by an administrator, hidden until confirmed
+- [x] Hide the "Edit with Lovable" badge on the published site
+- [ ] Confirm real payment and delivery methods with the business, then enable them in Settings
+- [ ] Legal review of Terms (still contains [DE COMPLETAT] marks)
+- [ ] Create the contact@lumeapungilor.ro mailbox (address is published across the site)
+- [ ] Automatic order e-mails (currently orders are recorded and confirmed by phone)
