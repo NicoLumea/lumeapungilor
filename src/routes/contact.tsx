@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref } from "@/lib/company";
+import { companyInfo, telephoneHref, SUPPORT_EMAIL } from "@/lib/company";
 import { useContent } from "@/lib/content";
 
 export const Route = createFileRoute("/contact")({
