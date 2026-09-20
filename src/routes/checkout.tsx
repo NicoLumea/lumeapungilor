@@ -291,6 +291,9 @@ function CheckoutPage() {
         disponibilității, livrării și modalității de plată.
       </p>
 
+      <ConfirmedMethods />
+
+
       <form onSubmit={onSubmit} noValidate className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-10">
           <fieldset className="space-y-5">
