@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useCategories, useContent, text } from "@/lib/content";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref } from "@/lib/company";
+import { companyInfo, telephoneHref, CONSUMER_LINKS, SUPPORT_EMAIL } from "@/lib/company";
 
 export function SiteFooter() {
   const { data: content } = useContent();
@@ -94,6 +94,11 @@ export function SiteFooter() {
                 {company.secondaryPhoneNote ? <span className="block text-xs">{company.secondaryPhoneNote}</span> : null}
               </li>
             ) : null}
+            <li>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex min-h-11 items-center link-underline text-foreground">
+                {SUPPORT_EMAIL}
+              </a>
+            </li>
             {company.operatingDays ? <li className="pt-4 text-foreground">{company.operatingDays}</li> : null}
             {company.operatingHours ? <li>{company.operatingHours}</li> : null}
           </ul>
@@ -119,15 +124,28 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-border">
+        <div className="site-container py-6">
+          <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
+            Informații pentru consumatori:{" "}
+            <a href={CONSUMER_LINKS.anpc} target="_blank" rel="noreferrer noopener" className="link-underline">
+              Autoritatea Națională pentru Protecția Consumatorilor (ANPC)
+            </a>{" "}
+            și{" "}
+            <a href={CONSUMER_LINKS.sal} target="_blank" rel="noreferrer noopener" className="link-underline">
+              platforma SAL – soluționarea alternativă a litigiilor
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-border">
         <div className="site-container grid gap-6 py-6 md:grid-cols-[1fr_auto] md:items-end">
           <CompanyIdentity />
           <div className="flex flex-wrap items-center gap-5 md:justify-end">
-          <p className="micro-sm text-muted-foreground">
-            © {new Date().getFullYear()} {name}
-          </p>
-          <Link to="/admin" className="micro-sm text-muted-foreground link-underline">
-            Administrare
-          </Link>
+            <p className="micro-sm text-muted-foreground">
+              © {new Date().getFullYear()} {name}
+            </p>
           </div>
         </div>
       </div>

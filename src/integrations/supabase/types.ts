@@ -284,6 +284,9 @@ export type Database = {
           is_guest: boolean
           is_test: boolean
           notes: string | null
+          notification_error: string | null
+          notification_status: string
+          notified_at: string | null
           order_number: string
           payment_reference: string | null
           payment_status: string
@@ -292,6 +295,7 @@ export type Database = {
           reg_com: string | null
           shipping_total: number
           status: string
+          stock_applied: boolean
           subtotal: number
           tax_total: number
           total: number
@@ -316,6 +320,9 @@ export type Database = {
           is_guest?: boolean
           is_test?: boolean
           notes?: string | null
+          notification_error?: string | null
+          notification_status?: string
+          notified_at?: string | null
           order_number?: string
           payment_reference?: string | null
           payment_status?: string
@@ -324,6 +331,7 @@ export type Database = {
           reg_com?: string | null
           shipping_total?: number
           status?: string
+          stock_applied?: boolean
           subtotal?: number
           tax_total?: number
           total?: number
@@ -348,6 +356,9 @@ export type Database = {
           is_guest?: boolean
           is_test?: boolean
           notes?: string | null
+          notification_error?: string | null
+          notification_status?: string
+          notified_at?: string | null
           order_number?: string
           payment_reference?: string | null
           payment_status?: string
@@ -356,6 +367,7 @@ export type Database = {
           reg_com?: string | null
           shipping_total?: number
           status?: string
+          stock_applied?: boolean
           subtotal?: number
           tax_total?: number
           total?: number
@@ -598,6 +610,63 @@ export type Database = {
         }
         Relationships: []
       }
+      restock_requests: {
+        Row: {
+          consent_at: string
+          created_at: string
+          email: string
+          id: string
+          notified_at: string | null
+          notify_error: string | null
+          product_id: string
+          status: string
+          unsubscribe_token: string
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          consent_at?: string
+          created_at?: string
+          email: string
+          id?: string
+          notified_at?: string | null
+          notify_error?: string | null
+          product_id: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          consent_at?: string
+          created_at?: string
+          email?: string
+          id?: string
+          notified_at?: string | null
+          notify_error?: string | null
+          product_id?: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restock_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restock_requests_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       return_requests: {
         Row: {
           archived_at: string | null
@@ -758,6 +827,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order_tx: {
+        Args: { p_items: Json; p_order: Json }
+        Returns: {
+          id: string
+          is_test: boolean
+          order_number: string
+          total: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -768,6 +846,13 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      top_selling_products: {
+        Args: { p_limit?: number }
+        Returns: {
+          product_id: string
+          sold: number
+        }[]
+      }
       write_audit: {
         Args: {
           _action: string

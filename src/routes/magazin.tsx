@@ -1,9 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { usePublishedProducts } from "@/lib/products";
+import { getTopSellingProducts } from "@/lib/recommendations.functions";
+import { companyInfo, telephoneHref } from "@/lib/company";
 
 export const Route = createFileRoute("/magazin")({
   head: () => ({
@@ -30,17 +34,30 @@ function Shop() {
   const { data: content } = useContent();
   const { data: categories } = useCategories();
   const { data: products } = usePublishedProducts();
+  const topSelling = useServerFn(getTopSellingProducts);
+  const { data: sales } = useQuery({
+    queryKey: ["recommendations", "top-selling"],
+    queryFn: () => topSelling(),
+    staleTime: 5 * 60 * 1000,
+  });
   const home = content?.["home"];
+  const company = companyInfo(content);
   const availableProducts = (products ?? []).filter((product) => !product.track_stock || product.stock > 0);
-  const featuredProducts = [
-    ...availableProducts.filter((product) => product.is_featured),
-    ...availableProducts.filter((product) => !product.is_featured),
-  ].slice(0, 6);
 
-  const heroTitle = text(home, "hero_title");
-  const heroSubtitle = text(home, "hero_subtitle");
-  const ctaLabel = text(home, "cta_label");
-  const ctaHref = text(home, "cta_href") ?? "/produse";
+  // Real sales ranking when it exists; otherwise only products an employee marked as featured.
+  const salesRanked = (sales?.productIds ?? [])
+    .map((id) => availableProducts.find((p) => p.id === id))
+    .filter((p): p is NonNullable<typeof p> => !!p);
+  const useSales = !!sales?.fromSales && salesRanked.length > 0;
+  const recommended = useSales
+    ? salesRanked.slice(0, 5)
+    : availableProducts.filter((p) => p.is_featured).slice(0, 5);
+  const recommendedHeading = useSales ? "Cele mai cumpărate" : "Produse recomandate";
+
+  const heroTitle = text(home, "hero_title") ?? "Ambalaje pentru magazine, restaurante și ateliere";
+  const heroSubtitle =
+    text(home, "hero_subtitle") ??
+    "Pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule, disponibile pentru comenzi de la persoane fizice și firme.";
   const edTitle = text(home, "editorial_title");
   const edBody = text(home, "editorial_body");
   const edImage = imageUrl(text(home, "editorial_image_url"));
@@ -48,23 +65,27 @@ function Shop() {
   return (
     <div>
       <section className="overflow-hidden border-b border-border bg-hero">
-        <div className="relative mx-auto w-full max-w-[1920px] lg:aspect-[12/5]">
-          <div className="site-container relative z-10 py-10 lg:absolute lg:inset-0 lg:grid lg:w-full lg:max-w-none lg:grid-cols-[38%_62%] lg:items-center lg:py-0">
+        <div className="relative mx-auto w-full max-w-[1920px]">
+          <div className="site-container relative z-10 py-10 lg:absolute lg:inset-0 lg:grid lg:w-full lg:max-w-none lg:grid-cols-[42%_58%] lg:items-center lg:py-0">
             <div className="max-w-[520px] text-left lg:px-[clamp(32px,3vw,56px)]">
-            {heroTitle ? <h1 className="display text-4xl leading-[1.05] lg:text-[clamp(44px,4vw,68px)]">{heroTitle}</h1> : null}
-            {heroSubtitle ? (
-              <p className="mt-6 max-w-md text-base leading-[1.5] text-foreground/80 lg:text-[clamp(16px,1.25vw,19px)]">
+              <h1 className="display text-3xl leading-[1.08] lg:text-[clamp(32px,2.6vw,44px)]">{heroTitle}</h1>
+              <p className="mt-4 max-w-md text-base leading-[1.5] text-foreground/80 lg:text-[clamp(15px,1.1vw,17px)]">
                 {heroSubtitle}
               </p>
-            ) : null}
-            {ctaLabel ? (
-              <a
-                href={ctaHref}
-                className="micro mt-7 inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background sm:mt-10 sm:px-8 sm:py-4"
-              >
-                {ctaLabel}
-              </a>
-            ) : null}
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  to="/produse"
+                  className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground bg-foreground px-6 py-3 text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                >
+                  Vezi catalogul
+                </Link>
+                <Link
+                  to="/contact"
+                  className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                >
+                  Contactează-ne
+                </Link>
+              </div>
             </div>
           </div>
           <img
@@ -73,10 +94,27 @@ function Shop() {
             width="1920"
             height="800"
             fetchPriority="high"
-            className="pointer-events-none relative block h-auto w-full object-contain lg:absolute lg:inset-0 lg:size-full lg:object-contain lg:object-center"
+            className="pointer-events-none relative block h-auto max-h-[320px] w-full object-contain lg:absolute lg:inset-0 lg:size-full lg:max-h-none lg:object-contain lg:object-right"
           />
+          <div className="hidden lg:block lg:h-[clamp(420px,34vw,500px)]" aria-hidden="true" />
         </div>
       </section>
+
+      <section className="border-b border-border">
+        <ul className="site-container grid gap-3 py-5 text-sm sm:grid-cols-3">
+          <li className="text-muted-foreground">Comenzi pentru persoane fizice și firme</li>
+          <li className="text-muted-foreground">
+            Asistență:{" "}
+            <a href={telephoneHref(company.phonePrimary)} className="link-underline text-foreground">
+              {company.phonePrimary}
+            </a>
+          </li>
+          <li className="text-muted-foreground">
+            {company.operatingDays ? `${company.operatingDays} ${company.operatingHours ?? ""}`.trim() : "Program de lucru afișat la Contact"}
+          </li>
+        </ul>
+      </section>
+
 
       {(categories ?? []).length > 0 ? (
         <section className="site-container py-8 md:py-20">
@@ -138,17 +176,19 @@ function Shop() {
         </div>
       </section>
 
-      {featuredProducts.length > 0 ? (
+      {recommended.length > 0 ? (
         <section className="rule-t">
           <div className="catalogue-container py-10 md:py-20">
             <div className="max-w-2xl">
-              <h2 className="display text-3xl md:text-4xl">Produse recomandate</h2>
+              <h2 className="display text-3xl md:text-4xl">{recommendedHeading}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Descoperă câteva dintre produsele disponibile în catalog.
+                {useSales
+                  ? "Produse alese cel mai des de clienții noștri, disponibile acum în stoc."
+                  : "Produse disponibile, selectate din catalog."}
               </p>
             </div>
             <div className="product-grid mt-7 md:mt-10">
-              {featuredProducts.map((product) => (
+              {recommended.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

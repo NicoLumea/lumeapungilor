@@ -1,5 +1,14 @@
 import { text, type ContentMap } from "@/lib/content";
 
+/** Official customer-service address, used everywhere the shop offers help. */
+export const SUPPORT_EMAIL = "contact@lumeapungilor.ro";
+
+/** Official Romanian consumer-protection references (ANPC / SAL). */
+export const CONSUMER_LINKS = {
+  anpc: "https://anpc.ro/",
+  sal: "https://reclamatiisal.anpc.ro/",
+} as const;
+
 export type CompanyInfo = {
   brandName: string | null;
   legalName: string | null;

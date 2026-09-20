@@ -3,7 +3,6 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  useNavigate,
   useRouter,
   useRouterState,
   HeadContent,
@@ -17,25 +16,31 @@ import { CartProvider } from "@/lib/cart";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OrganizationStructuredData } from "@/components/site/OrganizationStructuredData";
+import { BackToTop } from "@/components/site/BackToTop";
 import { Toaster } from "@/components/ui/sonner";
-import { useAuth } from "@/lib/use-auth";
-import { hasGuestAccess, isGatewayProtectedPath } from "@/lib/guest-access";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <p className="micro-sm text-muted-foreground">404</p>
-        <h1 className="display mt-4 text-3xl">Pagina nu a fost găsită</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Linkul nu mai există sau a fost mutat.
+    <div className="site-container flex min-h-[60vh] items-center justify-center py-20">
+      <div className="max-w-lg text-center">
+        <p className="micro-sm text-muted-foreground">Eroare 404</p>
+        <h1 className="display mt-4 text-3xl md:text-4xl">Pagina nu a fost găsită</h1>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          Adresa pe care ai deschis-o nu există sau a fost mutată. Poți reveni în magazin sau poți
+          căuta produsul direct în catalog.
         </p>
-        <div className="mt-8">
-            <Link
-              to="/magazin"
-            className="micro inline-flex items-center justify-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link
+            to="/magazin"
+            className="micro inline-flex min-h-11 items-center justify-center border border-foreground bg-foreground px-6 py-3 text-background transition-opacity hover:opacity-85"
           >
-            Înapoi acasă
+            Înapoi la magazin
+          </Link>
+          <Link
+            to="/produse"
+            className="micro inline-flex min-h-11 items-center justify-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
+          >
+            Vezi catalogul
           </Link>
         </div>
       </div>
@@ -142,19 +147,12 @@ function RootComponent() {
 }
 
 function PublicSiteFrame({ pathname }: { pathname: string }) {
-  const navigate = useNavigate();
-  const auth = useAuth();
-  const protectedPath = isGatewayProtectedPath(pathname);
-  const guestAccess = hasGuestAccess();
-
-  useEffect(() => {
-    if (!protectedPath || auth.loading || auth.user || guestAccess) return;
-    void navigate({ to: "/", replace: true });
-  }, [auth.loading, auth.user, guestAccess, navigate, protectedPath]);
-
-  if (protectedPath && (auth.loading || (!auth.user && !guestAccess))) {
-    return <div className="min-h-svh bg-hero" aria-busy="true" />;
-  }
+  // Long pages only: the control must never sit over the checkout actions.
+  const showBackToTop =
+    pathname === "/produse" ||
+    pathname === "/despre" ||
+    pathname === "/magazin" ||
+    pathname.startsWith("/categorie/");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -164,6 +162,7 @@ function PublicSiteFrame({ pathname }: { pathname: string }) {
         <Outlet />
       </main>
       <SiteFooter />
+      {showBackToTop ? <BackToTop /> : null}
     </div>
   );
 }

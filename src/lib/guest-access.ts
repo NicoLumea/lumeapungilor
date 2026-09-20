@@ -11,14 +11,3 @@ export function grantGuestAccess(): void {
 export function clearGuestAccess(): void {
   if (typeof window !== "undefined") window.sessionStorage.removeItem(GUEST_ACCESS_KEY);
 }
-
-export function isGatewayProtectedPath(pathname: string): boolean {
-  return (
-    pathname === "/magazin" ||
-    pathname === "/produse" ||
-    pathname === "/cos" ||
-    pathname === "/checkout" ||
-    pathname.startsWith("/categorie/") ||
-    pathname.startsWith("/produs/")
-  );
-}
