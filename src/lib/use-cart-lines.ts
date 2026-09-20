@@ -36,7 +36,10 @@ export function useCartLines() {
         unitPrice,
         lineTotal: Math.round(unitPrice * line.qty * 100) / 100,
         imageUrlPath: sortedImages(product)[0]?.url ?? null,
-        stock: variant ? variant.stock : product.stock,
+        stock:
+          variant && (product.product_variants ?? []).some((v) => v.stock > 0)
+            ? variant.stock
+            : product.stock,
       });
     }
     return out;

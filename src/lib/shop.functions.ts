@@ -162,7 +162,10 @@ export const placeOrder = createServerFn({ method: "POST" })
         };
       }
 
-      const stock = variant ? variant.stock : product.stock;
+      // Variants only carry their own inventory when at least one of them is stocked;
+      // otherwise they are plain options and the product stock applies.
+      const variantsStocked = variants.some((v) => v.stock > 0);
+      const stock = variant && variantsStocked ? variant.stock : product.stock;
       if (product.track_stock && line.qty > stock) {
         return { ok: false, error: `Stoc insuficient pentru „${product.name}”.` };
       }

@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref } from "@/lib/company";
 
 export const Route = createFileRoute("/comanda/$number")({
   head: () => ({
@@ -19,7 +18,6 @@ export const Route = createFileRoute("/comanda/$number")({
 
 function OrderConfirmation() {
   const { number } = Route.useParams();
-  const phones = [companyInfo.phone_primary, companyInfo.phone_secondary].filter(Boolean) as string[];
 
   return (
     <div className="site-container max-w-[720px] py-32 text-center">
@@ -35,15 +33,18 @@ function OrderConfirmation() {
         modalității de plată.
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        {phones.map((p) => (
-          <a
-            key={p}
-            href={telephoneHref(p)}
-            className="micro-sm inline-flex min-h-11 items-center border border-border px-5 py-2.5"
-          >
-            {p}
-          </a>
-        ))}
+        <a
+          href="tel:+40765514422"
+          className="micro-sm inline-flex min-h-11 items-center border border-border px-5 py-2.5"
+        >
+          0765 514 422
+        </a>
+        <a
+          href="tel:+40371900033"
+          className="micro-sm inline-flex min-h-11 items-center border border-border px-5 py-2.5"
+        >
+          0371 900 033
+        </a>
       </div>
       <div className="mx-auto mt-8 max-w-xl border-y border-border py-5 text-left">
         <p className="micro-sm mb-3 text-muted-foreground">Datele vânzătorului</p>
