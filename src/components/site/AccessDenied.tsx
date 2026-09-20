@@ -20,7 +20,6 @@ export function AccessDenied({
           <Link
             to="/"
             search={{ redirect: redirectTo ?? "" }}
-            hash="cont"
             className="micro inline-flex min-h-11 items-center border border-foreground bg-foreground px-6 py-3 text-background"
           >
             Autentificare

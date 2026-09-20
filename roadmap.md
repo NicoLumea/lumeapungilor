@@ -5,4 +5,4 @@
 - [x] Autentificare și creare cont reutilizate, cu intrare în `/magazin`
 - [x] Brandul magazinului și deconectarea actualizate pentru noul flux
 - [x] Card unic și grile compacte 2/3/4/5/6 coloane
-- [ ] Verificare funcțională și vizuală la lățimile solicitate
+- [x] Verificare funcțională și vizuală la lățimile solicitate

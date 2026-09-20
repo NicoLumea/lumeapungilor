@@ -133,14 +133,7 @@ function RootComponent() {
         {isAdmin || isGateway ? (
           <Outlet />
         ) : (
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <OrganizationStructuredData />
-            <main className="flex-1">
-              <CommercialAccessBoundary pathname={pathname} />
-            </main>
-            <SiteFooter />
-          </div>
+          <PublicSiteFrame pathname={pathname} />
         )}
         <Toaster position="bottom-right" />
       </CartProvider>
@@ -148,7 +141,7 @@ function RootComponent() {
   );
 }
 
-function CommercialAccessBoundary({ pathname }: { pathname: string }) {
+function PublicSiteFrame({ pathname }: { pathname: string }) {
   const navigate = useNavigate();
   const auth = useAuth();
   const protectedPath = isGatewayProtectedPath(pathname);
@@ -160,8 +153,17 @@ function CommercialAccessBoundary({ pathname }: { pathname: string }) {
   }, [auth.loading, auth.user, guestAccess, navigate, protectedPath]);
 
   if (protectedPath && (auth.loading || (!auth.user && !guestAccess))) {
-    return <div className="min-h-[55vh] bg-background" aria-busy="true" />;
+    return <div className="min-h-svh bg-hero" aria-busy="true" />;
   }
 
-  return <Outlet />;
+  return (
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <OrganizationStructuredData />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <SiteFooter />
+    </div>
+  );
 }
