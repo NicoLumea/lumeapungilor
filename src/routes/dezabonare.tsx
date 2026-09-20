@@ -1,13 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
-import { Link } from "@tanstack/react-router";
 import { cancelRestockNotice } from "@/lib/restock.functions";
 
 export const Route = createFileRoute("/dezabonare")({
-  validateSearch: zodValidator(z.object({ token: fallback(z.string(), "").default("") })),
+  validateSearch: (search: Record<string, unknown>) => ({
+    token: typeof search["token"] === "string" ? search["token"] : "",
+  }),
   head: () => ({
     meta: [
       { title: "Dezabonare anunțuri de stoc — Lumea Pungilor" },

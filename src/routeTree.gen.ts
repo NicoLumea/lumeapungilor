@@ -19,6 +19,7 @@ import { Route as ContRouteImport } from './routes/cont'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
+import { Route as DezabonareRouteImport } from './routes/dezabonare'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
 import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
@@ -101,6 +102,11 @@ const CosRoute = CosRouteImport.update({
 const DespreRoute = DespreRouteImport.update({
   id: '/despre',
   path: '/despre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DezabonareRoute = DezabonareRouteImport.update({
+  id: '/dezabonare',
+  path: '/dezabonare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivrareRoute = LivrareRouteImport.update({
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
+  '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
+  '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -369,6 +377,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
+  '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cos'
     | '/despre'
+    | '/dezabonare'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -460,6 +470,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cos'
     | '/despre'
+    | '/dezabonare'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -504,6 +515,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cos'
     | '/despre'
+    | '/dezabonare'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -550,6 +562,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CosRoute: typeof CosRoute
   DespreRoute: typeof DespreRoute
+  DezabonareRoute: typeof DezabonareRoute
   LivrareRoute: typeof LivrareRoute
   MagazinRoute: typeof MagazinRoute
   ParolaNouaRoute: typeof ParolaNouaRoute
@@ -634,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/despre'
       fullPath: '/despre'
       preLoaderRoute: typeof DespreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dezabonare': {
+      id: '/dezabonare'
+      path: '/dezabonare'
+      fullPath: '/dezabonare'
+      preLoaderRoute: typeof DezabonareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/livrare': {
@@ -939,6 +959,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CosRoute: CosRoute,
   DespreRoute: DespreRoute,
+  DezabonareRoute: DezabonareRoute,
   LivrareRoute: LivrareRoute,
   MagazinRoute: MagazinRoute,
   ParolaNouaRoute: ParolaNouaRoute,
