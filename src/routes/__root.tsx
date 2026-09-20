@@ -31,8 +31,8 @@ function NotFoundComponent() {
           Linkul nu mai există sau a fost mutat.
         </p>
         <div className="mt-8">
-          <Link
-            to="/"
+            <Link
+              to="/magazin"
             className="micro inline-flex items-center justify-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
           >
             Înapoi acasă
@@ -67,7 +67,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Încearcă din nou
           </button>
-          <a href="/" className="micro border border-border px-6 py-3 transition-colors hover:bg-accent">
+            <a href="/magazin" className="micro border border-border px-6 py-3 transition-colors hover:bg-accent">
             Acasă
           </a>
         </div>

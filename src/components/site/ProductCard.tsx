@@ -33,7 +33,7 @@ export function ProductCard({ product }: { product: Product }) {
       params={{ slug: product.slug }}
       aria-label={`${product.name}, ${cataloguePrice(product.price)} per ${product.selling_unit}`}
       title={product.name}
-      className="product-card group flex h-full min-w-0 max-w-[20rem] flex-col justify-self-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+      className="product-card group flex h-full w-full min-w-0 max-w-[20rem] flex-col justify-self-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
       <div className="relative h-[10.75rem] w-full overflow-hidden bg-field min-[480px]:h-[12rem] md:h-[13rem] lg:h-[14.5rem] xl:h-[15rem] min-[1600px]:h-[15.5rem]">
         <span

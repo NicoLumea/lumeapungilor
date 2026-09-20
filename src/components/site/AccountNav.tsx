@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { clearGuestAccess } from "@/lib/guest-access";
 
 export function AccountNav() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export function AccountNav() {
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
+    clearGuestAccess();
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
   }
