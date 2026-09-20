@@ -18,7 +18,6 @@ export const Route = createFileRoute("/comanda/$number")({
 
 function OrderConfirmation() {
   const { number } = Route.useParams();
-  const phones = [companyInfo.phone_primary, companyInfo.phone_secondary].filter(Boolean) as string[];
 
   return (
     <div className="site-container max-w-[720px] py-32 text-center">
