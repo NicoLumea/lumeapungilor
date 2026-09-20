@@ -10,18 +10,19 @@ const lineSchema = z.object({
 const orderSchema = z.object({
   idempotencyKey: z.string().min(8).max(80),
   expectedTotal: z.number().nonnegative().optional(),
+  termsAccepted: z.literal(true),
   customer: z.object({
     contact_name: z.string().trim().min(2).max(120),
     email: z.string().trim().email().max(200),
-    phone: z.string().trim().max(40).optional().nullable(),
+    phone: z.string().trim().min(6).max(40),
     company_name: z.string().trim().max(160).optional().nullable(),
     cui: z.string().trim().max(40).optional().nullable(),
     reg_com: z.string().trim().max(60).optional().nullable(),
     billing_address: z.string().trim().max(400).optional().nullable(),
-    delivery_address: z.string().trim().max(400).optional().nullable(),
-    city: z.string().trim().max(120).optional().nullable(),
-    county: z.string().trim().max(120).optional().nullable(),
-    postal_code: z.string().trim().max(20).optional().nullable(),
+    delivery_address: z.string().trim().min(5).max(400),
+    city: z.string().trim().min(2).max(120),
+    county: z.string().trim().min(2).max(120),
+    postal_code: z.string().trim().min(4).max(20),
     notes: z.string().trim().max(1000).optional().nullable(),
   }),
   lines: z.array(lineSchema).min(1).max(100),
@@ -153,6 +154,12 @@ export const placeOrder = createServerFn({ method: "POST" })
       const variant = line.variantId ? variants.find((v) => v.id === line.variantId) : null;
       if (line.variantId && !variant) {
         return { ok: false, error: "O opțiune selectată nu mai există." };
+      }
+      if (!line.variantId && variants.length > 0) {
+        return {
+          ok: false,
+          error: `Alege o opțiune pentru „${product.name}” înainte de a trimite comanda.`,
+        };
       }
 
       const stock = variant ? variant.stock : product.stock;
