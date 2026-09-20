@@ -88,33 +88,20 @@ function AdminLayout() {
 
 function AuthCard() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "in") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/admin" });
-      } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        if (!data.session) {
-          toast.success("Ți-am trimis un e-mail de confirmare. Confirmă, apoi autentifică-te.");
-          setMode("in");
-        }
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Autentificare eșuată.");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/admin" });
+    } catch {
+      toast.error("Autentificare eșuată. Verifică datele introduse.");
     } finally {
       setBusy(false);
     }
@@ -124,7 +111,8 @@ function AuthCard() {
     <div className="mx-auto max-w-[420px] px-4 py-28">
       <h1 className="display text-2xl">Administrare</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        {mode === "in" ? "Autentifică-te pentru a administra magazinul." : "Creează contul de proprietar."}
+        Zonă rezervată angajaților și administratorilor. Conturile de administrare se creează doar
+        intern, de către un administrator existent.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
         <label className="block">
@@ -132,6 +120,7 @@ function AuthCard() {
           <input
             type="email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
@@ -139,30 +128,34 @@ function AuthCard() {
         </label>
         <label className="block">
           <span className="micro-sm text-muted-foreground">Parolă</span>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-          />
+          <span className="relative mt-2 block">
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-input bg-background px-3 py-2 pr-24 text-sm outline-none focus:border-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-pressed={showPassword}
+              className="micro-sm absolute inset-y-0 right-0 px-3 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? "Ascunde" : "Afișează"}
+            </button>
+          </span>
         </label>
         <button
           type="submit"
           disabled={busy}
           className="micro w-full border border-foreground bg-foreground px-6 py-3 text-background disabled:opacity-40"
         >
-          {busy ? "Se procesează…" : mode === "in" ? "Intră în cont" : "Creează cont"}
+          {busy ? "Se procesează…" : "Intră în cont"}
         </button>
       </form>
-      <button
-        type="button"
-        className="micro-sm mt-6 link-underline"
-        onClick={() => setMode(mode === "in" ? "up" : "in")}
-      >
-        {mode === "in" ? "Nu ai cont? Creează unul" : "Ai deja cont? Autentifică-te"}
-      </button>
     </div>
   );
 }

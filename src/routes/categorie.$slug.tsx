@@ -1,8 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Catalogue } from "@/components/site/Catalogue";
 import { useCategories } from "@/lib/content";
 
+/** Permanent slug changes: old catalog URLs must keep working. */
+const SLUG_REDIRECTS: Record<string, string> = {
+  "pungi-hartie": "pungi-fara-maner",
+};
+
 export const Route = createFileRoute("/categorie/$slug")({
+  beforeLoad: ({ params }) => {
+    const target = SLUG_REDIRECTS[params.slug];
+    if (target) {
+      throw redirect({ to: "/categorie/$slug", params: { slug: target }, replace: true });
+    }
+  },
   head: ({ params }) => ({
     meta: [
       { title: `Categorie ${params.slug} — Lumea Pungilor` },

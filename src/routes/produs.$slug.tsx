@@ -6,6 +6,7 @@ import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
 import { normalizeQty, sortedImages } from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
+import { RestockNotice } from "@/components/site/RestockNotice";
 
 export const Route = createFileRoute("/produs/$slug")({
   head: ({ params }) => ({
@@ -253,6 +254,8 @@ function ProductPage() {
           >
             {inStock ? "Adaugă în coș" : "Indisponibil"}
           </button>
+
+          {!inStock ? <RestockNotice productId={product.id} variantId={variantId} /> : null}
 
           {product.description ? (
             <div className="mt-10 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">

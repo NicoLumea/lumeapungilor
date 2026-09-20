@@ -214,9 +214,9 @@ export const placeOrder = createServerFn({ method: "POST" })
       };
     }
 
-    const { data: order, error: oErr } = await supabaseAdmin
-      .from("orders")
-      .insert({
+    // Order and its lines are written in one transaction that re-checks stock under row locks.
+    const { data: created, error: oErr } = await supabaseAdmin.rpc("create_order_tx", {
+      p_order: {
         contact_name: data.customer.contact_name,
         email: data.customer.email,
         phone: data.customer.phone ?? null,
@@ -240,12 +240,27 @@ export const placeOrder = createServerFn({ method: "POST" })
         is_test: !paymentsConfigured,
         status: "nou",
         payment_status: paymentsConfigured ? "in_asteptare" : "neplatit",
-      })
-      .select("id, order_number, total, is_test")
-      .single();
+      },
+      p_items: items,
+    });
+
+    const order = Array.isArray(created) ? created[0] : created;
 
     if (oErr || !order) {
-      // Unique violation means a parallel submit already created it.
+      const message = oErr?.message ?? "";
+      if (message.includes("STOC_INSUFICIENT")) {
+        const name = message.split("STOC_INSUFICIENT:")[1]?.split('"')[0]?.trim();
+        return {
+          ok: false,
+          error: name
+            ? `Stocul pentru „${name}” s-a modificat între timp. Ajustează cantitatea și încearcă din nou.`
+            : "Stocul s-a modificat între timp. Te rugăm să reverifici coșul.",
+        };
+      }
+      if (message.includes("PRODUS_INDISPONIBIL")) {
+        return { ok: false, error: "Unul dintre produse nu mai este disponibil." };
+      }
+      // A unique violation means a parallel submit already created this exact order.
       const retry = await supabaseAdmin
         .from("orders")
         .select("order_number,total,is_test")
@@ -259,14 +274,6 @@ export const placeOrder = createServerFn({ method: "POST" })
           isTest: retry.data.is_test,
         };
       }
-      return { ok: false, error: "Comanda nu a putut fi salvată." };
-    }
-
-    const { error: iErr } = await supabaseAdmin
-      .from("order_items")
-      .insert(items.map((i) => ({ ...i, order_id: order.id })));
-    if (iErr) {
-      await supabaseAdmin.from("orders").delete().eq("id", order.id);
       return { ok: false, error: "Comanda nu a putut fi salvată." };
     }
 

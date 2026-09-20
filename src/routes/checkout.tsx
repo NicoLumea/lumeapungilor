@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
@@ -9,6 +9,9 @@ import { placeOrder } from "@/lib/shop.functions";
 import { useAuth } from "@/lib/use-auth";
 import { useGuestCartLimit } from "@/lib/dashboard-data";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
+import { SUPPORT_EMAIL, telephoneHref } from "@/lib/company";
+
+const SUPPORT_PHONE = "0765 514 422";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -110,6 +113,8 @@ function Field({
   );
 }
 
+const DRAFT_KEY = "lp-checkout-draft";
+
 function CheckoutPage() {
   const navigate = useNavigate();
   const { lines: cartLines, clear } = useCart();
@@ -126,6 +131,28 @@ function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<FormKey | "terms", string | undefined>>>({});
   const [busy, setBusy] = useState(false);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
+
+  // Going back to the cart and returning must not lose what was already typed.
+  useEffect(() => {
+    try {
+      const raw = window.sessionStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as {
+        form?: Partial<typeof emptyForm>;
+        customerType?: "persoana" | "companie";
+        billingSame?: boolean;
+      };
+      if (saved.form) setForm((f) => ({ ...f, ...saved.form }));
+      if (saved.customerType) setCustomerType(saved.customerType);
+      if (typeof saved.billingSame === "boolean") setBillingSame(saved.billingSame);
+    } catch {
+      /* a corrupted draft simply starts the form empty */
+    }
+  }, []);
+
+  useEffect(() => {
+    window.sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ form, customerType, billingSame }));
+  }, [form, customerType, billingSame]);
 
   const set = (key: FormKey) => (v: string) => {
     setForm((f) => ({ ...f, [key]: v }));
@@ -156,12 +183,16 @@ function CheckoutPage() {
     if (!terms)
       next.terms = "Pentru a trimite cererea trebuie să accepți Termenii și Politica de confidențialitate.";
     setErrors(next);
+    const firstInvalid = Object.keys(next)[0];
+    if (firstInvalid && firstInvalid !== "terms") {
+      window.document.getElementById(firstInvalid)?.focus();
+    }
     return Object.keys(next).length === 0;
   }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (lines.length === 0) return;
+    if (lines.length === 0 || busy) return;
     if (!validate()) {
       toast.error("Te rugăm să completezi câmpurile obligatorii.");
       return;
@@ -197,6 +228,7 @@ function CheckoutPage() {
         return;
       }
       clear();
+      window.sessionStorage.removeItem(DRAFT_KEY);
       navigate({ to: "/comanda/$number", params: { number: result.orderNumber } });
     } catch {
       toast.error("Cererea de comandă nu a putut fi trimisă. Încearcă din nou.");
@@ -219,7 +251,20 @@ function CheckoutPage() {
 
   return (
     <div className="site-container max-w-[1200px] py-14">
-      <h1 className="display text-3xl md:text-4xl">Finalizare comandă</h1>
+      <Link to="/cos" className="micro-sm inline-flex min-h-11 items-center link-underline">
+        ← Înapoi la coș
+      </Link>
+      <h1 className="display mt-3 text-3xl md:text-4xl">Finalizare comandă</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Ajutor pentru comandă:{" "}
+        <a href={telephoneHref(SUPPORT_PHONE)} className="link-underline text-foreground">
+          {SUPPORT_PHONE}
+        </a>{" "}
+        /{" "}
+        <a href={`mailto:${SUPPORT_EMAIL}`} className="link-underline text-foreground">
+          {SUPPORT_EMAIL}
+        </a>
+      </p>
 
       {!auth.user ? (
         <div className="mt-6 border border-border bg-field p-4 text-sm">
