@@ -123,7 +123,7 @@ function CheckoutPage() {
   const [customerType, setCustomerType] = useState<"persoana" | "companie">("persoana");
   const [billingSame, setBillingSame] = useState(true);
   const [terms, setTerms] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<FormKey | "terms", string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<FormKey | "terms", string | undefined>>>({});
   const [busy, setBusy] = useState(false);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
 
@@ -133,7 +133,7 @@ function CheckoutPage() {
   };
 
   function validate() {
-    const next: Partial<Record<FormKey | "terms", string>> = {};
+    const next: Partial<Record<FormKey | "terms", string | undefined>> = {};
     if (form.contact_name.trim().length < 2) next.contact_name = "Introdu numele și prenumele.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim()))
       next.email = "Introdu o adresă de e-mail validă.";
