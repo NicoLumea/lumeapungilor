@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGuestCartLimit } from "@/lib/dashboard-data";
+import { useMethods, type MethodEntry, type MethodKey } from "@/lib/methods";
 
 export const Route = createFileRoute("/admin/setari")({
   component: SettingsPage,
