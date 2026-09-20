@@ -184,7 +184,13 @@ function AboutPage() {
           {faqItems.map((item) => (
             <section key={item.question} className="py-6">
               <h3 className="text-lg font-semibold">{item.question}</h3>
-              <p className="mt-3">{item.answer}</p>
+              {item.question === "Unde pot vedea produsele disponibile?" ? (
+                <p className="mt-3">
+                  Produsele pot fi consultate în <Link to="/produse" className="link-underline font-medium">catalogul Lumea Pungilor</Link> și în paginile dedicate fiecărei categorii.
+                </p>
+              ) : (
+                <p className="mt-3">{item.answer}</p>
+              )}
             </section>
           ))}
         </div>
