@@ -59,8 +59,8 @@ function Field({
   required?: boolean;
   type?: string;
   textarea?: boolean;
-  autoComplete?: string;
-  error?: string;
+  autoComplete?: string | undefined;
+  error?: string | undefined;
 }) {
   const describedBy = error ? `${id}-error` : undefined;
   const cls =
