@@ -177,22 +177,39 @@ function ProductPage() {
           </p>
 
           {variants.length > 0 ? (
-            <label className="mt-6 block">
-              <span className="micro-sm text-muted-foreground">Opțiune</span>
-              <select
-                value={variantId ?? ""}
-                onChange={(e) => setVariantId(e.target.value || null)}
-                className="mt-2 w-full border border-input bg-background px-3 py-3 text-sm outline-none focus:border-foreground"
-              >
-                <option value="">Standard</option>
-                {variants.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                    {v.price !== null ? ` — ${formatRon(v.price)}` : ""}
+            <div className="mt-6">
+              <label className="block">
+                <span className="micro-sm text-muted-foreground">{optionLabel} *</span>
+                <select
+                  value={variantId ?? ""}
+                  required
+                  aria-invalid={variantError}
+                  aria-describedby={variantError ? "variant-error" : undefined}
+                  onChange={(e) => {
+                    setVariantId(e.target.value || null);
+                    if (e.target.value) setVariantError(false);
+                  }}
+                  className="mt-2 w-full border bg-background px-3 py-3 text-sm outline-none focus:border-foreground"
+                  style={{ borderColor: variantError ? "var(--destructive)" : "var(--input)" }}
+                >
+                  <option value="" disabled>
+                    {optionPlaceholder}
                   </option>
-                ))}
-              </select>
-            </label>
+                  {variants.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                      {v.price !== null ? ` — ${formatRon(v.price)}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {variantError ? (
+                <p id="variant-error" role="alert" className="mt-2 text-sm text-destructive">
+                  Te rugăm să alegi {isColorChoice ? "o culoare" : "o opțiune"} înainte de a adăuga
+                  produsul în coș.
+                </p>
+              ) : null}
+            </div>
           ) : null}
 
           <div className="mt-6">
