@@ -1,5 +1,5 @@
-- [ ] Remove all BazarulOnline references
-- [ ] Replace the About page with semantic supplied content and FAQ metadata
-- [ ] Add compact store homepage introduction
-- [ ] Update Contact introduction and footer description
-- [ ] Verify links, FAQ data, mobile and desktop layouts
+- [x] Remove all external marketplace references
+- [x] Replace the About page with semantic supplied content and FAQ metadata
+- [x] Add compact store homepage introduction
+- [x] Update Contact introduction and footer description
+- [x] Verify links, FAQ data, mobile and desktop layouts
