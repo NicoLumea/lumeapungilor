@@ -50,6 +50,21 @@ function ProductPage() {
     );
   }
 
+  const COLOR_WORDS = [
+    "negru", "rosu", "roșu", "verde", "albastru", "alb", "bleo", "bleu", "mov", "roz", "bej",
+    "portocaliu", "galben", "gri", "maro", "auriu", "argintiu", "transparent",
+  ];
+  const isColorChoice =
+    variants.length > 0 &&
+    variants.every((v) =>
+      v.name
+        .toLowerCase()
+        .split(/[\s\u2013\u2014-]+/)
+        .some((w) => COLOR_WORDS.includes(w)),
+    );
+  const optionLabel = isColorChoice ? "Culoare" : "Opțiune";
+  const optionPlaceholder = isColorChoice ? "Alege culoarea" : "Alege opțiunea";
+
   const variant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = Number(variant?.price ?? product.price);
   const stock = variant ? variant.stock : product.stock;
