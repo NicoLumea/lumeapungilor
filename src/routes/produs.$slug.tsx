@@ -67,7 +67,8 @@ function ProductPage() {
 
   const variant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = Number(variant?.price ?? product.price);
-  const stock = variant ? variant.stock : product.stock;
+  const variantsStocked = variants.some((v) => v.stock > 0);
+  const stock = variant && variantsStocked ? variant.stock : product.stock;
   const inStock = !product.track_stock || stock > 0;
   const min = Math.max(1, product.min_order_qty || 1);
   const step = Math.max(1, product.qty_increment || 1);
