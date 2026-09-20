@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref } from "@/lib/company";
 
 export const Route = createFileRoute("/comanda/$number")({
   head: () => ({
