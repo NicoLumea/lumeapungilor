@@ -232,7 +232,6 @@ export function AuthPanel({
             }}
             autoComplete={mode === "up" ? "new-password" : "current-password"}
             error={errors["password"]}
-            hint={mode === "up" ? undefined : ""}
             inputRef={passwordRef}
           />
         ) : null}
