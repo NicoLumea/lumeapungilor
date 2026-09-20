@@ -34,11 +34,7 @@ export function ContentPage({
             </p>
           ))}
         </div>
-      ) : isLoading ? null : (
-        <p className="mt-10 text-sm text-muted-foreground">
-          Lumea Pungilor | versiune de lucru
-        </p>
-      )}
+      ) : null}
       {showCompany ? (
         <aside className="mt-12 border-y border-border py-6">
           <p className="micro-sm mb-4 text-muted-foreground">Datele operatorului</p>
