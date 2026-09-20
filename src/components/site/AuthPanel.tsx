@@ -44,7 +44,13 @@ function romanianError(message: string): string {
   return "Ceva nu a funcționat. Te rugăm să încerci din nou.";
 }
 
-export function AuthPanel({ onSignedIn }: { onSignedIn?: () => void }) {
+export function AuthPanel({
+  onSignedIn,
+  onSignedUp,
+}: {
+  onSignedIn?: () => void;
+  onSignedUp?: () => void;
+}) {
   const [mode, setMode] = useState<Mode>("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -80,8 +86,9 @@ export function AuthPanel({ onSignedIn }: { onSignedIn?: () => void }) {
         if (!data.session) {
           setSent("Ți-am trimis un e-mail de confirmare. Confirmă adresa, apoi autentifică-te.");
           setMode("in");
+          onSignedUp?.();
         } else {
-          onSignedIn?.();
+          onSignedUp?.();
         }
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -98,7 +105,7 @@ export function AuthPanel({ onSignedIn }: { onSignedIn?: () => void }) {
   }
 
   return (
-    <div className="border border-border p-6 md:p-8">
+    <div className="border border-border p-5 sm:p-6">
       <div className="flex gap-6 border-b border-border pb-3">
         <button
           type="button"

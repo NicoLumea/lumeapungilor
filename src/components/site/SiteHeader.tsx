@@ -92,7 +92,7 @@ export function SiteHeader() {
               Contul meu
             </Link>
           ) : (
-            <Link to="/" hash="cont" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link to="/" search={{ redirect: "/cont" }} className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               Contul meu
             </Link>
           )}
@@ -133,7 +133,7 @@ export function SiteHeader() {
                       Contul meu
                     </Link>
                   ) : (
-                    <Link to="/" hash="cont" className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Link to="/" search={{ redirect: "/cont" }} className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                       <UserRound className="size-4" aria-hidden="true" />
                       Contul meu
                     </Link>
@@ -145,7 +145,7 @@ export function SiteHeader() {
         </div>
 
         <Link
-          to="/"
+          to="/magazin"
           className="min-w-0 justify-self-start whitespace-nowrap text-[clamp(1rem,3.8vw,1.25rem)] font-semibold uppercase leading-none tracking-[0.035em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 min-[769px]:text-[1.35rem] min-[1100px]:text-[clamp(1.5rem,1.8vw,1.75rem)]"
           aria-label={`${name} — pagina principală`}
         >
@@ -172,7 +172,7 @@ export function SiteHeader() {
               Contul meu
             </Link>
           ) : (
-            <Link to="/" hash="cont" className="link-underline hidden shrink-0 text-xs font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring min-[1100px]:block">
+            <Link to="/" search={{ redirect: "/cont" }} className="link-underline hidden shrink-0 text-xs font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring min-[1100px]:block">
               Contul meu
             </Link>
           )}

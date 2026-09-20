@@ -33,12 +33,12 @@ export function ProductCard({ product }: { product: Product }) {
       params={{ slug: product.slug }}
       aria-label={`${product.name}, ${cataloguePrice(product.price)} per ${product.selling_unit}`}
       title={product.name}
-      className="group flex h-full min-w-0 flex-col outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+      className="product-card group flex h-full min-w-0 max-w-[20rem] flex-col justify-self-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-field">
+      <div className="relative h-[10.75rem] w-full overflow-hidden bg-field min-[480px]:h-[12rem] md:h-[13rem] lg:h-[14.5rem] xl:h-[15rem] min-[1600px]:h-[15.5rem]">
         <span
           className={cn(
-            "micro-sm absolute left-3 top-3 z-10 px-2.5 py-2",
+            "micro-sm absolute left-2 top-2 z-10 px-2 py-1.5",
             inventory === "available" && "bg-stock-available text-stock-available-foreground",
             inventory === "low" && "bg-stock-low text-stock-low-foreground",
             inventory === "unavailable" && "bg-stock-unavailable text-stock-unavailable-foreground",
@@ -55,7 +55,7 @@ export function ProductCard({ product }: { product: Product }) {
               onLoad={() => setLoaded(true)}
               onError={() => setFailed(true)}
               className={cn(
-                "product-card-image absolute inset-0 size-full object-contain p-6",
+                "product-card-image absolute inset-0 size-full object-contain p-3 sm:p-4",
                 loaded ? "opacity-100" : "opacity-0",
                 secondary && "group-hover:opacity-0",
               )}
@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: Product }) {
                 src={secondary}
                 alt={images[1]?.alt ?? product.name}
                 loading="lazy"
-                className="product-card-image absolute inset-0 size-full object-contain p-6 opacity-0 group-hover:opacity-100"
+                className="product-card-image absolute inset-0 size-full object-contain p-3 opacity-0 group-hover:opacity-100 sm:p-4"
               />
             ) : null}
           </>
@@ -78,18 +78,18 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="mt-4 flex flex-1 flex-col">
+      <div className="mt-3 flex flex-1 flex-col">
         <p className="micro-sm min-h-3 text-muted-foreground" aria-hidden={!product.categories?.name}>
           {product.categories?.name ?? " "}
         </p>
-        <p className="product-title-clamp mt-2 min-h-10 text-sm leading-5">{product.name}</p>
-        <div className="mt-auto pt-4">
+        <p className="product-title-clamp mt-1.5 min-h-9 text-[0.8125rem] leading-[1.125rem] sm:text-sm sm:leading-5">{product.name}</p>
+        <div className="mt-auto pt-2.5">
           {product.units_per_pack && product.units_per_pack > 0 ? (
-            <p className="mb-1.5 text-xs text-muted-foreground">
+            <p className="mb-1 text-[0.6875rem] text-muted-foreground sm:text-xs">
               {product.units_per_pack} buc./{product.selling_unit}
             </p>
           ) : null}
-          <p className="text-base font-medium leading-6">
+          <p className="text-sm font-medium leading-5 sm:text-base sm:leading-6">
             {cataloguePrice(product.price)}
             <span className="ml-1 text-xs font-normal text-muted-foreground">/ {product.selling_unit}</span>
           </p>
