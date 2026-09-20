@@ -29,7 +29,7 @@ function ContactPage() {
       <div className="max-w-3xl">
         <h1 className="display text-4xl md:text-5xl">Contactează-ne</h1>
         <p className="mt-6 text-base leading-relaxed text-muted-foreground">
-          Pentru informații despre produse, disponibilitate, comenzi sau colaborări, ne poți contacta telefonic în timpul programului de lucru.
+          Pentru informații despre produse, stoc, comenzi sau colaborări, echipa Lumea Pungilor poate fi contactată în timpul programului operațional. Datele complete ale companiei și modalitățile de contact sunt disponibile mai jos.
         </p>
       </div>
 

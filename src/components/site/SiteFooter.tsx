@@ -11,16 +11,15 @@ export function SiteFooter() {
   const name = company.brandName ?? "Lumea Pungilor";
   const facebook = text(companyBlock, "facebook");
   const instagram = text(companyBlock, "instagram");
-  const footerText = text(companyBlock, "footer_text");
 
   return (
     <footer className="mt-24 border-t border-border">
       <div className="site-container grid gap-10 py-14 md:grid-cols-4">
         <div>
           <p className="micro">{name.toUpperCase()}</p>
-          {footerText ? (
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">{footerText}</p>
-          ) : null}
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            Pungi, fețe de masă și folie cu bule pentru activități comerciale și profesionale.
+          </p>
         </div>
 
         <div>

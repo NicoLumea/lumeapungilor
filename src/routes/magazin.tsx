@@ -121,6 +121,23 @@ function Shop() {
         </section>
       ) : null}
 
+      <section className="rule-t">
+        <div className="site-container grid gap-6 py-10 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:items-start md:gap-12 md:py-14">
+          <h2 className="display text-3xl md:text-4xl">Despre Lumea Pungilor</h2>
+          <div>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              Lumea Pungilor reunește într-un singur catalog produse practice pentru ambalare, servire și protejarea mărfurilor. Oferta include pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule pentru magazine, revânzători, restaurante, ateliere și alte activități profesionale.
+            </p>
+            <Link
+              to="/despre"
+              className="micro mt-6 inline-flex min-h-11 w-fit items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background"
+            >
+              Află mai multe despre noi
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {featuredProducts.length > 0 ? (
         <section className="rule-t">
           <div className="catalogue-container py-10 md:py-20">
