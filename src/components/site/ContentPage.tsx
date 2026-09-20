@@ -11,7 +11,7 @@ export function ContentPage({
   fallbackTitle: string;
   showCompany?: boolean;
 }) {
-  const { data, isLoading } = useContent();
+  const { data } = useContent();
   const block = data?.[contentKey];
   const title = text(block, "title") ?? fallbackTitle;
   const body = text(block, "body");

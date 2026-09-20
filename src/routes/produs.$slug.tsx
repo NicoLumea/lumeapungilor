@@ -25,6 +25,7 @@ function ProductPage() {
   const { add } = useCart();
   const [active, setActive] = useState(0);
   const [variantId, setVariantId] = useState<string | null>(null);
+  const [variantError, setVariantError] = useState(false);
   const [qty, setQty] = useState<number | null>(null);
   const [mainFailed, setMainFailed] = useState(false);
 
