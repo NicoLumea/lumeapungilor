@@ -62,6 +62,11 @@ function ProductPage() {
 
   function addToCart() {
     if (!product) return;
+    if (variants.length > 0 && !variantId) {
+      setVariantError(true);
+      return;
+    }
+    setVariantError(false);
     const safeQty = normalizeQty(product, quantity);
     if (product.track_stock && safeQty > stock) {
       toast.error("Stoc insuficient pentru cantitatea aleasă.");
