@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { claimOwnerAccess } from "@/lib/shop.functions";
+import { clearGuestAccess } from "@/lib/guest-access";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -49,7 +50,7 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-background">
       <header className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-border px-4 py-4 md:px-8">
-        <Link to="/" className="micro">
+        <Link to="/magazin" className="micro">
           Lumea Pungilor
         </Link>
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
@@ -70,8 +71,9 @@ function AdminLayout() {
           type="button"
           className="micro-sm ml-auto text-muted-foreground hover:text-foreground"
           onClick={async () => {
+            clearGuestAccess();
             await supabase.auth.signOut();
-            refresh();
+            window.location.assign("/");
           }}
         >
           Ieșire
@@ -227,8 +229,9 @@ function ClaimCard({
         type="button"
         className="micro-sm mt-6 link-underline"
         onClick={async () => {
+          clearGuestAccess();
           await supabase.auth.signOut();
-          onClaimed();
+          window.location.assign("/");
         }}
       >
         Ieșire

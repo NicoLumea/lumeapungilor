@@ -10,8 +10,8 @@ type Sort = "recent" | "pret-asc" | "pret-desc" | "nume";
 function ProductCardSkeleton() {
   return (
     <div className="flex h-full animate-pulse flex-col" aria-hidden="true">
-      <div className="aspect-[4/5] w-full bg-field" />
-      <div className="mt-4 flex flex-1 flex-col gap-3">
+      <div className="h-[10.75rem] w-full bg-field min-[480px]:h-[12rem] md:h-[13rem] lg:h-[14.5rem] xl:h-[15rem] min-[1600px]:h-[15.5rem]" />
+      <div className="mt-3 flex flex-1 flex-col gap-2">
         <div className="h-2.5 w-1/3 bg-muted" />
         <div className="space-y-2">
           <div className="h-3.5 w-full bg-muted" />
@@ -244,7 +244,7 @@ export function Catalogue({
 
       {isLoading ? (
         <div
-          className="catalogue-grid mt-10 motion-reduce:[&>*]:animate-none"
+          className="product-grid mt-8 motion-reduce:[&>*]:animate-none"
           aria-label="Produsele se încarcă"
           aria-busy="true"
         >
@@ -279,7 +279,7 @@ export function Catalogue({
           </button>
         </div>
       ) : (
-        <div className="catalogue-grid mt-10">
+        <div className="product-grid mt-8">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

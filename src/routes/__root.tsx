@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useNavigate,
   useRouter,
   useRouterState,
   HeadContent,
@@ -17,6 +18,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OrganizationStructuredData } from "@/components/site/OrganizationStructuredData";
 import { Toaster } from "@/components/ui/sonner";
+import { useAuth } from "@/lib/use-auth";
+import { hasGuestAccess, isGatewayProtectedPath } from "@/lib/guest-access";
 
 function NotFoundComponent() {
   return (
@@ -28,8 +31,8 @@ function NotFoundComponent() {
           Linkul nu mai există sau a fost mutat.
         </p>
         <div className="mt-8">
-          <Link
-            to="/"
+            <Link
+              to="/magazin"
             className="micro inline-flex items-center justify-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
           >
             Înapoi acasă
@@ -64,7 +67,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Încearcă din nou
           </button>
-          <a href="/" className="micro border border-border px-6 py-3 transition-colors hover:bg-accent">
+            <a href="/magazin" className="micro border border-border px-6 py-3 transition-colors hover:bg-accent">
             Acasă
           </a>
         </div>
@@ -122,25 +125,45 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = pathname.startsWith("/admin");
+  const isGateway = pathname === "/";
 
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        {isAdmin ? (
+        {isAdmin || isGateway ? (
           <Outlet />
         ) : (
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <OrganizationStructuredData />
-            <main className="flex-1">
-              {/* Required: nested routes render here. */}
-              <Outlet />
-            </main>
-            <SiteFooter />
-          </div>
+          <PublicSiteFrame pathname={pathname} />
         )}
         <Toaster position="bottom-right" />
       </CartProvider>
     </QueryClientProvider>
+  );
+}
+
+function PublicSiteFrame({ pathname }: { pathname: string }) {
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const protectedPath = isGatewayProtectedPath(pathname);
+  const guestAccess = hasGuestAccess();
+
+  useEffect(() => {
+    if (!protectedPath || auth.loading || auth.user || guestAccess) return;
+    void navigate({ to: "/", replace: true });
+  }, [auth.loading, auth.user, guestAccess, navigate, protectedPath]);
+
+  if (protectedPath && (auth.loading || (!auth.user && !guestAccess))) {
+    return <div className="min-h-svh bg-hero" aria-busy="true" />;
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <OrganizationStructuredData />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

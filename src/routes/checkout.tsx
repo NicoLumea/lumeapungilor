@@ -228,7 +228,7 @@ function CheckoutPage() {
             {typeof guestLimit === "number" ? guestLimit : 3} produse diferite, o singură dată per adresă
             de e-mail.
           </p>
-          <Link to="/" hash="cont" className="micro-sm mt-2 inline-block link-underline">
+          <Link to="/" search={{ redirect: "/checkout" }} className="micro-sm mt-2 inline-block link-underline">
             Creează un cont pentru comenzi nelimitate
           </Link>
         </div>

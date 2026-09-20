@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
-import { FeaturedProductCard } from "@/components/site/FeaturedProductCard";
+import { ProductCard } from "@/components/site/ProductCard";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { usePublishedProducts } from "@/lib/products";
@@ -130,9 +130,9 @@ function Shop() {
                 Descoperă câteva dintre produsele disponibile în catalog.
               </p>
             </div>
-            <div className="featured-products-grid mt-7 md:mt-10">
-              {featuredProducts.map((product, index) => (
-                <FeaturedProductCard key={product.id} product={product} index={index} />
+            <div className="product-grid mt-7 md:mt-10">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { clearGuestAccess } from "@/lib/guest-access";
 
 export type AppRole = "customer" | "employee" | "admin" | "owner";
 
@@ -75,5 +76,6 @@ export function useAuth(): AuthState {
 }
 
 export async function signOutCleanly(): Promise<void> {
+  clearGuestAccess();
   await supabase.auth.signOut();
 }
