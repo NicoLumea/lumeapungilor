@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 export const Route = createFileRoute("/comanda/$number")({
   head: () => ({
@@ -44,6 +45,12 @@ function OrderConfirmation() {
           className="micro-sm inline-flex min-h-11 items-center border border-border px-5 py-2.5"
         >
           0371 900 033
+        </a>
+        <a
+          href={`mailto:${SUPPORT_EMAIL}`}
+          className="micro-sm inline-flex min-h-11 items-center border border-border px-5 py-2.5"
+        >
+          {SUPPORT_EMAIL}
         </a>
       </div>
       <div className="mx-auto mt-8 max-w-xl border-y border-border py-5 text-left">

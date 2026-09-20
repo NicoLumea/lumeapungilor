@@ -27,6 +27,7 @@ const NAV: { to: string; label: string; exact: boolean }[] = [
   { to: "/admin/clienti", label: "Clienți", exact: false },
   { to: "/admin/roluri", label: "Angajați și accese", exact: false },
   { to: "/admin/retururi", label: "Retururi", exact: false },
+  { to: "/admin/stoc", label: "Cereri revenire stoc", exact: false },
   { to: "/admin/mesaje", label: "Mesaje", exact: false },
   { to: "/admin/content", label: "Conținut site", exact: false },
   { to: "/admin/setari", label: "Setări", exact: false },

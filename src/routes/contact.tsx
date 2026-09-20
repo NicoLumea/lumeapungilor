@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref } from "@/lib/company";
+import { companyInfo, telephoneHref, SUPPORT_EMAIL } from "@/lib/company";
 import { useContent } from "@/lib/content";
 
 export const Route = createFileRoute("/contact")({
@@ -53,6 +53,14 @@ function ContactPage() {
             ))}
           </ul>
           {company.secondaryPhoneNote ? <p className="mt-1 text-xs text-muted-foreground">{company.secondaryPhoneNote}</p> : null}
+          <h2 className="micro-sm mt-6 text-muted-foreground">E-mail</h2>
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm font-medium link-underline"
+          >
+            <Mail aria-hidden="true" className="size-4 stroke-[1.5]" />
+            {SUPPORT_EMAIL}
+          </a>
         </section>
 
         <section className="min-w-0 bg-background p-6 md:p-8">

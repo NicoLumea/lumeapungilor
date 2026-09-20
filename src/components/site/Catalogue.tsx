@@ -42,7 +42,13 @@ function specValues(products: Product[], label: string): string[] {
 
 /** Everything a customer might type: name, code and dimensions. */
 function searchIndex(p: Product): string {
-  return [p.name, p.sku ?? "", p.description ?? "", ...p.specs.map((s) => `${s.label} ${s.value}`)].join(" ");
+  return [
+    p.name,
+    p.sku ?? "",
+    p.description ?? "",
+    p.categories?.name ?? "",
+    ...p.specs.map((s) => `${s.label} ${s.value}`),
+  ].join(" ");
 }
 
 export function Catalogue({

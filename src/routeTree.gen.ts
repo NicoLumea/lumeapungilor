@@ -19,6 +19,7 @@ import { Route as ContRouteImport } from './routes/cont'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
+import { Route as DezabonareRouteImport } from './routes/dezabonare'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
 import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
@@ -39,6 +40,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminRetururiRouteImport } from './routes/admin.retururi'
 import { Route as AdminRoluriRouteImport } from './routes/admin.roluri'
 import { Route as AdminSetariRouteImport } from './routes/admin.setari'
+import { Route as AdminStocRouteImport } from './routes/admin.stoc'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
@@ -49,6 +51,7 @@ import { Route as StaffContinutRouteImport } from './routes/staff.continut'
 import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
 import { Route as StaffProduseRouteImport } from './routes/staff.produse'
 import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
+import { Route as StaffStocRouteImport } from './routes/staff.stoc'
 import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -99,6 +102,11 @@ const CosRoute = CosRouteImport.update({
 const DespreRoute = DespreRouteImport.update({
   id: '/despre',
   path: '/despre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DezabonareRoute = DezabonareRouteImport.update({
+  id: '/dezabonare',
+  path: '/dezabonare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivrareRoute = LivrareRouteImport.update({
@@ -201,6 +209,11 @@ const AdminSetariRoute = AdminSetariRouteImport.update({
   path: '/setari',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStocRoute = AdminStocRouteImport.update({
+  id: '/stoc',
+  path: '/stoc',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
   id: '/categorie/$slug',
   path: '/categorie/$slug',
@@ -251,6 +264,11 @@ const StaffRetururiRoute = StaffRetururiRouteImport.update({
   path: '/retururi',
   getParentRoute: () => StaffRoute,
 } as any)
+const StaffStocRoute = StaffStocRouteImport.update({
+  id: '/stoc',
+  path: '/stoc',
+  getParentRoute: () => StaffRoute,
+} as any)
 const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
   id: '/api/public/img/$',
   path: '/api/public/img/$',
@@ -268,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
+  '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -287,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/admin/retururi': typeof AdminRetururiRoute
   '/admin/roluri': typeof AdminRoluriRoute
   '/admin/setari': typeof AdminSetariRoute
+  '/admin/stoc': typeof AdminStocRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -296,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
+  '/staff/stoc': typeof StaffStocRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
@@ -310,6 +331,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
+  '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -328,6 +350,7 @@ export interface FileRoutesByTo {
   '/admin/retururi': typeof AdminRetururiRoute
   '/admin/roluri': typeof AdminRoluriRoute
   '/admin/setari': typeof AdminSetariRoute
+  '/admin/stoc': typeof AdminStocRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -337,6 +360,7 @@ export interface FileRoutesByTo {
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
+  '/staff/stoc': typeof StaffStocRoute
   '/admin': typeof AdminIndexRoute
   '/staff': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
@@ -353,6 +377,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
+  '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -372,6 +397,7 @@ export interface FileRoutesById {
   '/admin/retururi': typeof AdminRetururiRoute
   '/admin/roluri': typeof AdminRoluriRoute
   '/admin/setari': typeof AdminSetariRoute
+  '/admin/stoc': typeof AdminStocRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -381,6 +407,7 @@ export interface FileRoutesById {
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
+  '/staff/stoc': typeof StaffStocRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
@@ -398,6 +425,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cos'
     | '/despre'
+    | '/dezabonare'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -417,6 +445,7 @@ export interface FileRouteTypes {
     | '/admin/retururi'
     | '/admin/roluri'
     | '/admin/setari'
+    | '/admin/stoc'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -426,6 +455,7 @@ export interface FileRouteTypes {
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
+    | '/staff/stoc'
     | '/admin/'
     | '/staff/'
     | '/api/public/img/$'
@@ -440,6 +470,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cos'
     | '/despre'
+    | '/dezabonare'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -458,6 +489,7 @@ export interface FileRouteTypes {
     | '/admin/retururi'
     | '/admin/roluri'
     | '/admin/setari'
+    | '/admin/stoc'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -467,6 +499,7 @@ export interface FileRouteTypes {
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
+    | '/staff/stoc'
     | '/admin'
     | '/staff'
     | '/api/public/img/$'
@@ -482,6 +515,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cos'
     | '/despre'
+    | '/dezabonare'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -501,6 +535,7 @@ export interface FileRouteTypes {
     | '/admin/retururi'
     | '/admin/roluri'
     | '/admin/setari'
+    | '/admin/stoc'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -510,6 +545,7 @@ export interface FileRouteTypes {
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
+    | '/staff/stoc'
     | '/admin/'
     | '/staff/'
     | '/api/public/img/$'
@@ -526,6 +562,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CosRoute: typeof CosRoute
   DespreRoute: typeof DespreRoute
+  DezabonareRoute: typeof DezabonareRoute
   LivrareRoute: typeof LivrareRoute
   MagazinRoute: typeof MagazinRoute
   ParolaNouaRoute: typeof ParolaNouaRoute
@@ -610,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/despre'
       fullPath: '/despre'
       preLoaderRoute: typeof DespreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dezabonare': {
+      id: '/dezabonare'
+      path: '/dezabonare'
+      fullPath: '/dezabonare'
+      preLoaderRoute: typeof DezabonareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/livrare': {
@@ -752,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSetariRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/stoc': {
+      id: '/admin/stoc'
+      path: '/stoc'
+      fullPath: '/admin/stoc'
+      preLoaderRoute: typeof AdminStocRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/categorie/$slug': {
       id: '/categorie/$slug'
       path: '/categorie/$slug'
@@ -822,6 +873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffRetururiRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/staff/stoc': {
+      id: '/staff/stoc'
+      path: '/stoc'
+      fullPath: '/staff/stoc'
+      preLoaderRoute: typeof StaffStocRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/api/public/img/$': {
       id: '/api/public/img/$'
       path: '/api/public/img/$'
@@ -844,6 +902,7 @@ interface AdminRouteChildren {
   AdminRetururiRoute: typeof AdminRetururiRoute
   AdminRoluriRoute: typeof AdminRoluriRoute
   AdminSetariRoute: typeof AdminSetariRoute
+  AdminStocRoute: typeof AdminStocRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -859,6 +918,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRetururiRoute: AdminRetururiRoute,
   AdminRoluriRoute: AdminRoluriRoute,
   AdminSetariRoute: AdminSetariRoute,
+  AdminStocRoute: AdminStocRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -871,6 +931,7 @@ interface StaffRouteChildren {
   StaffMesajeRoute: typeof StaffMesajeRoute
   StaffProduseRoute: typeof StaffProduseRoute
   StaffRetururiRoute: typeof StaffRetururiRoute
+  StaffStocRoute: typeof StaffStocRoute
   StaffIndexRoute: typeof StaffIndexRoute
 }
 
@@ -881,6 +942,7 @@ const StaffRouteChildren: StaffRouteChildren = {
   StaffMesajeRoute: StaffMesajeRoute,
   StaffProduseRoute: StaffProduseRoute,
   StaffRetururiRoute: StaffRetururiRoute,
+  StaffStocRoute: StaffStocRoute,
   StaffIndexRoute: StaffIndexRoute,
 }
 
@@ -897,6 +959,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CosRoute: CosRoute,
   DespreRoute: DespreRoute,
+  DezabonareRoute: DezabonareRoute,
   LivrareRoute: LivrareRoute,
   MagazinRoute: MagazinRoute,
   ParolaNouaRoute: ParolaNouaRoute,
