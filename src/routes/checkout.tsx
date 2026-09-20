@@ -39,74 +39,152 @@ const emptyForm = {
   notes: "",
 };
 
+type FormKey = keyof typeof emptyForm;
+
 function Field({
+  id,
   label,
   value,
   onChange,
   required,
   type = "text",
   textarea,
+  autoComplete,
+  error,
 }: {
+  id: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
   required?: boolean;
   type?: string;
   textarea?: boolean;
+  autoComplete?: string;
+  error?: string;
 }) {
+  const describedBy = error ? `${id}-error` : undefined;
+  const cls =
+    "mt-2 w-full border bg-background px-3 py-2 text-sm outline-none focus:border-foreground";
+  const style = { borderColor: error ? "var(--destructive)" : "var(--input)" };
   return (
-    <label className="block">
-      <span className="micro-sm text-muted-foreground">
-        {label}
-        {required ? " *" : ""}
-      </span>
+    <div>
+      <label htmlFor={id} className="block">
+        <span className="micro-sm text-muted-foreground">
+          {label}
+          {required ? " *" : ""}
+        </span>
+      </label>
       {textarea ? (
         <textarea
+          id={id}
           value={value}
-          required={required}
           rows={3}
+          autoComplete={autoComplete}
+          aria-required={required}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
           onChange={(e) => onChange(e.target.value)}
-          className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+          className={cls}
+          style={style}
         />
       ) : (
         <input
+          id={id}
           type={type}
           value={value}
-          required={required}
+          autoComplete={autoComplete}
+          aria-required={required}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
           onChange={(e) => onChange(e.target.value)}
-          className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+          className={cls}
+          style={style}
         />
       )}
-    </label>
+      {error ? (
+        <p id={describedBy} role="alert" className="mt-1 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
 function CheckoutPage() {
   const navigate = useNavigate();
   const { lines: cartLines, clear } = useCart();
-  const { lines, subtotal, shipping, shippingConfigured, tax, vatRate, total, paymentsConfigured } =
-    useCartLines();
+  const { lines, subtotal, shipping, shippingConfigured, tax, vatRate, total } = useCartLines();
   const submit = useServerFn(placeOrder);
   const auth = useAuth();
   const { data: guestLimit } = useGuestCartLimit();
   const distinctProducts = new Set(cartLines.map((l) => l.productId)).size;
   const overGuestLimit = !auth.user && typeof guestLimit === "number" && distinctProducts > guestLimit;
   const [form, setForm] = useState(emptyForm);
+  const [customerType, setCustomerType] = useState<"persoana" | "companie">("persoana");
+  const [billingSame, setBillingSame] = useState(true);
+  const [terms, setTerms] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<FormKey | "terms", string>>>({});
   const [busy, setBusy] = useState(false);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
 
-  const set = (key: keyof typeof emptyForm) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
+  const set = (key: FormKey) => (v: string) => {
+    setForm((f) => ({ ...f, [key]: v }));
+    setErrors((e) => ({ ...e, [key]: undefined }));
+  };
+
+  function validate() {
+    const next: Partial<Record<FormKey | "terms", string>> = {};
+    if (form.contact_name.trim().length < 2) next.contact_name = "Introdu numele și prenumele.";
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim()))
+      next.email = "Introdu o adresă de e-mail validă.";
+    if (form.phone.replace(/\D/g, "").length < 9)
+      next.phone = "Introdu un număr de telefon valid.";
+    if (form.delivery_address.trim().length < 5)
+      next.delivery_address = "Introdu adresa de livrare.";
+    if (form.city.trim().length < 2) next.city = "Introdu orașul.";
+    if (form.county.trim().length < 2) next.county = "Introdu județul.";
+    if (!/^\d{4,10}$/.test(form.postal_code.trim()))
+      next.postal_code = "Introdu codul poștal.";
+    if (customerType === "companie") {
+      if (form.company_name.trim().length < 2) next.company_name = "Introdu numele firmei.";
+      if (form.cui.trim().length < 2) next.cui = "Introdu CUI-ul firmei.";
+      if (!billingSame && form.billing_address.trim().length < 5)
+        next.billing_address = "Introdu adresa de facturare.";
+    } else if (!billingSame && form.billing_address.trim().length < 5) {
+      next.billing_address = "Introdu adresa de facturare.";
+    }
+    if (!terms)
+      next.terms = "Pentru a trimite cererea trebuie să accepți Termenii și Politica de confidențialitate.";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (lines.length === 0) return;
+    if (!validate()) {
+      toast.error("Te rugăm să completezi câmpurile obligatorii.");
+      return;
+    }
     setBusy(true);
     try {
+      const billing = billingSame
+        ? [form.delivery_address, [form.city, form.county, form.postal_code].filter(Boolean).join(", ")]
+            .filter(Boolean)
+            .join("\n")
+        : form.billing_address;
       const result = await submit({
         data: {
           idempotencyKey,
           expectedTotal: total,
-          customer: form,
+          termsAccepted: true as const,
+          customer: {
+            ...form,
+            billing_address: billing,
+            company_name: customerType === "companie" ? form.company_name : null,
+            cui: customerType === "companie" ? form.cui : null,
+            reg_com: customerType === "companie" ? form.reg_com : null,
+          },
           lines: cartLines.map((l) => ({
             productId: l.productId,
             variantId: l.variantId,
@@ -121,7 +199,7 @@ function CheckoutPage() {
       clear();
       navigate({ to: "/comanda/$number", params: { number: result.orderNumber } });
     } catch {
-      toast.error("Comanda nu a putut fi trimisă. Încearcă din nou.");
+      toast.error("Cererea de comandă nu a putut fi trimisă. Încearcă din nou.");
     } finally {
       setBusy(false);
     }
@@ -163,39 +241,170 @@ function CheckoutPage() {
         </p>
       ) : null}
 
-      {!paymentsConfigured ? (
-        <p className="mt-6 border border-border bg-field p-4 text-sm">
-          <span className="micro-sm">Flux de test</span> — plata online nu este încă activată. Comanda
-          este înregistrată ca cerere, fără nicio plată reală.
-        </p>
-      ) : null}
+      <p className="mt-6 border border-border bg-field p-4 text-sm">
+        Comanda este trimisă spre confirmare. Echipa Lumea Pungilor te va contacta pentru confirmarea
+        disponibilității, livrării și modalității de plată.
+      </p>
 
-      <form onSubmit={onSubmit} className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
+      <form onSubmit={onSubmit} noValidate className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-10">
           <fieldset className="space-y-5">
             <legend className="micro-sm text-muted-foreground">Contact</legend>
-            <Field label="Nume și prenume" value={form.contact_name} onChange={set("contact_name")} required />
-            <Field label="E-mail" type="email" value={form.email} onChange={set("email")} required />
-            <Field label="Telefon" value={form.phone} onChange={set("phone")} />
-          </fieldset>
-
-          <fieldset className="space-y-5">
-            <legend className="micro-sm text-muted-foreground">Date de facturare</legend>
-            <Field label="Firmă" value={form.company_name} onChange={set("company_name")} />
-            <Field label="CUI" value={form.cui} onChange={set("cui")} />
-            <Field label="Nr. Reg. Com." value={form.reg_com} onChange={set("reg_com")} />
-            <Field label="Adresă de facturare" value={form.billing_address} onChange={set("billing_address")} textarea />
+            <Field
+              id="contact_name"
+              label="Nume și prenume"
+              autoComplete="name"
+              value={form.contact_name}
+              onChange={set("contact_name")}
+              required
+              error={errors.contact_name}
+            />
+            <Field
+              id="email"
+              label="E-mail"
+              type="email"
+              autoComplete="email"
+              value={form.email}
+              onChange={set("email")}
+              required
+              error={errors.email}
+            />
+            <Field
+              id="phone"
+              label="Telefon"
+              type="tel"
+              autoComplete="tel"
+              value={form.phone}
+              onChange={set("phone")}
+              required
+              error={errors.phone}
+            />
           </fieldset>
 
           <fieldset className="space-y-5">
             <legend className="micro-sm text-muted-foreground">Livrare</legend>
-            <Field label="Adresă de livrare" value={form.delivery_address} onChange={set("delivery_address")} textarea />
+            <Field
+              id="delivery_address"
+              label="Adresă de livrare"
+              autoComplete="shipping street-address"
+              value={form.delivery_address}
+              onChange={set("delivery_address")}
+              required
+              textarea
+              error={errors.delivery_address}
+            />
             <div className="grid gap-5 md:grid-cols-3">
-              <Field label="Oraș" value={form.city} onChange={set("city")} />
-              <Field label="Județ" value={form.county} onChange={set("county")} />
-              <Field label="Cod poștal" value={form.postal_code} onChange={set("postal_code")} />
+              <Field
+                id="city"
+                label="Oraș"
+                autoComplete="shipping address-level2"
+                value={form.city}
+                onChange={set("city")}
+                required
+                error={errors.city}
+              />
+              <Field
+                id="county"
+                label="Județ"
+                autoComplete="shipping address-level1"
+                value={form.county}
+                onChange={set("county")}
+                required
+                error={errors.county}
+              />
+              <Field
+                id="postal_code"
+                label="Cod poștal"
+                autoComplete="shipping postal-code"
+                value={form.postal_code}
+                onChange={set("postal_code")}
+                required
+                error={errors.postal_code}
+              />
             </div>
-            <Field label="Observații" value={form.notes} onChange={set("notes")} textarea />
+            <Field
+              id="notes"
+              label="Observații"
+              value={form.notes}
+              onChange={set("notes")}
+              textarea
+            />
+          </fieldset>
+
+          <fieldset className="space-y-5">
+            <legend className="micro-sm text-muted-foreground">Facturare</legend>
+
+            <div role="radiogroup" aria-label="Tip client" className="flex flex-wrap gap-3">
+              {(["persoana", "companie"] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  role="radio"
+                  aria-checked={customerType === t}
+                  onClick={() => setCustomerType(t)}
+                  className="micro-sm min-h-11 border px-5 py-2.5"
+                  style={{
+                    borderColor: customerType === t ? "var(--foreground)" : "var(--border)",
+                    background: customerType === t ? "var(--foreground)" : "transparent",
+                    color: customerType === t ? "var(--background)" : "inherit",
+                  }}
+                >
+                  {t === "persoana" ? "Persoană fizică" : "Companie"}
+                </button>
+              ))}
+            </div>
+
+            {customerType === "companie" ? (
+              <>
+                <Field
+                  id="company_name"
+                  label="Firmă"
+                  autoComplete="organization"
+                  value={form.company_name}
+                  onChange={set("company_name")}
+                  required
+                  error={errors.company_name}
+                />
+                <Field
+                  id="cui"
+                  label="CUI"
+                  value={form.cui}
+                  onChange={set("cui")}
+                  required
+                  error={errors.cui}
+                />
+                <Field
+                  id="reg_com"
+                  label="Nr. Reg. Com."
+                  value={form.reg_com}
+                  onChange={set("reg_com")}
+                  error={errors.reg_com}
+                />
+              </>
+            ) : null}
+
+            <label className="flex items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={billingSame}
+                onChange={(e) => setBillingSame(e.target.checked)}
+                className="mt-1 size-4"
+              />
+              <span>Adresa de facturare este aceeași cu adresa de livrare</span>
+            </label>
+
+            {!billingSame ? (
+              <Field
+                id="billing_address"
+                label="Adresă de facturare"
+                autoComplete="billing street-address"
+                value={form.billing_address}
+                onChange={set("billing_address")}
+                required
+                textarea
+                error={errors.billing_address}
+              />
+            ) : null}
           </fieldset>
         </div>
 
@@ -232,12 +441,48 @@ function CheckoutPage() {
               <dd>{formatRon(total)}</dd>
             </div>
           </dl>
+
+          <label className="mt-6 flex items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={terms}
+              onChange={(e) => {
+                setTerms(e.target.checked);
+                if (e.target.checked) setErrors((x) => ({ ...x, terms: undefined }));
+              }}
+              aria-invalid={!!errors.terms}
+              aria-describedby={errors.terms ? "terms-error" : undefined}
+              className="mt-1 size-4"
+            />
+            <span>
+              Am citit și accept{" "}
+              <a href="/termeni" target="_blank" rel="noopener noreferrer" className="link-underline">
+                Termenii și condițiile
+              </a>{" "}
+              și{" "}
+              <a
+                href="/confidentialitate"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline"
+              >
+                Politica de confidențialitate
+              </a>
+              .
+            </span>
+          </label>
+          {errors.terms ? (
+            <p id="terms-error" role="alert" className="mt-2 text-sm text-destructive">
+              {errors.terms}
+            </p>
+          ) : null}
+
           <button
             type="submit"
             disabled={busy || overGuestLimit}
-            className="micro mt-8 w-full border border-foreground bg-foreground px-8 py-4 text-background transition-opacity hover:opacity-85 disabled:opacity-40"
+            className="micro mt-6 w-full border border-foreground bg-foreground px-8 py-4 text-background transition-opacity hover:opacity-85 disabled:opacity-40"
           >
-            {busy ? "Se trimite…" : paymentsConfigured ? "Plătește" : "Trimite comanda (test)"}
+            {busy ? "Se trimite…" : "Trimite cererea de comandă"}
           </button>
           <div className="mt-6 border-t border-border pt-5">
             <p className="micro-sm mb-3 text-muted-foreground">Datele vânzătorului</p>

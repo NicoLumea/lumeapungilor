@@ -25,6 +25,7 @@ function ProductPage() {
   const { add } = useCart();
   const [active, setActive] = useState(0);
   const [variantId, setVariantId] = useState<string | null>(null);
+  const [variantError, setVariantError] = useState(false);
   const [qty, setQty] = useState<number | null>(null);
   const [mainFailed, setMainFailed] = useState(false);
 
@@ -49,6 +50,21 @@ function ProductPage() {
     );
   }
 
+  const COLOR_WORDS = [
+    "negru", "rosu", "roșu", "verde", "albastru", "alb", "bleo", "bleu", "mov", "roz", "bej",
+    "portocaliu", "galben", "gri", "maro", "auriu", "argintiu", "transparent",
+  ];
+  const isColorChoice =
+    variants.length > 0 &&
+    variants.every((v) =>
+      v.name
+        .toLowerCase()
+        .split(/[\s\u2013\u2014-]+/)
+        .some((w) => COLOR_WORDS.includes(w)),
+    );
+  const optionLabel = isColorChoice ? "Culoare" : "Opțiune";
+  const optionPlaceholder = isColorChoice ? "Alege culoarea" : "Alege opțiunea";
+
   const variant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = Number(variant?.price ?? product.price);
   const stock = variant ? variant.stock : product.stock;
@@ -61,6 +77,11 @@ function ProductPage() {
 
   function addToCart() {
     if (!product) return;
+    if (variants.length > 0 && !variantId) {
+      setVariantError(true);
+      return;
+    }
+    setVariantError(false);
     const safeQty = normalizeQty(product, quantity);
     if (product.track_stock && safeQty > stock) {
       toast.error("Stoc insuficient pentru cantitatea aleasă.");
@@ -156,22 +177,39 @@ function ProductPage() {
           </p>
 
           {variants.length > 0 ? (
-            <label className="mt-6 block">
-              <span className="micro-sm text-muted-foreground">Opțiune</span>
-              <select
-                value={variantId ?? ""}
-                onChange={(e) => setVariantId(e.target.value || null)}
-                className="mt-2 w-full border border-input bg-background px-3 py-3 text-sm outline-none focus:border-foreground"
-              >
-                <option value="">Standard</option>
-                {variants.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                    {v.price !== null ? ` — ${formatRon(v.price)}` : ""}
+            <div className="mt-6">
+              <label className="block">
+                <span className="micro-sm text-muted-foreground">{optionLabel} *</span>
+                <select
+                  value={variantId ?? ""}
+                  required
+                  aria-invalid={variantError}
+                  aria-describedby={variantError ? "variant-error" : undefined}
+                  onChange={(e) => {
+                    setVariantId(e.target.value || null);
+                    if (e.target.value) setVariantError(false);
+                  }}
+                  className="mt-2 w-full border bg-background px-3 py-3 text-sm outline-none focus:border-foreground"
+                  style={{ borderColor: variantError ? "var(--destructive)" : "var(--input)" }}
+                >
+                  <option value="" disabled>
+                    {optionPlaceholder}
                   </option>
-                ))}
-              </select>
-            </label>
+                  {variants.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                      {v.price !== null ? ` — ${formatRon(v.price)}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {variantError ? (
+                <p id="variant-error" role="alert" className="mt-2 text-sm text-destructive">
+                  Te rugăm să alegi {isColorChoice ? "o culoare" : "o opțiune"} înainte de a adăuga
+                  produsul în coș.
+                </p>
+              ) : null}
+            </div>
           ) : null}
 
           <div className="mt-6">
