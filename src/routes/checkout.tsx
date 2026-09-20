@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/use-auth";
 import { useGuestCartLimit } from "@/lib/dashboard-data";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 import { SUPPORT_EMAIL, telephoneHref } from "@/lib/company";
+import { useEnabledMethods } from "@/lib/methods";
 
 const SUPPORT_PHONE = "0765 514 422";
 
@@ -538,6 +539,36 @@ function CheckoutPage() {
           </div>
         </aside>
       </form>
+    </div>
+  );
+}
+
+function MethodList({ title, items }: { title: string; items: { label: string; description: string }[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h2 className="micro-sm text-muted-foreground">{title}</h2>
+      <ul className="mt-2 space-y-1 text-sm">
+        {items.map((m) => (
+          <li key={m.label}>
+            <span className="font-medium">{m.label}</span>
+            {m.description ? <span className="text-muted-foreground"> — {m.description}</span> : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Shows only the payment and delivery methods an administrator has confirmed. */
+function ConfirmedMethods() {
+  const { data: payments } = useEnabledMethods("payment_methods");
+  const { data: deliveries } = useEnabledMethods("delivery_methods");
+  if (payments.length === 0 && deliveries.length === 0) return null;
+  return (
+    <div className="mt-4 grid gap-6 border border-border p-4 sm:grid-cols-2">
+      <MethodList title="Modalități de plată" items={payments} />
+      <MethodList title="Modalități de livrare" items={deliveries} />
     </div>
   );
 }
