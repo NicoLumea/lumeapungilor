@@ -65,10 +65,10 @@ function Shop() {
   return (
     <div>
       <section className="overflow-hidden border-b border-border bg-hero">
-        <div className="relative mx-auto w-full max-w-[1200px]">
+        <div className="relative w-full">
           <div className="relative z-10 px-5 py-5 md:absolute md:inset-0 md:flex md:items-center md:px-[clamp(28px,4vw,56px)] md:py-0">
-            <div className="max-w-[500px] text-left md:w-[43%]">
-              <h1 className="display text-3xl leading-[1.08] md:text-[clamp(30px,3.2vw,44px)]">{heroTitle}</h1>
+            <div className="max-w-[500px] text-left md:w-[30%] md:max-w-[390px]">
+              <h1 className="display text-3xl leading-[1.08] md:text-[clamp(28px,2.7vw,40px)]">{heroTitle}</h1>
               <p className="mt-3 max-w-md text-sm leading-[1.5] text-foreground/80 md:mt-4 md:text-[clamp(14px,1.35vw,17px)]">
                 {heroSubtitle}
               </p>
@@ -94,7 +94,7 @@ function Shop() {
             width="1920"
             height="800"
             fetchPriority="high"
-            className="pointer-events-none relative block h-auto w-full"
+            className="pointer-events-none relative block h-auto w-full md:h-[min(41.6667vw,500px)] md:object-fill"
           />
         </div>
       </section>
