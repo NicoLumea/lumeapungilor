@@ -94,7 +94,7 @@ function Shop() {
             width="1920"
             height="800"
             fetchPriority="high"
-            className="pointer-events-none relative block h-auto w-full md:h-[clamp(420px,34vw,500px)] md:object-fill"
+            className="pointer-events-none relative block h-auto w-full md:h-[min(41.6667vw,500px)] md:object-fill"
           />
         </div>
       </section>
