@@ -17,9 +17,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/use-auth";
 
 function headerCategoryLabel(name: string): string {
-  return name
-    .replace(/\bFARA\b/gi, "FĂRĂ")
-    .replace(/\bMANER\b/gi, "MÂNER");
+  return name.replace(/\bFARA\b/gi, "FĂRĂ").replace(/\bMANER\b/gi, "MÂNER");
 }
 
 export function SiteHeader() {
@@ -81,18 +79,31 @@ export function SiteHeader() {
     >
       <div className="utility-bar hidden h-8 bg-muted/70 min-[769px]:block">
         <div className="mx-auto flex h-full w-full max-w-[110rem] items-center justify-end gap-6 px-[clamp(20px,3vw,56px)]">
-          <Link to="/contact" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Link
+            to="/contact"
+            className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             Contact
           </Link>
-          <Link to="/ajutor-comanda" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Link
+            to="/ajutor-comanda"
+            className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             Ajutor
           </Link>
           {auth.user ? (
-            <Link to="/cont" className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link
+              to="/cont"
+              className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               Contul meu
             </Link>
           ) : (
-            <Link to="/" search={{ redirect: "/cont" }} className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link
+              to="/autentificare"
+              search={{ redirect: "/cont" }}
+              className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               Contul meu
             </Link>
           )}
@@ -103,17 +114,27 @@ export function SiteHeader() {
         <div className="min-[1100px]:hidden">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="-ml-2 size-11" aria-label="Deschide meniul de navigare">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="-ml-2 size-11"
+                aria-label="Deschide meniul de navigare"
+              >
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[min(88vw,24rem)] border-border p-0 shadow-none">
               <SheetHeader className="border-b border-border px-6 py-6 text-left">
-                <SheetTitle className="pr-8 text-lg font-semibold uppercase tracking-[0.04em]">{name}</SheetTitle>
+                <SheetTitle className="pr-8 text-lg font-semibold uppercase tracking-[0.04em]">
+                  {name}
+                </SheetTitle>
               </SheetHeader>
               <nav aria-label="Navigare principală" className="flex flex-col px-6 py-3">
                 <SheetClose asChild>
-                  <Link to="/produse" className="border-b border-border py-4 text-sm font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset">
+                  <Link
+                    to="/produse"
+                    className="border-b border-border py-4 text-sm font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                  >
                     Catalog
                   </Link>
                 </SheetClose>
@@ -121,19 +142,36 @@ export function SiteHeader() {
               </nav>
               <div className="mt-4 flex flex-col border-t border-border px-6 py-3">
                 <SheetClose asChild>
-                  <Link to="/contact" className="py-3 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Contact</Link>
+                  <Link
+                    to="/contact"
+                    className="py-3 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Contact
+                  </Link>
                 </SheetClose>
                 <SheetClose asChild>
-                  <Link to="/ajutor-comanda" className="py-3 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Ajutor</Link>
+                  <Link
+                    to="/ajutor-comanda"
+                    className="py-3 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Ajutor
+                  </Link>
                 </SheetClose>
                 <SheetClose asChild>
                   {auth.user ? (
-                    <Link to="/cont" className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Link
+                      to="/cont"
+                      className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
                       <UserRound className="size-4" aria-hidden="true" />
                       Contul meu
                     </Link>
                   ) : (
-                    <Link to="/" search={{ redirect: "/cont" }} className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Link
+                      to="/autentificare"
+                      search={{ redirect: "/cont" }}
+                      className="flex min-h-11 items-center gap-2 text-sm font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
                       <UserRound className="size-4" aria-hidden="true" />
                       Contul meu
                     </Link>
@@ -152,7 +190,10 @@ export function SiteHeader() {
           {name.toUpperCase()}
         </Link>
 
-        <nav aria-label="Categorii produse" className="hidden items-center justify-center gap-[clamp(16px,1.65vw,30px)] whitespace-nowrap min-[1100px]:flex">
+        <nav
+          aria-label="Categorii produse"
+          className="hidden items-center justify-center gap-[clamp(16px,1.65vw,30px)] whitespace-nowrap min-[1100px]:flex"
+        >
           <Link
             to="/produse"
             className="link-underline shrink-0 text-[0.8125rem] font-medium uppercase leading-none tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
@@ -164,19 +205,34 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center justify-end gap-1 whitespace-nowrap min-[769px]:gap-[clamp(12px,1.5vw,24px)]">
-          <Link to="/produse" aria-label="Caută produse" className="grid size-11 shrink-0 place-items-center outline-none hover:opacity-60 focus-visible:ring-2 focus-visible:ring-ring">
+          <Link
+            to="/produse"
+            aria-label="Caută produse"
+            className="grid size-11 shrink-0 place-items-center outline-none hover:opacity-60 focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <Search className="size-[1.125rem]" aria-hidden="true" />
           </Link>
           {auth.user ? (
-            <Link to="/cont" className="link-underline hidden shrink-0 text-xs font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring min-[1100px]:block">
+            <Link
+              to="/cont"
+              className="link-underline hidden shrink-0 text-xs font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring min-[1100px]:block"
+            >
               Contul meu
             </Link>
           ) : (
-            <Link to="/" search={{ redirect: "/cont" }} className="link-underline hidden shrink-0 text-xs font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring min-[1100px]:block">
+            <Link
+              to="/autentificare"
+              search={{ redirect: "/cont" }}
+              className="link-underline hidden shrink-0 text-xs font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring min-[1100px]:block"
+            >
               Contul meu
             </Link>
           )}
-          <Link to="/cos" aria-label={`Coș de cumpărături, ${count} produse`} className="flex h-11 shrink-0 items-center gap-2 px-1 text-xs font-medium uppercase tracking-[0.08em] outline-none hover:opacity-60 focus-visible:ring-2 focus-visible:ring-ring">
+          <Link
+            to="/cos"
+            aria-label={`Coș de cumpărături, ${count} produse`}
+            className="flex h-11 shrink-0 items-center gap-2 px-1 text-xs font-medium uppercase tracking-[0.08em] outline-none hover:opacity-60 focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <ShoppingBag className="size-[1.125rem] min-[769px]:hidden" aria-hidden="true" />
             <span className="hidden min-[769px]:inline">Coș</span>
             <span aria-hidden="true">({count})</span>

@@ -124,7 +124,8 @@ function CheckoutPage() {
   const auth = useAuth();
   const { data: guestLimit } = useGuestCartLimit();
   const distinctProducts = new Set(cartLines.map((l) => l.productId)).size;
-  const overGuestLimit = !auth.user && typeof guestLimit === "number" && distinctProducts > guestLimit;
+  const overGuestLimit =
+    !auth.user && typeof guestLimit === "number" && distinctProducts > guestLimit;
   const [form, setForm] = useState(emptyForm);
   const [customerType, setCustomerType] = useState<"persoana" | "companie">("persoana");
   const [billingSame, setBillingSame] = useState(true);
@@ -165,14 +166,12 @@ function CheckoutPage() {
     if (form.contact_name.trim().length < 2) next.contact_name = "Introdu numele și prenumele.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim()))
       next.email = "Introdu o adresă de e-mail validă.";
-    if (form.phone.replace(/\D/g, "").length < 9)
-      next.phone = "Introdu un număr de telefon valid.";
+    if (form.phone.replace(/\D/g, "").length < 9) next.phone = "Introdu un număr de telefon valid.";
     if (form.delivery_address.trim().length < 5)
       next.delivery_address = "Introdu adresa de livrare.";
     if (form.city.trim().length < 2) next.city = "Introdu orașul.";
     if (form.county.trim().length < 2) next.county = "Introdu județul.";
-    if (!/^\d{4,10}$/.test(form.postal_code.trim()))
-      next.postal_code = "Introdu codul poștal.";
+    if (!/^\d{4,10}$/.test(form.postal_code.trim())) next.postal_code = "Introdu codul poștal.";
     if (customerType === "companie") {
       if (form.company_name.trim().length < 2) next.company_name = "Introdu numele firmei.";
       if (form.cui.trim().length < 2) next.cui = "Introdu CUI-ul firmei.";
@@ -182,7 +181,8 @@ function CheckoutPage() {
       next.billing_address = "Introdu adresa de facturare.";
     }
     if (!terms)
-      next.terms = "Pentru a trimite cererea trebuie să accepți Termenii și Politica de confidențialitate.";
+      next.terms =
+        "Pentru a trimite cererea trebuie să accepți Termenii și Politica de confidențialitate.";
     setErrors(next);
     const firstInvalid = Object.keys(next)[0];
     if (firstInvalid && firstInvalid !== "terms") {
@@ -201,7 +201,10 @@ function CheckoutPage() {
     setBusy(true);
     try {
       const billing = billingSame
-        ? [form.delivery_address, [form.city, form.county, form.postal_code].filter(Boolean).join(", ")]
+        ? [
+            form.delivery_address,
+            [form.city, form.county, form.postal_code].filter(Boolean).join(", "),
+          ]
             .filter(Boolean)
             .join("\n")
         : form.billing_address;
@@ -271,10 +274,14 @@ function CheckoutPage() {
         <div className="mt-6 border border-border bg-field p-4 text-sm">
           <p>
             Comanzi fără cont. Fără cont poți comanda maximum{" "}
-            {typeof guestLimit === "number" ? guestLimit : 3} produse diferite, o singură dată per adresă
-            de e-mail.
+            {typeof guestLimit === "number" ? guestLimit : 3} produse diferite, o singură dată per
+            adresă de e-mail.
           </p>
-          <Link to="/" search={{ redirect: "/checkout" }} className="micro-sm mt-2 inline-block link-underline">
+          <Link
+            to="/autentificare"
+            search={{ redirect: "/checkout" }}
+            className="micro-sm mt-2 inline-block link-underline"
+          >
             Creează un cont pentru comenzi nelimitate
           </Link>
         </div>
@@ -282,18 +289,17 @@ function CheckoutPage() {
 
       {overGuestLimit ? (
         <p className="mt-4 border border-destructive p-4 text-sm text-destructive" role="alert">
-          Ai {distinctProducts} produse diferite în coș. Fără cont poți comanda maximum {guestLimit}.
-          Creează un cont sau scoate câteva produse din coș.
+          Ai {distinctProducts} produse diferite în coș. Fără cont poți comanda maximum {guestLimit}
+          . Creează un cont sau scoate câteva produse din coș.
         </p>
       ) : null}
 
       <p className="mt-6 border border-border bg-field p-4 text-sm">
-        Comanda este trimisă spre confirmare. Echipa Lumea Pungilor te va contacta pentru confirmarea
-        disponibilității, livrării și modalității de plată.
+        Comanda este trimisă spre confirmare. Echipa Lumea Pungilor te va contacta pentru
+        confirmarea disponibilității, livrării și modalității de plată.
       </p>
 
       <ConfirmedMethods />
-
 
       <form onSubmit={onSubmit} noValidate className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-10">
@@ -461,7 +467,10 @@ function CheckoutPage() {
           <p className="micro-sm text-muted-foreground">Comanda ta</p>
           <ul className="mt-5 space-y-3 text-sm">
             {lines.map((l) => (
-              <li key={`${l.product.id}-${l.variant?.id ?? "std"}`} className="flex justify-between gap-4">
+              <li
+                key={`${l.product.id}-${l.variant?.id ?? "std"}`}
+                className="flex justify-between gap-4"
+              >
                 <span>
                   {l.product.name}
                   {l.variant ? ` — ${l.variant.name}` : ""} × {l.qty} {l.product.selling_unit}
@@ -505,7 +514,12 @@ function CheckoutPage() {
             />
             <span>
               Am citit și accept{" "}
-              <a href="/termeni" target="_blank" rel="noopener noreferrer" className="link-underline">
+              <a
+                href="/termeni"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline"
+              >
                 Termenii și condițiile
               </a>{" "}
               și{" "}
@@ -543,7 +557,13 @@ function CheckoutPage() {
   );
 }
 
-function MethodList({ title, items }: { title: string; items: { label: string; description: string }[] }) {
+function MethodList({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; description: string }[];
+}) {
   if (items.length === 0) return null;
   return (
     <div>
@@ -552,7 +572,9 @@ function MethodList({ title, items }: { title: string; items: { label: string; d
         {items.map((m) => (
           <li key={m.label}>
             <span className="font-medium">{m.label}</span>
-            {m.description ? <span className="text-muted-foreground"> — {m.description}</span> : null}
+            {m.description ? (
+              <span className="text-muted-foreground"> — {m.description}</span>
+            ) : null}
           </li>
         ))}
       </ul>

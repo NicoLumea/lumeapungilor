@@ -83,10 +83,12 @@ function Field({
 function romanianError(message: string): string {
   const m = message.toLowerCase();
   if (m.includes("invalid login")) return "E-mail sau parolă incorecte.";
-  if (m.includes("email not confirmed")) return "Confirmă întâi adresa de e-mail din mesajul primit.";
+  if (m.includes("email not confirmed"))
+    return "Confirmă întâi adresa de e-mail din mesajul primit.";
   if (m.includes("already registered") || m.includes("already been registered"))
     return "Nu am putut finaliza înregistrarea cu datele introduse. Dacă ai deja cont, autentifică-te sau resetează parola.";
-  if (m.includes("password")) return `Parola trebuie să aibă cel puțin ${MIN_PASSWORD_LENGTH} caractere.`;
+  if (m.includes("password"))
+    return `Parola trebuie să aibă cel puțin ${MIN_PASSWORD_LENGTH} caractere.`;
   if (m.includes("rate limit") || m.includes("too many"))
     return "Prea multe încercări. Te rugăm să reîncerci peste câteva minute.";
   return "Ceva nu a funcționat. Te rugăm să încerci din nou.";
@@ -95,9 +97,11 @@ function romanianError(message: string): string {
 export function AuthPanel({
   onSignedIn,
   onSignedUp,
+  emailRedirectTo = "/cont",
 }: {
   onSignedIn?: () => void;
-  onSignedUp?: () => void;
+  onSignedUp?: (authenticated: boolean) => void;
+  emailRedirectTo?: string;
 }) {
   const [mode, setMode] = useState<Mode>("in");
   const [email, setEmail] = useState("");
@@ -142,18 +146,22 @@ export function AuthPanel({
         toast.success("Bine ai revenit.");
         onSignedIn?.();
       } else if (mode === "up") {
+        const safeEmailRedirect =
+          emailRedirectTo.startsWith("/") && !emailRedirectTo.startsWith("//")
+            ? emailRedirectTo
+            : "/cont";
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/cont` },
+          options: { emailRedirectTo: `${window.location.origin}${safeEmailRedirect}` },
         });
         if (error) throw error;
         if (!data.session) {
           setSent("Ți-am trimis un e-mail de confirmare. Confirmă adresa, apoi autentifică-te.");
           setMode("in");
-          onSignedUp?.();
+          onSignedUp?.(false);
         } else {
-          onSignedUp?.();
+          onSignedUp?.(true);
         }
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -202,7 +210,8 @@ export function AuthPanel({
 
       {mode === "up" ? (
         <p className="mt-5 text-sm text-muted-foreground">
-          Crearea unui cont este opțională. Poți continua cumpărăturile și plasa o comandă ca vizitator.
+          Crearea unui cont este opțională. Poți continua cumpărăturile și plasa o comandă ca
+          vizitator.
         </p>
       ) : null}
 

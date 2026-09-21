@@ -1,9 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AuthPanel } from "@/components/site/AuthPanel";
 import { useCart } from "@/lib/cart";
 import { useCartLines } from "@/lib/use-cart-lines";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
 import { normalizeQty } from "@/lib/shop-types";
+import { useAuth } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/cos")({
   head: () => ({
@@ -18,9 +20,15 @@ export const Route = createFileRoute("/cos")({
 });
 
 function CartPage() {
+  const navigate = useNavigate();
+  const auth = useAuth();
   const { setQty, remove } = useCart();
   const { lines, isLoading, subtotal, shipping, shippingConfigured, tax, vatRate, total } =
     useCartLines();
+
+  function continueAsGuest() {
+    void navigate({ to: "/checkout" });
+  }
 
   return (
     <div className="site-container max-w-[1200px] py-14">
@@ -124,7 +132,8 @@ function CartPage() {
                     ) : null}
                     {l.qty !== normalizeQty(l.product, l.qty) ? (
                       <p className="mt-2 text-sm text-destructive">
-                        Cantitatea trebuie să pornească de la {min} și să crească din {step} în {step}.
+                        Cantitatea trebuie să pornească de la {min} și să crească din {step} în{" "}
+                        {step}.
                       </p>
                     ) : null}
                   </div>
@@ -143,7 +152,9 @@ function CartPage() {
               </div>
               <div className="flex justify-between">
                 <dt>Livrare</dt>
-                <dd>{shippingConfigured ? formatRon(shipping) : "Se calculează după confirmare"}</dd>
+                <dd>
+                  {shippingConfigured ? formatRon(shipping) : "Se calculează după confirmare"}
+                </dd>
               </div>
               {vatRate !== null ? (
                 <div className="flex justify-between">
@@ -156,13 +167,64 @@ function CartPage() {
                 <dd>{formatRon(total)}</dd>
               </div>
             </dl>
-            <Link
-              to="/checkout"
-              className="micro mt-8 block border border-foreground bg-foreground px-8 py-4 text-center text-background transition-opacity hover:opacity-85"
-            >
-              Finalizează comanda
-            </Link>
+            {auth.loading ? (
+              <p className="mt-8 text-sm text-muted-foreground" role="status">
+                Se verifică sesiunea…
+              </p>
+            ) : auth.user ? (
+              <Link
+                to="/checkout"
+                className="micro mt-8 block border border-foreground bg-foreground px-8 py-4 text-center text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+              >
+                Finalizează comanda
+              </Link>
+            ) : null}
           </aside>
+
+          {!auth.loading && !auth.user ? (
+            <section
+              aria-labelledby="checkout-options-title"
+              className="border-t border-border pt-10 lg:col-span-2"
+            >
+              <h2 id="checkout-options-title" className="display text-2xl md:text-3xl">
+                Cum vrei să continui?
+              </h2>
+              <div className="mt-6 grid items-start gap-6 md:grid-cols-2">
+                <div className="border-2 border-foreground bg-field p-6 sm:p-8">
+                  <p className="micro-sm text-muted-foreground">Recomandat</p>
+                  <h3 className="display mt-3 text-2xl">Continuă ca vizitator</h3>
+                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                    Nu ai nevoie de cont. Datele de contact, livrare și facturare vor fi completate
+                    în pasul următor.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={continueAsGuest}
+                    className="micro mt-7 min-h-12 w-full border border-foreground bg-foreground px-6 py-3 text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  >
+                    Finalizează ca vizitator
+                  </button>
+                </div>
+
+                <div className="border border-border p-6 sm:p-8">
+                  <h3 className="display text-2xl">Ai deja cont?</h3>
+                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                    Autentificarea sau crearea unui cont este opțională și te ajută să păstrezi
+                    datele și istoricul comenzilor viitoare.
+                  </p>
+                  <div className="mt-6">
+                    <AuthPanel
+                      emailRedirectTo="/checkout"
+                      onSignedIn={() => void navigate({ to: "/checkout" })}
+                      onSignedUp={(authenticated) => {
+                        if (authenticated) void navigate({ to: "/checkout" });
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+          ) : null}
         </div>
       )}
     </div>

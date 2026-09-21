@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { clearGuestAccess } from "@/lib/guest-access";
 
 export type DashboardNavItem = { to: string; label: string; exact: boolean };
 
@@ -21,7 +20,6 @@ export function DashboardShell({
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
-    clearGuestAccess();
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
   }

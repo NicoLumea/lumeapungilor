@@ -18,7 +18,7 @@ export function AccessDenied({
       <div className="mt-8 flex flex-wrap justify-center gap-4">
         {showLogin ? (
           <Link
-            to="/"
+            to="/autentificare"
             search={{ redirect: redirectTo ?? "" }}
             className="micro inline-flex min-h-11 items-center border border-foreground bg-foreground px-6 py-3 text-background"
           >

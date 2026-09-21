@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AjutorComandaRouteImport } from './routes/ajutor-comanda'
+import { Route as AutentificareRouteImport } from './routes/autentificare'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ComenzileMeleRouteImport } from './routes/comenzile-mele'
 import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
@@ -67,6 +68,11 @@ const AdminRoute = AdminRouteImport.update({
 const AjutorComandaRoute = AjutorComandaRouteImport.update({
   id: '/ajutor-comanda',
   path: '/ajutor-comanda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutentificareRoute = AutentificareRouteImport.update({
+  id: '/autentificare',
+  path: '/autentificare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/ajutor-comanda': typeof AjutorComandaRoute
+  '/autentificare': typeof AutentificareRoute
   '/checkout': typeof CheckoutRoute
   '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajutor-comanda': typeof AjutorComandaRoute
+  '/autentificare': typeof AutentificareRoute
   '/checkout': typeof CheckoutRoute
   '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/ajutor-comanda': typeof AjutorComandaRoute
+  '/autentificare': typeof AutentificareRoute
   '/checkout': typeof CheckoutRoute
   '/comenzile-mele': typeof ComenzileMeleRoute
   '/confidentialitate': typeof ConfidentialitateRoute
@@ -418,6 +427,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/ajutor-comanda'
+    | '/autentificare'
     | '/checkout'
     | '/comenzile-mele'
     | '/confidentialitate'
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ajutor-comanda'
+    | '/autentificare'
     | '/checkout'
     | '/comenzile-mele'
     | '/confidentialitate'
@@ -508,6 +519,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/ajutor-comanda'
+    | '/autentificare'
     | '/checkout'
     | '/comenzile-mele'
     | '/confidentialitate'
@@ -555,6 +567,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AjutorComandaRoute: typeof AjutorComandaRoute
+  AutentificareRoute: typeof AutentificareRoute
   CheckoutRoute: typeof CheckoutRoute
   ComenzileMeleRoute: typeof ComenzileMeleRoute
   ConfidentialitateRoute: typeof ConfidentialitateRoute
@@ -598,6 +611,13 @@ declare module '@tanstack/react-router' {
       path: '/ajutor-comanda'
       fullPath: '/ajutor-comanda'
       preLoaderRoute: typeof AjutorComandaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/autentificare': {
+      id: '/autentificare'
+      path: '/autentificare'
+      fullPath: '/autentificare'
+      preLoaderRoute: typeof AutentificareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -952,6 +972,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AjutorComandaRoute: AjutorComandaRoute,
+  AutentificareRoute: AutentificareRoute,
   CheckoutRoute: CheckoutRoute,
   ComenzileMeleRoute: ComenzileMeleRoute,
   ConfidentialitateRoute: ConfidentialitateRoute,

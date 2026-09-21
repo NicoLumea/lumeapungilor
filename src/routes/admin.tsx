@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { claimOwnerAccess } from "@/lib/shop.functions";
-import { clearGuestAccess } from "@/lib/guest-access";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -72,7 +71,6 @@ function AdminLayout() {
           type="button"
           className="micro-sm ml-auto text-muted-foreground hover:text-foreground"
           onClick={async () => {
-            clearGuestAccess();
             await supabase.auth.signOut();
             window.location.assign("/");
           }}
@@ -223,7 +221,6 @@ function ClaimCard({
         type="button"
         className="micro-sm mt-6 link-underline"
         onClick={async () => {
-          clearGuestAccess();
           await supabase.auth.signOut();
           window.location.assign("/");
         }}
