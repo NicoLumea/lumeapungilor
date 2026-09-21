@@ -65,23 +65,23 @@ function Shop() {
   return (
     <div>
       <section className="overflow-hidden border-b border-border bg-hero">
-        <div className="relative mx-auto w-full max-w-[1920px]">
-          <div className="site-container relative z-10 py-10 lg:absolute lg:inset-0 lg:grid lg:w-full lg:max-w-none lg:grid-cols-[42%_58%] lg:items-center lg:py-0">
-            <div className="max-w-[520px] text-left lg:px-[clamp(32px,3vw,56px)]">
-              <h1 className="display text-3xl leading-[1.08] lg:text-[clamp(32px,2.6vw,44px)]">{heroTitle}</h1>
-              <p className="mt-4 max-w-md text-base leading-[1.5] text-foreground/80 lg:text-[clamp(15px,1.1vw,17px)]">
+        <div className="relative mx-auto w-full max-w-[1200px]">
+          <div className="relative z-10 px-5 py-5 md:absolute md:inset-0 md:flex md:items-center md:px-[clamp(28px,4vw,56px)] md:py-0">
+            <div className="max-w-[500px] text-left md:w-[43%]">
+              <h1 className="display text-3xl leading-[1.08] md:text-[clamp(30px,3.2vw,44px)]">{heroTitle}</h1>
+              <p className="mt-3 max-w-md text-sm leading-[1.5] text-foreground/80 md:mt-4 md:text-[clamp(14px,1.35vw,17px)]">
                 {heroSubtitle}
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap gap-2.5 md:mt-6 md:gap-3">
                 <Link
                   to="/produse"
-                  className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground bg-foreground px-6 py-3 text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground bg-foreground px-4 py-3 text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground md:px-6"
                 >
                   Vezi catalogul
                 </Link>
                 <Link
                   to="/contact"
-                  className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground px-4 py-3 transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground md:px-6"
                 >
                   Contactează-ne
                 </Link>
@@ -94,9 +94,8 @@ function Shop() {
             width="1920"
             height="800"
             fetchPriority="high"
-            className="pointer-events-none relative block h-auto max-h-[320px] w-full object-contain lg:absolute lg:inset-0 lg:size-full lg:max-h-none lg:object-contain lg:object-right"
+            className="pointer-events-none relative block h-auto w-full"
           />
-          <div className="hidden lg:block lg:h-[clamp(420px,34vw,500px)]" aria-hidden="true" />
         </div>
       </section>
 
