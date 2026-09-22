@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { Phone } from "lucide-react";
 import { useCategories, useContent, text } from "@/lib/content";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref, CONSUMER_LINKS, SUPPORT_EMAIL } from "@/lib/company";
+import { companyInfo, telephoneHref, whatsappHref, CONSUMER_LINKS, SUPPORT_EMAIL } from "@/lib/company";
 
 export function SiteFooter() {
   const { data: content } = useContent();
