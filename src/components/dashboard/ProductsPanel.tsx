@@ -1,14 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminProducts, uploadProductImage } from "@/lib/admin-data";
 import { useCategories } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { formatRon, slugify } from "@/lib/format";
-import { sortedImages, type Product, type Spec } from "@/lib/shop-types";
+import { primaryImage, sortedImages, type Product, type Spec } from "@/lib/shop-types";
 
-type ImageDraft = { id?: string; url: string; alt: string };
+type ImageDraft = { id?: string; url: string; alt: string; isPrimary: boolean };
 type VariantDraft = { id?: string; name: string; sku: string; price: string; stock: number };
 
 type Draft = {
@@ -76,7 +76,12 @@ function toDraft(p: Product): Draft {
     is_archived: p.is_archived,
     sort_order: p.sort_order,
     specs: p.specs ?? [],
-    images: sortedImages(p).map((i) => ({ id: i.id, url: i.url, alt: i.alt ?? "" })),
+    images: sortedImages(p).map((i) => ({
+      id: i.id,
+      url: i.url,
+      alt: i.alt ?? "",
+      isPrimary: i.is_primary,
+    })),
     variants: [...(p.product_variants ?? [])]
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((v) => ({
@@ -122,10 +127,104 @@ export function ProductsPanel() {
   const { data: categories } = useCategories(true);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
+  const draggedImageKey = useRef<string | null>(null);
+  const dragStartImages = useRef<ImageDraft[] | null>(null);
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["admin", "products"] });
     qc.invalidateQueries({ queryKey: ["products"] });
+  }
+
+  async function persistGallery(productId: string, images: ImageDraft[]) {
+    const imageIds = images.map((image) => image.id).filter((id): id is string => !!id);
+    if (imageIds.length !== images.length) return;
+    const primaryId = images.find((image) => image.isPrimary)?.id ?? imageIds[0];
+    if (!primaryId) return;
+    const { error } = await supabase.rpc("update_product_image_gallery", {
+      p_product_id: productId,
+      p_image_ids: imageIds,
+      p_primary_image_id: primaryId,
+    });
+    if (error) throw error;
+    invalidate();
+  }
+
+  async function moveImage(from: number, to: number) {
+    if (!draft || from === to || to < 0 || to >= draft.images.length) return;
+    const previous = draft.images;
+    const images = [...previous];
+    const [moved] = images.splice(from, 1);
+    if (!moved) return;
+    images.splice(to, 0, moved);
+    setDraft({ ...draft, images });
+    if (!draft.id) return;
+    try {
+      await persistGallery(draft.id, images);
+    } catch (error) {
+      setDraft((current) => (current ? { ...current, images: previous } : current));
+      toast.error(
+        error instanceof Error ? error.message : "Ordinea fotografiilor nu a putut fi salvată.",
+      );
+    }
+  }
+
+  async function choosePrimary(index: number) {
+    if (!draft || draft.images[index]?.isPrimary) return;
+    const previous = draft.images;
+    const images = draft.images.map((image, current) => ({
+      ...image,
+      isPrimary: current === index,
+    }));
+    setDraft({ ...draft, images });
+    if (!draft.id) return;
+    try {
+      await persistGallery(draft.id, images);
+      toast.success("Fotografia principală a fost actualizată.");
+    } catch (error) {
+      setDraft((current) => (current ? { ...current, images: previous } : current));
+      toast.error(
+        error instanceof Error ? error.message : "Fotografia principală nu a putut fi salvată.",
+      );
+    }
+  }
+
+  async function deleteImage(index: number) {
+    if (!draft) return;
+    const removed = draft.images[index];
+    if (!removed) return;
+    const remaining = draft.images.filter((_, current) => current !== index);
+    if (removed.isPrimary && remaining[0]) remaining[0] = { ...remaining[0], isPrimary: true };
+    setDraft({ ...draft, images: remaining });
+    if (!draft.id || !removed.id) return;
+    try {
+      const { error } = await supabase.from("product_images").delete().eq("id", removed.id);
+      if (error) throw error;
+      if (remaining.length > 0) await persistGallery(draft.id, remaining);
+      else invalidate();
+    } catch (error) {
+      setDraft(null);
+      invalidate();
+      toast.error(
+        error instanceof Error
+          ? `${error.message} Reîncărcăm galeria salvată.`
+          : "Fotografia nu a putut fi ștearsă. Reîncărcăm galeria salvată.",
+      );
+    }
+  }
+
+  async function finishDrag() {
+    const previous = dragStartImages.current;
+    draggedImageKey.current = null;
+    dragStartImages.current = null;
+    if (!draft?.id || !previous || previous === draft.images) return;
+    try {
+      await persistGallery(draft.id, draft.images);
+    } catch (error) {
+      setDraft((current) => (current ? { ...current, images: previous } : current));
+      toast.error(
+        error instanceof Error ? error.message : "Ordinea fotografiilor nu a putut fi salvată.",
+      );
+    }
   }
 
   async function save() {
@@ -166,24 +265,41 @@ export function ProductsPanel() {
         const { error } = await supabase.from("products").update(payload).eq("id", productId);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("products").insert(payload).select("id").single();
+        const { data, error } = await supabase
+          .from("products")
+          .insert(payload)
+          .select("id")
+          .single();
         if (error) throw error;
         productId = data.id;
       }
 
-      await supabase.from("product_images").delete().eq("product_id", productId);
-      if (draft.images.length > 0) {
-        const { error } = await supabase.from("product_images").insert(
-          draft.images.map((img, i) => ({
-            product_id: productId,
-            url: img.url,
-            alt: img.alt.trim() || null,
-            sort_order: i,
-            is_primary: i === 0,
-          })),
-        );
-        if (error) throw error;
+      const savedImages: ImageDraft[] = [];
+      for (const [index, image] of draft.images.entries()) {
+        if (image.id) {
+          const { error } = await supabase
+            .from("product_images")
+            .update({ alt: image.alt.trim() || null })
+            .eq("id", image.id);
+          if (error) throw error;
+          savedImages.push(image);
+        } else {
+          const { data, error } = await supabase
+            .from("product_images")
+            .insert({
+              product_id: productId,
+              url: image.url,
+              alt: image.alt.trim() || null,
+              sort_order: index,
+              is_primary: false,
+            })
+            .select("id")
+            .single();
+          if (error) throw error;
+          savedImages.push({ ...image, id: data.id });
+        }
       }
+      if (savedImages.length > 0) await persistGallery(productId, savedImages);
 
       await supabase.from("product_variants").delete().eq("product_id", productId);
       const variants = draft.variants.filter((v) => v.name.trim());
@@ -249,7 +365,11 @@ export function ProductsPanel() {
       {draft ? (
         <div className="mt-8 space-y-8 border border-border p-6">
           <div className="grid gap-5 md:grid-cols-2">
-            <Text label="Nume *" value={draft.name} onChange={(v) => setDraft({ ...draft, name: v })} />
+            <Text
+              label="Nume *"
+              value={draft.name}
+              onChange={(v) => setDraft({ ...draft, name: v })}
+            />
             <Text
               label="Adresă în link"
               value={draft.slug}
@@ -271,7 +391,11 @@ export function ProductsPanel() {
                 ))}
               </select>
             </label>
-            <Text label="Cod produs" value={draft.sku} onChange={(v) => setDraft({ ...draft, sku: v })} />
+            <Text
+              label="Cod produs"
+              value={draft.sku}
+              onChange={(v) => setDraft({ ...draft, sku: v })}
+            />
             <Text
               label="Preț (RON) *"
               value={draft.price}
@@ -295,7 +419,10 @@ export function ProductsPanel() {
               <select
                 value={draft.status}
                 onChange={(e) =>
-                  setDraft({ ...draft, status: e.target.value === "published" ? "published" : "draft" })
+                  setDraft({
+                    ...draft,
+                    status: e.target.value === "published" ? "published" : "draft",
+                  })
                 }
                 className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
               >
@@ -377,13 +504,46 @@ export function ProductsPanel() {
           <div>
             <p className="micro-sm text-muted-foreground">Fotografii</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Prima fotografie este principală; a doua apare la trecerea cu mouse-ul.
+              Trage fotografiile pentru a schimba ordinea. Coperta este imaginea implicită în
+              catalog.
             </p>
-            <div className="mt-3 flex flex-wrap gap-4">
+            <div className="mt-3 flex flex-wrap gap-4" aria-label="Galerie foto ordonabilă">
               {draft.images.map((img, i) => (
-                <div key={`${img.url}-${i}`} className="w-40">
-                  <div className="bg-field p-2">
-                    <img src={imageUrl(img.url) ?? ""} alt="" className="aspect-square w-full object-contain" />
+                <div
+                  key={img.id ?? img.url}
+                  data-image-index={i}
+                  draggable={!busy}
+                  onDragStart={(event) => {
+                    draggedImageKey.current = img.id ?? img.url;
+                    dragStartImages.current = draft.images;
+                    event.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragEnter={(event) => {
+                    event.preventDefault();
+                    const key = draggedImageKey.current;
+                    const from = draft.images.findIndex((image) => (image.id ?? image.url) === key);
+                    if (from < 0 || from === i) return;
+                    const images = [...draft.images];
+                    const [moved] = images.splice(from, 1);
+                    if (!moved) return;
+                    images.splice(i, 0, moved);
+                    setDraft({ ...draft, images });
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDragEnd={() => void finishDrag()}
+                  className="w-40 cursor-grab border border-border bg-background p-2 active:cursor-grabbing"
+                >
+                  <div className="relative bg-field p-2">
+                    <img
+                      src={imageUrl(img.url) ?? ""}
+                      alt=""
+                      className="aspect-square w-full object-contain"
+                    />
+                    {img.isPrimary ? (
+                      <span className="micro absolute left-1 top-1 bg-foreground px-2 py-1 text-background">
+                        Principală
+                      </span>
+                    ) : null}
                   </div>
                   <input
                     value={img.alt}
@@ -395,28 +555,38 @@ export function ProductsPanel() {
                     }}
                     className="mt-2 w-full border border-input bg-background px-2 py-1 text-xs outline-none focus:border-foreground"
                   />
-                  <div className="mt-2 flex gap-3">
-                    {i > 0 ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={i === 0 || busy}
+                      aria-label={`Mută fotografia ${i + 1} la stânga`}
+                      className="micro-sm link-underline disabled:cursor-not-allowed disabled:opacity-30"
+                      onClick={() => void moveImage(i, i - 1)}
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      disabled={i === draft.images.length - 1 || busy}
+                      aria-label={`Mută fotografia ${i + 1} la dreapta`}
+                      className="micro-sm link-underline disabled:cursor-not-allowed disabled:opacity-30"
+                      onClick={() => void moveImage(i, i + 1)}
+                    >
+                      →
+                    </button>
+                    {!img.isPrimary ? (
                       <button
                         type="button"
                         className="micro-sm link-underline"
-                        onClick={() => {
-                          const images = [...draft.images];
-                          const prev = images[i - 1]!;
-                          images[i - 1] = img;
-                          images[i] = prev;
-                          setDraft({ ...draft, images });
-                        }}
+                        onClick={() => void choosePrimary(i)}
                       >
-                        ←
+                        Setează principală
                       </button>
                     ) : null}
                     <button
                       type="button"
                       className="micro-sm link-underline"
-                      onClick={() =>
-                        setDraft({ ...draft, images: draft.images.filter((_, j) => j !== i) })
-                      }
+                      onClick={() => void deleteImage(i)}
                     >
                       Șterge
                     </button>
@@ -435,9 +605,31 @@ export function ProductsPanel() {
                 try {
                   const uploaded: ImageDraft[] = [];
                   for (const file of files) {
-                    uploaded.push({ url: await uploadProductImage(file), alt: "" });
+                    const url = await uploadProductImage(file);
+                    const isPrimary = draft.images.length === 0 && uploaded.length === 0;
+                    if (draft.id) {
+                      const { data, error } = await supabase
+                        .from("product_images")
+                        .insert({
+                          product_id: draft.id,
+                          url,
+                          sort_order: draft.images.length + uploaded.length,
+                          is_primary: false,
+                        })
+                        .select("id")
+                        .single();
+                      if (error) throw error;
+                      uploaded.push({ id: data.id, url, alt: "", isPrimary });
+                    } else {
+                      uploaded.push({ url, alt: "", isPrimary });
+                    }
                   }
-                  setDraft((d) => (d ? { ...d, images: [...d.images, ...uploaded] } : d));
+                  const images = [...draft.images, ...uploaded];
+                  if (!images.some((image) => image.isPrimary) && images[0]) {
+                    images[0] = { ...images[0], isPrimary: true };
+                  }
+                  setDraft({ ...draft, images });
+                  if (draft.id) await persistGallery(draft.id, images);
                   toast.success("Fotografii încărcate.");
                 } catch {
                   toast.error("Fotografiile nu au putut fi încărcate.");
@@ -475,7 +667,9 @@ export function ProductsPanel() {
                   <button
                     type="button"
                     className="micro-sm link-underline"
-                    onClick={() => setDraft({ ...draft, specs: draft.specs.filter((_, j) => j !== i) })}
+                    onClick={() =>
+                      setDraft({ ...draft, specs: draft.specs.filter((_, j) => j !== i) })
+                    }
                   >
                     Șterge
                   </button>
@@ -485,7 +679,9 @@ export function ProductsPanel() {
             <button
               type="button"
               className="micro-sm mt-3 link-underline"
-              onClick={() => setDraft({ ...draft, specs: [...draft.specs, { label: "", value: "" }] })}
+              onClick={() =>
+                setDraft({ ...draft, specs: [...draft.specs, { label: "", value: "" }] })
+              }
             >
               Adaugă specificație
             </button>
@@ -584,9 +780,9 @@ export function ProductsPanel() {
           {(products ?? []).map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-4 py-4">
               <div className="size-16 shrink-0 bg-field p-1">
-                {sortedImages(p)[0] ? (
+                {primaryImage(p) ? (
                   <img
-                    src={imageUrl(sortedImages(p)[0]?.url) ?? ""}
+                    src={imageUrl(primaryImage(p)?.url) ?? ""}
                     alt=""
                     className="size-full object-contain"
                   />
@@ -600,7 +796,11 @@ export function ProductsPanel() {
                   {p.is_archived ? "arhivat" : p.status === "published" ? "publicat" : "ciornă"}
                 </p>
               </div>
-              <button type="button" className="micro-sm link-underline" onClick={() => togglePublish(p)}>
+              <button
+                type="button"
+                className="micro-sm link-underline"
+                onClick={() => togglePublish(p)}
+              >
                 {p.status === "published" ? "Treci pe ciornă" : "Publică"}
               </button>
               <button

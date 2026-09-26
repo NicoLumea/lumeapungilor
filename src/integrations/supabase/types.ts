@@ -420,6 +420,7 @@ export type Database = {
           is_primary: boolean
           product_id: string
           sort_order: number
+          updated_at: string
           url: string
         }
         Insert: {
@@ -429,6 +430,7 @@ export type Database = {
           is_primary?: boolean
           product_id: string
           sort_order?: number
+          updated_at?: string
           url: string
         }
         Update: {
@@ -438,6 +440,7 @@ export type Database = {
           is_primary?: boolean
           product_id?: string
           sort_order?: number
+          updated_at?: string
           url?: string
         }
         Relationships: [
@@ -927,6 +930,14 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      update_product_image_gallery: {
+        Args: {
+          p_image_ids: string[]
+          p_primary_image_id: string
+          p_product_id: string
+        }
+        Returns: undefined
+      }
       record_auth_rate_limit_event: {
         Args: {
           _account_key: string

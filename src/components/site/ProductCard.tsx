@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
-import { sortedImages, type Product } from "@/lib/shop-types";
+import { primaryImage, sortedImages, type Product } from "@/lib/shop-types";
 import { cn } from "@/lib/utils";
 
 type StockState = "available" | "low" | "unavailable";
@@ -19,8 +19,10 @@ function cataloguePrice(value: number): string {
 
 export function ProductCard({ product }: { product: Product }) {
   const images = sortedImages(product);
-  const primary = imageUrl(images[0]?.url);
-  const secondary = imageUrl(images[1]?.url);
+  const cover = primaryImage(product);
+  const secondaryImage = images.find((image) => image.id !== cover?.id);
+  const primary = imageUrl(cover?.url);
+  const secondary = imageUrl(secondaryImage?.url);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const inventory = stockState(product);
@@ -50,7 +52,7 @@ export function ProductCard({ product }: { product: Product }) {
           <>
             <img
               src={primary}
-              alt={images[0]?.alt ?? product.name}
+              alt={cover?.alt ?? product.name}
               loading="lazy"
               onLoad={() => setLoaded(true)}
               onError={() => setFailed(true)}
@@ -63,7 +65,7 @@ export function ProductCard({ product }: { product: Product }) {
             {secondary ? (
               <img
                 src={secondary}
-                alt={images[1]?.alt ?? product.name}
+                alt={secondaryImage?.alt ?? product.name}
                 loading="lazy"
                 className="product-card-image absolute inset-0 size-full object-contain p-3 opacity-0 group-hover:opacity-100 sm:p-4"
               />
@@ -79,10 +81,15 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="mt-3 flex flex-1 flex-col">
-        <p className="micro-sm min-h-3 text-muted-foreground" aria-hidden={!product.categories?.name}>
+        <p
+          className="micro-sm min-h-3 text-muted-foreground"
+          aria-hidden={!product.categories?.name}
+        >
           {product.categories?.name ?? " "}
         </p>
-        <p className="product-title-clamp mt-1.5 min-h-9 text-[0.8125rem] leading-[1.125rem] sm:text-sm sm:leading-5">{product.name}</p>
+        <p className="product-title-clamp mt-1.5 min-h-9 text-[0.8125rem] leading-[1.125rem] sm:text-sm sm:leading-5">
+          {product.name}
+        </p>
         <div className="mt-auto pt-2.5">
           {product.units_per_pack && product.units_per_pack > 0 ? (
             <p className="mb-1 text-[0.6875rem] text-muted-foreground sm:text-xs">
@@ -91,7 +98,9 @@ export function ProductCard({ product }: { product: Product }) {
           ) : null}
           <p className="text-sm font-medium leading-5 sm:text-base sm:leading-6">
             {cataloguePrice(product.price)}
-            <span className="ml-1 text-xs font-normal text-muted-foreground">/ {product.selling_unit}</span>
+            <span className="ml-1 text-xs font-normal text-muted-foreground">
+              / {product.selling_unit}
+            </span>
           </p>
         </div>
       </div>

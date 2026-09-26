@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useCart } from "@/lib/cart";
 import { useProductsByIds } from "@/lib/products";
 import { num, useContent } from "@/lib/content";
-import { sortedImages, type Product, type ProductVariant } from "@/lib/shop-types";
+import { primaryImage, type Product, type ProductVariant } from "@/lib/shop-types";
 
 export type ResolvedLine = {
   product: Product;
@@ -26,8 +26,7 @@ export function useCartLines() {
     for (const line of lines) {
       const product = products.find((p) => p.id === line.productId);
       if (!product || product.status !== "published" || product.is_archived) continue;
-      const variant =
-        (product.product_variants ?? []).find((v) => v.id === line.variantId) ?? null;
+      const variant = (product.product_variants ?? []).find((v) => v.id === line.variantId) ?? null;
       const unitPrice = Number(variant?.price ?? product.price);
       out.push({
         product,
@@ -35,7 +34,7 @@ export function useCartLines() {
         qty: line.qty,
         unitPrice,
         lineTotal: Math.round(unitPrice * line.qty * 100) / 100,
-        imageUrlPath: sortedImages(product)[0]?.url ?? null,
+        imageUrlPath: primaryImage(product)?.url ?? null,
         stock:
           variant && (product.product_variants ?? []).some((v) => v.stock > 0)
             ? variant.stock
