@@ -265,6 +265,42 @@ export type Database = {
           },
         ]
       }
+      login_rate_limits: {
+        Row: {
+          blocked_until: string | null
+          created_at: string
+          expires_at: string
+          failed_attempts: number
+          key_hash: string
+          last_attempt_at: string | null
+          scope: string
+          updated_at: string
+          window_started_at: string
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string
+          expires_at?: string
+          failed_attempts?: number
+          key_hash: string
+          last_attempt_at?: string | null
+          scope: string
+          updated_at?: string
+          window_started_at?: string
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string
+          expires_at?: string
+          failed_attempts?: number
+          key_hash?: string
+          last_attempt_at?: string | null
+          scope?: string
+          updated_at?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           archived_at: string | null
@@ -827,6 +863,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_auth_rate_limits: {
+        Args: { _keys: string[] }
+        Returns: Json
+      }
+      clear_auth_rate_limit: {
+        Args: { _account_key: string }
+        Returns: undefined
+      }
       admin_interest_dashboard: {
         Args: {
           _date_from?: string
@@ -883,6 +927,19 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      record_auth_rate_limit_event: {
+        Args: {
+          _account_key: string
+          _account_max: number
+          _account_scope: string
+          _ip_key: string
+          _ip_max: number
+          _ip_scope: string
+          _lockout_seconds: number
+          _window_seconds: number
+        }
+        Returns: Json
+      }
       top_selling_products: {
         Args: { p_limit?: number }
         Returns: {

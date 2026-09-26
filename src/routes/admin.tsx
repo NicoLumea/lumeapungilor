@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { claimOwnerAccess } from "@/lib/shop.functions";
 import { AccessDenied } from "@/components/site/AccessDenied";
+import { protectedSignIn, PublicAuthError } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -116,11 +117,17 @@ function AuthCard() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      await protectedSignIn(email, password);
       navigate({ to: "/admin" });
-    } catch {
-      toast.error("Autentificare eșuată. Verifică datele introduse.");
+    } catch (error) {
+      if (error instanceof PublicAuthError && error.code === "rate_limited") {
+        const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 60) / 60));
+        toast.error(
+          `Prea multe încercări nereușite. Încearcă din nou în aproximativ ${minutes} minute.`,
+        );
+      } else {
+        toast.error("E-mail sau parolă incorecte.");
+      }
     } finally {
       setBusy(false);
     }
