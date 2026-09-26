@@ -54,6 +54,8 @@ import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
 import { Route as StaffProduseRouteImport } from './routes/staff.produse'
 import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
 import { Route as StaffStocRouteImport } from './routes/staff.stoc'
+import { Route as ApiAuthLoginRouteImport } from './routes/api.auth.login'
+import { Route as ApiAuthPasswordResetRouteImport } from './routes/api.auth.password-reset'
 import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -281,6 +283,16 @@ const StaffStocRoute = StaffStocRouteImport.update({
   path: '/stoc',
   getParentRoute: () => StaffRoute,
 } as any)
+const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
+  id: '/api/auth/login',
+  path: '/api/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthPasswordResetRoute = ApiAuthPasswordResetRouteImport.update({
+  id: '/api/auth/password-reset',
+  path: '/api/auth/password-reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
   id: '/api/public/img/$',
   path: '/api/public/img/$',
@@ -333,6 +345,8 @@ export interface FileRoutesByFullPath {
   '/staff/stoc': typeof StaffStocRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesByTo {
@@ -379,6 +393,8 @@ export interface FileRoutesByTo {
   '/staff/stoc': typeof StaffStocRoute
   '/admin': typeof AdminIndexRoute
   '/staff': typeof StaffIndexRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesById {
@@ -428,6 +444,8 @@ export interface FileRoutesById {
   '/staff/stoc': typeof StaffStocRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRouteTypes {
@@ -478,6 +496,8 @@ export interface FileRouteTypes {
     | '/staff/stoc'
     | '/admin/'
     | '/staff/'
+    | '/api/auth/login'
+    | '/api/auth/password-reset'
     | '/api/public/img/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -524,6 +544,8 @@ export interface FileRouteTypes {
     | '/staff/stoc'
     | '/admin'
     | '/staff'
+    | '/api/auth/login'
+    | '/api/auth/password-reset'
     | '/api/public/img/$'
   id:
     | '__root__'
@@ -572,6 +594,8 @@ export interface FileRouteTypes {
     | '/staff/stoc'
     | '/admin/'
     | '/staff/'
+    | '/api/auth/login'
+    | '/api/auth/password-reset'
     | '/api/public/img/$'
   fileRoutesById: FileRoutesById
 }
@@ -599,6 +623,8 @@ export interface RootRouteChildren {
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
   ProdusSlugRoute: typeof ProdusSlugRoute
+  ApiAuthLoginRoute: typeof ApiAuthLoginRoute
+  ApiAuthPasswordResetRoute: typeof ApiAuthPasswordResetRoute
   ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
 }
 
@@ -919,6 +945,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffStocRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/api/auth/login': {
+      id: '/api/auth/login'
+      path: '/api/auth/login'
+      fullPath: '/api/auth/login'
+      preLoaderRoute: typeof ApiAuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/password-reset': {
+      id: '/api/auth/password-reset'
+      path: '/api/auth/password-reset'
+      fullPath: '/api/auth/password-reset'
+      preLoaderRoute: typeof ApiAuthPasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/img/$': {
       id: '/api/public/img/$'
       path: '/api/public/img/$'
@@ -1013,6 +1053,8 @@ const rootRouteChildren: RootRouteChildren = {
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
   ProdusSlugRoute: ProdusSlugRoute,
+  ApiAuthLoginRoute: ApiAuthLoginRoute,
+  ApiAuthPasswordResetRoute: ApiAuthPasswordResetRoute,
   ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
 }
 export const routeTree = rootRouteImport

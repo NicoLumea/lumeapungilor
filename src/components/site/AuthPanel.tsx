@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { protectedPasswordReset, protectedSignIn, PublicAuthError } from "@/lib/auth-client";
 
 type Mode = "in" | "up" | "reset";
 
@@ -94,6 +95,14 @@ function romanianError(message: string): string {
   return "Ceva nu a funcționat. Te rugăm să încerci din nou.";
 }
 
+function publicAuthError(error: unknown): string {
+  if (error instanceof PublicAuthError && error.code === "rate_limited") {
+    const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 60) / 60));
+    return `Prea multe încercări nereușite. Încearcă din nou în aproximativ ${minutes} minute.`;
+  }
+  return romanianError(error instanceof Error ? error.message : "");
+}
+
 export function AuthPanel({
   onSignedIn,
   onSignedUp,
@@ -141,8 +150,7 @@ export function AuthPanel({
     setBusy(true);
     try {
       if (mode === "in") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        await protectedSignIn(email, password);
         toast.success("Bine ai revenit.");
         onSignedIn?.();
       } else if (mode === "up") {
@@ -164,14 +172,10 @@ export function AuthPanel({
           onSignedUp?.(true);
         }
       } else {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/parola-noua`,
-        });
-        if (error) throw error;
-        setSent("Dacă există un cont pentru această adresă, vei primi un e-mail cu instrucțiuni.");
+        setSent(await protectedPasswordReset(email));
       }
     } catch (err) {
-      toast.error(romanianError(err instanceof Error ? err.message : ""));
+      toast.error(publicAuthError(err));
     } finally {
       setBusy(false);
     }
