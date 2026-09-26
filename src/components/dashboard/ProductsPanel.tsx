@@ -140,7 +140,7 @@ export function ProductsPanel() {
     if (imageIds.length !== images.length) return;
     const primaryId = images.find((image) => image.isPrimary)?.id ?? imageIds[0];
     if (!primaryId) return;
-    const { error } = await supabase.rpc("update_product_image_gallery", {
+    const { error } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }> }).rpc("update_product_image_gallery", {
       p_product_id: productId,
       p_image_ids: imageIds,
       p_primary_image_id: primaryId,

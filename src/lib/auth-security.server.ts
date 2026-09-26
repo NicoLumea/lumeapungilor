@@ -114,7 +114,7 @@ function store(
   return {
     async check(keys) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data, error } = await supabaseAdmin.rpc("check_auth_rate_limits", {
+      const { data, error } = await (supabaseAdmin as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc("check_auth_rate_limits", {
         _keys: [keys.accountKey, keys.ipKey],
       });
       if (error) throw new Error("Authentication rate-limit check failed.");
@@ -122,7 +122,7 @@ function store(
     },
     async recordFailure(keys) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data, error } = await supabaseAdmin.rpc("record_auth_rate_limit_event", {
+      const { data, error } = await (supabaseAdmin as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc("record_auth_rate_limit_event", {
         _account_key: keys.accountKey,
         _ip_key: keys.ipKey,
         _account_scope: scopes.account,
@@ -137,7 +137,7 @@ function store(
     },
     async clearAccount(accountKey) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { error } = await supabaseAdmin.rpc("clear_auth_rate_limit", {
+      const { error } = await (supabaseAdmin as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc("clear_auth_rate_limit", {
         _account_key: accountKey,
       });
       if (error) throw new Error("Authentication rate-limit reset failed.");
