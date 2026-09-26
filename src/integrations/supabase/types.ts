@@ -827,6 +827,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_interest_dashboard: {
+        Args: {
+          _date_from?: string
+          _date_to?: string
+          _page?: number
+          _page_size?: number
+          _search?: string
+          _source?: string
+        }
+        Returns: Json
+      }
+      admin_users_dashboard: {
+        Args: {
+          _date_from?: string
+          _date_to?: string
+          _page?: number
+          _page_size?: number
+          _role?: string
+          _search?: string
+          _sort?: string
+          _source?: string
+          _status?: string
+        }
+        Returns: Json
+      }
+      admin_users_export: {
+        Args: {
+          _date_from?: string
+          _date_to?: string
+          _role?: string
+          _search?: string
+          _sort?: string
+          _source?: string
+          _status?: string
+        }
+        Returns: Json
+      }
       create_order_tx: {
         Args: { p_items: Json; p_order: Json }
         Returns: {
