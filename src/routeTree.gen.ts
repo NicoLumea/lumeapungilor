@@ -42,6 +42,7 @@ import { Route as AdminRetururiRouteImport } from './routes/admin.retururi'
 import { Route as AdminRoluriRouteImport } from './routes/admin.roluri'
 import { Route as AdminSetariRouteImport } from './routes/admin.setari'
 import { Route as AdminStocRouteImport } from './routes/admin.stoc'
+import { Route as AdminUtilizatoriRouteImport } from './routes/admin.utilizatori'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
@@ -220,6 +221,11 @@ const AdminStocRoute = AdminStocRouteImport.update({
   path: '/stoc',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUtilizatoriRoute = AdminUtilizatoriRouteImport.update({
+  id: '/utilizatori',
+  path: '/utilizatori',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
   id: '/categorie/$slug',
   path: '/categorie/$slug',
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/admin/roluri': typeof AdminRoluriRoute
   '/admin/setari': typeof AdminSetariRoute
   '/admin/stoc': typeof AdminStocRoute
+  '/admin/utilizatori': typeof AdminUtilizatoriRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByTo {
   '/admin/roluri': typeof AdminRoluriRoute
   '/admin/setari': typeof AdminSetariRoute
   '/admin/stoc': typeof AdminStocRoute
+  '/admin/utilizatori': typeof AdminUtilizatoriRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/admin/roluri': typeof AdminRoluriRoute
   '/admin/setari': typeof AdminSetariRoute
   '/admin/stoc': typeof AdminStocRoute
+  '/admin/utilizatori': typeof AdminUtilizatoriRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/produs/$slug': typeof ProdusSlugRoute
@@ -456,6 +465,7 @@ export interface FileRouteTypes {
     | '/admin/roluri'
     | '/admin/setari'
     | '/admin/stoc'
+    | '/admin/utilizatori'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -501,6 +511,7 @@ export interface FileRouteTypes {
     | '/admin/roluri'
     | '/admin/setari'
     | '/admin/stoc'
+    | '/admin/utilizatori'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -548,6 +559,7 @@ export interface FileRouteTypes {
     | '/admin/roluri'
     | '/admin/setari'
     | '/admin/stoc'
+    | '/admin/utilizatori'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/produs/$slug'
@@ -823,6 +835,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStocRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/utilizatori': {
+      id: '/admin/utilizatori'
+      path: '/utilizatori'
+      fullPath: '/admin/utilizatori'
+      preLoaderRoute: typeof AdminUtilizatoriRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/categorie/$slug': {
       id: '/categorie/$slug'
       path: '/categorie/$slug'
@@ -923,6 +942,7 @@ interface AdminRouteChildren {
   AdminRoluriRoute: typeof AdminRoluriRoute
   AdminSetariRoute: typeof AdminSetariRoute
   AdminStocRoute: typeof AdminStocRoute
+  AdminUtilizatoriRoute: typeof AdminUtilizatoriRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -939,6 +959,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRoluriRoute: AdminRoluriRoute,
   AdminSetariRoute: AdminSetariRoute,
   AdminStocRoute: AdminStocRoute,
+  AdminUtilizatoriRoute: AdminUtilizatoriRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

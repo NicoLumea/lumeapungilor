@@ -1,10 +1,11 @@
-import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { claimOwnerAccess } from "@/lib/shop.functions";
+import { AccessDenied } from "@/components/site/AccessDenied";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -23,6 +24,7 @@ const NAV: { to: string; label: string; exact: boolean }[] = [
   { to: "/admin/products", label: "Produse", exact: false },
   { to: "/admin/categories", label: "Categorii", exact: false },
   { to: "/admin/orders", label: "Comenzi", exact: false },
+  { to: "/admin/utilizatori", label: "Utilizatori și interes", exact: false },
   { to: "/admin/clienti", label: "Clienți", exact: false },
   { to: "/admin/roluri", label: "Angajați și accese", exact: false },
   { to: "/admin/retururi", label: "Retururi", exact: false },
@@ -34,18 +36,25 @@ const NAV: { to: string; label: string; exact: boolean }[] = [
   { to: "/admin/guide", label: "Ghid", exact: false },
 ];
 
-
 function AdminLayout() {
   const { user, isAdmin, loading, refresh } = useAuth();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isUsersDashboard = pathname === "/admin/utilizatori";
 
   if (loading) {
     return <p className="py-32 text-center text-sm text-muted-foreground">Se încarcă…</p>;
   }
 
-  if (!user) return <AuthCard />;
-  if (!isAdmin)
-    return <ClaimCard onClaimed={refresh} email={user.email ?? ""} userId={user.id} />;
-
+  if (!user) return isUsersDashboard ? <AdminLoginRedirect /> : <AuthCard />;
+  if (!isAdmin && isUsersDashboard) {
+    return (
+      <AccessDenied
+        title="Acces interzis"
+        message="Această pagină este disponibilă exclusiv administratorilor. Conturile de client și angajat nu pot consulta adresele de e-mail ale conturilor înregistrate."
+      />
+    );
+  }
+  if (!isAdmin) return <ClaimCard onClaimed={refresh} email={user.email ?? ""} userId={user.id} />;
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,7 +74,6 @@ function AdminLayout() {
               {item.label}
             </Link>
           ))}
-
         </nav>
         <button
           type="button"
@@ -82,6 +90,18 @@ function AdminLayout() {
         <Outlet />
       </main>
     </div>
+  );
+}
+
+function AdminLoginRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate({ to: "/admin", replace: true });
+  }, [navigate]);
+  return (
+    <p className="py-32 text-center text-sm text-muted-foreground">
+      Redirecționare către autentificarea de administrare…
+    </p>
   );
 }
 
@@ -168,7 +188,6 @@ function ClaimCard({
   email: string;
   userId: string;
 }) {
-
   const claim = useServerFn(claimOwnerAccess);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -177,8 +196,8 @@ function ClaimCard({
     <div className="mx-auto max-w-[480px] px-4 py-28">
       <h1 className="display text-2xl">Acces proprietar</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Ești autentificat ca {email}, dar contul nu are încă drepturi de administrare. Introdu codul de
-        proprietar o singură dată pentru a le activa.
+        Ești autentificat ca {email}, dar contul nu are încă drepturi de administrare. Introdu codul
+        de proprietar o singură dată pentru a le activa.
       </p>
       <form
         className="mt-8 space-y-5"
