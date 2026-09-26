@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useProduct } from "@/lib/products";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
-import { normalizeQty, sortedImages } from "@/lib/shop-types";
+import { normalizeQty, primaryImage, sortedImages } from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
 import { RestockNotice } from "@/components/site/RestockNotice";
 
@@ -24,17 +24,42 @@ function ProductPage() {
   const { slug } = Route.useParams();
   const { data: product, isLoading } = useProduct(slug);
   const { add } = useCart();
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState<number | null>(null);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [variantError, setVariantError] = useState(false);
   const [qty, setQty] = useState<number | null>(null);
   const [mainFailed, setMainFailed] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [galleryHovered, setGalleryHovered] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
   const images = useMemo(() => (product ? sortedImages(product) : []), [product]);
+  const primaryIndex = product
+    ? images.findIndex((image) => image.id === primaryImage(product)?.id)
+    : 0;
+  const activeIndex = active ?? Math.max(0, primaryIndex);
   const variants = useMemo(
     () => [...(product?.product_variants ?? [])].sort((a, b) => a.sort_order - b.sort_order),
     [product],
   );
+
+  useEffect(() => {
+    if (!product) return;
+    setActive(null);
+    setMainFailed(false);
+    setAutoRotate(
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches && images.length > 1,
+    );
+  }, [images, product]);
+
+  useEffect(() => {
+    if (!autoRotate || galleryHovered || images.length < 2) return;
+    const timer = window.setInterval(() => {
+      setMainFailed(false);
+      setActive((current) => ((current ?? activeIndex) + 1) % images.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [activeIndex, autoRotate, galleryHovered, images.length]);
 
   if (isLoading) {
     return <p className="py-32 text-center text-sm text-muted-foreground">Se încarcă…</p>;
@@ -52,8 +77,24 @@ function ProductPage() {
   }
 
   const COLOR_WORDS = [
-    "negru", "rosu", "roșu", "verde", "albastru", "alb", "bleo", "bleu", "mov", "roz", "bej",
-    "portocaliu", "galben", "gri", "maro", "auriu", "argintiu", "transparent",
+    "negru",
+    "rosu",
+    "roșu",
+    "verde",
+    "albastru",
+    "alb",
+    "bleo",
+    "bleu",
+    "mov",
+    "roz",
+    "bej",
+    "portocaliu",
+    "galben",
+    "gri",
+    "maro",
+    "auriu",
+    "argintiu",
+    "transparent",
   ];
   const isColorChoice =
     variants.length > 0 &&
@@ -75,7 +116,9 @@ function ProductPage() {
   const step = Math.max(1, product.qty_increment || 1);
   const quantity = qty ?? min;
   const perPiece =
-    product.units_per_pack && product.units_per_pack > 0 ? unitPrice / product.units_per_pack : null;
+    product.units_per_pack && product.units_per_pack > 0
+      ? unitPrice / product.units_per_pack
+      : null;
 
   function addToCart() {
     if (!product) return;
@@ -91,6 +134,12 @@ function ProductPage() {
     }
     add({ productId: product.id, variantId, qty: safeQty });
     toast.success("Produs adăugat în coș.");
+  }
+
+  function selectImage(index: number) {
+    setActive((index + images.length) % images.length);
+    setMainFailed(false);
+    setAutoRotate(false);
   }
 
   return (
@@ -114,13 +163,28 @@ function ProductPage() {
       </nav>
 
       <div className="mt-8 grid gap-12 lg:grid-cols-[1.2fr_1fr]">
-        <div>
-          <div className="product-field">
-            {images[active] && !mainFailed ? (
+        <div
+          onMouseEnter={() => setGalleryHovered(true)}
+          onMouseLeave={() => setGalleryHovered(false)}
+        >
+          <div
+            className="product-field"
+            onTouchStart={(event) => {
+              touchStartX.current = event.changedTouches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(event) => {
+              const start = touchStartX.current;
+              const end = event.changedTouches[0]?.clientX;
+              touchStartX.current = null;
+              if (start === null || end === undefined || Math.abs(end - start) < 45) return;
+              selectImage(activeIndex + (end < start ? 1 : -1));
+            }}
+          >
+            {images[activeIndex] && !mainFailed ? (
               <img
-                key={images[active]?.id}
-                src={imageUrl(images[active]?.url) ?? ""}
-                alt={images[active]?.alt ?? product.name}
+                key={images[activeIndex]?.id}
+                src={imageUrl(images[activeIndex]?.url) ?? ""}
+                alt={images[activeIndex]?.alt ?? product.name}
                 onError={() => setMainFailed(true)}
                 className="absolute inset-0 size-full object-contain p-10"
               />
@@ -131,26 +195,57 @@ function ProductPage() {
                 </span>
               </div>
             )}
+            {images.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  aria-label="Fotografia precedentă"
+                  onClick={() => selectImage(activeIndex - 1)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 border border-border bg-background/90 px-3 py-2 text-lg shadow-sm transition-opacity hover:opacity-80"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  aria-label="Fotografia următoare"
+                  onClick={() => selectImage(activeIndex + 1)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 border border-border bg-background/90 px-3 py-2 text-lg shadow-sm transition-opacity hover:opacity-80"
+                >
+                  →
+                </button>
+              </>
+            ) : null}
           </div>
           {images.length > 1 ? (
-            <div className="mt-3 flex flex-wrap gap-3">
-              {images.map((img, i) => (
-                <button
-                  key={img.id}
-                  type="button"
-                  onClick={() => { setActive(i); setMainFailed(false); }}
-                  aria-label={`Imaginea ${i + 1}`}
-                  aria-current={i === active}
-                  className="size-20 border bg-field p-2"
-                  style={{ borderColor: i === active ? "var(--foreground)" : "var(--border)" }}
-                >
-                  <img
-                    src={imageUrl(img.url) ?? ""}
-                    alt={img.alt ?? product.name}
-                    className="size-full object-contain"
-                  />
-                </button>
-              ))}
+            <div className="mt-3">
+              <div className="flex flex-wrap gap-3">
+                {images.map((img, i) => (
+                  <button
+                    key={img.id}
+                    type="button"
+                    onClick={() => selectImage(i)}
+                    aria-label={`Imaginea ${i + 1}${img.is_primary ? ", principală" : ""}`}
+                    aria-current={i === activeIndex}
+                    className="relative size-20 border bg-field p-2"
+                    style={{
+                      borderColor: i === activeIndex ? "var(--foreground)" : "var(--border)",
+                    }}
+                  >
+                    <img
+                      src={imageUrl(img.url) ?? ""}
+                      alt={img.alt ?? product.name}
+                      className="size-full object-contain"
+                    />
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="micro-sm mt-3 link-underline"
+                onClick={() => setAutoRotate((current) => !current)}
+              >
+                {autoRotate ? "Oprește rotirea automată" : "Pornește rotirea automată"}
+              </button>
             </div>
           ) : null}
         </div>

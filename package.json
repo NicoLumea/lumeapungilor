@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "test:auth": "node --test src/lib/login-rate-limit-core.test.ts",
+    "test:gallery": "node --test src/lib/product-gallery.test.ts",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."

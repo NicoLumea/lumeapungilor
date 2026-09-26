@@ -17,6 +17,8 @@ export type ProductImage = {
   alt: string | null;
   sort_order: number;
   is_primary: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export type ProductVariant = {
@@ -56,25 +58,34 @@ export type Product = {
   categories?: { slug: string; name: string } | null;
 };
 
-export const PRODUCT_SELECT =
-  "*, product_images(*), product_variants(*), categories(slug,name)";
+export const PRODUCT_SELECT = "*, product_images(*), product_variants(*), categories(slug,name)";
 
 export function sortedImages(p: Product): ProductImage[] {
   return [...(p.product_images ?? [])].sort(
-    (a, b) => Number(b.is_primary) - Number(a.is_primary) || a.sort_order - b.sort_order,
+    (a, b) =>
+      a.sort_order - b.sort_order ||
+      a.created_at.localeCompare(b.created_at) ||
+      a.id.localeCompare(b.id),
   );
+}
+
+export function primaryImage(p: Product): ProductImage | undefined {
+  const images = sortedImages(p);
+  return images.find((image) => image.is_primary) ?? images[0];
 }
 
 export function specList(specs: unknown): Spec[] {
   if (!Array.isArray(specs)) return [];
   return specs.filter(
-    (s): s is Spec =>
-      !!s && typeof s === "object" && "label" in s && "value" in s,
+    (s): s is Spec => !!s && typeof s === "object" && "label" in s && "value" in s,
   );
 }
 
 /** Clamp a quantity to the product's minimum and increment rules. */
-export function normalizeQty(product: Pick<Product, "min_order_qty" | "qty_increment">, qty: number): number {
+export function normalizeQty(
+  product: Pick<Product, "min_order_qty" | "qty_increment">,
+  qty: number,
+): number {
   const min = Math.max(1, product.min_order_qty || 1);
   const step = Math.max(1, product.qty_increment || 1);
   if (!Number.isFinite(qty) || qty < min) return min;
