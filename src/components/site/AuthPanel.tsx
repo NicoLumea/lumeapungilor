@@ -116,7 +116,6 @@ export function AuthPanel({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [privacy, setPrivacy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
@@ -134,7 +133,6 @@ export function AuthPanel({
       next["password"] = `Parola trebuie să aibă cel puțin ${MIN_PASSWORD_LENGTH} caractere.`;
     if (mode === "up") {
       if (password !== confirm) next["confirm"] = "Cele două parole nu coincid.";
-      if (!privacy) next["privacy"] = "Confirmă că ai citit Politica de confidențialitate.";
     }
     setErrors(next);
     if (next["email"]) emailRef.current?.focus();
@@ -268,33 +266,13 @@ export function AuthPanel({
               error={errors["confirm"]}
               inputRef={confirmRef}
             />
-            <div>
-              <label className="flex items-start gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={privacy}
-                  onChange={(e) => {
-                    setPrivacy(e.target.checked);
-                    setErrors((x) => ({ ...x, privacy: undefined }));
-                  }}
-                  aria-invalid={!!errors["privacy"]}
-                  aria-describedby={errors["privacy"] ? "privacy-error" : undefined}
-                  className="mt-1 size-4 accent-foreground"
-                />
-                <span className="text-muted-foreground">
-                  Am citit{" "}
-                  <Link to="/confidentialitate" target="_blank" className="link-underline">
-                    Politica de confidențialitate
-                  </Link>
-                  .
-                </span>
-              </label>
-              {errors["privacy"] ? (
-                <p id="privacy-error" role="alert" className="mt-1 text-sm text-destructive">
-                  {errors["privacy"]}
-                </p>
-              ) : null}
-            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Prin crearea contului, datele sunt prelucrate pentru administrarea acestuia conform{" "}
+              <Link to="/confidentialitate" target="_blank" className="link-underline">
+                Politicii de confidențialitate
+              </Link>
+              . Aceasta este o informare, nu un acord pentru marketing.
+            </p>
             <p className="text-xs text-muted-foreground">
               După înregistrare, este posibil să fie necesar să confirmi adresa de email înainte de
               autentificare.

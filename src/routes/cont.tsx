@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { useMyProfile } from "@/lib/dashboard-data";
 import { useServerFn } from "@tanstack/react-start";
 import { requestEmployeeAccess } from "@/lib/account.functions";
 import { useAuth } from "@/lib/use-auth";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 export const Route = createFileRoute("/cont")({
   ssr: false,
@@ -19,7 +20,11 @@ export const Route = createFileRoute("/cont")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: () => <RequireAccess level="customer">{(auth) => <AccountPage userId={auth.user!.id} email={auth.user!.email ?? ""} />}</RequireAccess>,
+  component: () => (
+    <RequireAccess level="customer">
+      {(auth) => <AccountPage userId={auth.user!.id} email={auth.user!.email ?? ""} />}
+    </RequireAccess>
+  ),
 });
 
 const FIELDS: { key: string; label: string }[] = [
@@ -48,14 +53,18 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
   useEffect(() => {
     if (!profile) return;
     const next: Record<string, string> = {};
-    for (const f of FIELDS) next[f.key] = ((profile as Record<string, unknown>)[f.key] as string) ?? "";
+    for (const f of FIELDS)
+      next[f.key] = ((profile as Record<string, unknown>)[f.key] as string) ?? "";
     setForm(next);
   }, [profile]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.from("profiles").update(form as never).eq("id", userId);
+    const { error } = await supabase
+      .from("profiles")
+      .update(form as never)
+      .eq("id", userId);
     setBusy(false);
     if (error) {
       toast.error("Datele nu au putut fi salvate.");
@@ -135,7 +144,8 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
         >
           <h2 className="display text-xl">Lucrezi la Lumea Pungilor?</h2>
           <p className="text-sm text-muted-foreground">
-            Poți cere acces de angajat. Cererea este activată doar după aprobarea unui administrator.
+            Poți cere acces de angajat. Cererea este activată doar după aprobarea unui
+            administrator.
           </p>
           {accessSent ? (
             <p className="border border-border bg-field p-3 text-sm">
@@ -158,7 +168,10 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
         </form>
       ) : null}
 
-      <form onSubmit={changePassword} className="mt-14 max-w-md space-y-5 border-t border-border pt-10">
+      <form
+        onSubmit={changePassword}
+        className="mt-14 max-w-md space-y-5 border-t border-border pt-10"
+      >
         <h2 className="display text-xl">Schimbă parola</h2>
         <label className="block">
           <span className="micro-sm text-muted-foreground">Parola curentă</span>
@@ -185,6 +198,24 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
           Schimbă parola
         </button>
       </form>
+
+      <section className="mt-14 max-w-2xl border-t border-border pt-10">
+        <h2 className="display text-xl">Confidențialitate și date</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Poți modifica datele de profil mai sus. Pentru acces la date, corectări care nu pot fi
+          făcute din cont sau ștergerea contului, scrie la{" "}
+          <a
+            className="link-underline text-foreground"
+            href={`mailto:${SUPPORT_EMAIL}?subject=Cerere%20GDPR`}
+          >
+            {SUPPORT_EMAIL}
+          </a>
+          . Unele evidențe de comandă sau facturare pot fi păstrate când există o obligație legală.
+        </p>
+        <Link to="/confidentialitate" className="micro-sm mt-4 inline-block link-underline">
+          Citește Politica de confidențialitate
+        </Link>
+      </section>
     </div>
   );
 }
