@@ -22,6 +22,8 @@ const interestPageSchema = filtersSchema
   .pick({ search: true, source: true, dateFrom: true, dateTo: true })
   .extend({ page: z.number().int().min(1).max(100_000).default(1) });
 
+const passwordResetSchema = z.object({ userId: z.string().uuid() });
+
 export type AdminUserRow = {
   id: string;
   email: string;
@@ -125,6 +127,65 @@ export const getAdminInterest = createServerFn({ method: "GET" })
       return { ok: true, data: payload as unknown as InterestPayload };
     },
   );
+
+export const sendAdminPasswordReset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => passwordResetSchema.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true } | AdminUsersFailure> => {
+    if (!(await verifyAdmin(context.supabase, context.userId))) {
+      return { ok: false, kind: "forbidden", error: "Acces interzis." };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { checkRateLimit, audit } = await import("@/lib/rate-limit.server");
+    const [{ getRequest }, { passwordRecoveryRedirect }] = await Promise.all([
+      import("@tanstack/react-start/server"),
+      import("@/lib/auth-security.server"),
+    ]);
+    const actorLimit = await checkRateLimit(
+      "admin_password_reset_actor",
+      context.userId,
+      10,
+      60 * 60,
+    );
+    const targetLimit = await checkRateLimit(
+      "admin_password_reset_target",
+      data.userId,
+      3,
+      60 * 60,
+    );
+    if (!actorLimit.allowed || !targetLimit.allowed) {
+      return {
+        ok: false,
+        kind: "error",
+        error: "Au fost trimise prea multe solicitări. Încearcă din nou mai târziu.",
+      };
+    }
+
+    const { data: target, error: targetError } = await supabaseAdmin.auth.admin.getUserById(
+      data.userId,
+    );
+    if (targetError || !target.user?.email) {
+      return { ok: false, kind: "error", error: "Emailul de resetare nu a putut fi trimis." };
+    }
+    const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
+      target.user.email,
+      { redirectTo: passwordRecoveryRedirect(getRequest()) },
+    );
+    if (resetError) {
+      return { ok: false, kind: "error", error: "Emailul de resetare nu a putut fi trimis." };
+    }
+
+    await audit({
+      actorId: context.userId,
+      actorEmail: typeof context.claims.email === "string" ? context.claims.email : null,
+      action: "password_recovery.sent",
+      entity: "auth.users",
+      entityId: data.userId,
+      details: { channel: "email", initiated_by: "administrator" },
+    });
+    return { ok: true };
+  });
 
 function csvCell(value: string | number | boolean | null): string {
   const normalized = value == null ? "" : String(value);

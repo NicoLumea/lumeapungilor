@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { PASSWORD_RESET_GENERIC_MESSAGE } from "@/lib/password-recovery";
 
 const inputSchema = z.object({ email: z.string().trim().email().max(320) });
 const headers = { "Cache-Control": "no-store", "Content-Type": "application/json" };
-const genericMessage =
-  "Dacă există un cont pentru această adresă, vei primi un e-mail cu instrucțiuni.";
 
 export const Route = createFileRoute("/api/auth/password-reset")({
   server: {
@@ -18,7 +17,10 @@ export const Route = createFileRoute("/api/auth/password-reset")({
 
         const input = inputSchema.safeParse(await request.json().catch(() => null));
         if (!input.success) {
-          return Response.json({ ok: true, message: genericMessage }, { status: 202, headers });
+          return Response.json(
+            { ok: true, message: PASSWORD_RESET_GENERIC_MESSAGE },
+            { status: 202, headers },
+          );
         }
 
         try {
@@ -35,11 +37,17 @@ export const Route = createFileRoute("/api/auth/password-reset")({
               { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } },
             );
           }
-          return Response.json({ ok: true, message: genericMessage }, { status: 202, headers });
+          return Response.json(
+            { ok: true, message: PASSWORD_RESET_GENERIC_MESSAGE },
+            { status: 202, headers },
+          );
         } catch {
           // Keep the public response generic so provider errors cannot reveal
           // whether the submitted account exists.
-          return Response.json({ ok: true, message: genericMessage }, { status: 202, headers });
+          return Response.json(
+            { ok: true, message: PASSWORD_RESET_GENERIC_MESSAGE },
+            { status: 202, headers },
+          );
         }
       },
     },

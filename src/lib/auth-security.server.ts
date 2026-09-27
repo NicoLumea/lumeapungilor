@@ -114,7 +114,14 @@ function store(
   return {
     async check(keys) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data, error } = await (supabaseAdmin as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc("check_auth_rate_limits", {
+      const { data, error } = await (
+        supabaseAdmin as unknown as {
+          rpc: (
+            fn: string,
+            args: Record<string, unknown>,
+          ) => Promise<{ data: unknown; error: unknown }>;
+        }
+      ).rpc("check_auth_rate_limits", {
         _keys: [keys.accountKey, keys.ipKey],
       });
       if (error) throw new Error("Authentication rate-limit check failed.");
@@ -122,7 +129,14 @@ function store(
     },
     async recordFailure(keys) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data, error } = await (supabaseAdmin as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc("record_auth_rate_limit_event", {
+      const { data, error } = await (
+        supabaseAdmin as unknown as {
+          rpc: (
+            fn: string,
+            args: Record<string, unknown>,
+          ) => Promise<{ data: unknown; error: unknown }>;
+        }
+      ).rpc("record_auth_rate_limit_event", {
         _account_key: keys.accountKey,
         _ip_key: keys.ipKey,
         _account_scope: scopes.account,
@@ -137,7 +151,14 @@ function store(
     },
     async clearAccount(accountKey) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { error } = await (supabaseAdmin as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc("clear_auth_rate_limit", {
+      const { error } = await (
+        supabaseAdmin as unknown as {
+          rpc: (
+            fn: string,
+            args: Record<string, unknown>,
+          ) => Promise<{ data: unknown; error: unknown }>;
+        }
+      ).rpc("clear_auth_rate_limit", {
         _account_key: accountKey,
       });
       if (error) throw new Error("Authentication rate-limit reset failed.");
@@ -201,9 +222,28 @@ export async function requestPasswordResetWithProtection(request: Request, email
   const afterAttempt = await rateStore.recordFailure(keys);
   if (afterAttempt.blocked) return { status: "rate_limited" as const, ...afterAttempt };
 
-  const redirectTo = `${new URL(request.url).origin}/parola-noua`;
-  await authClient(clientIp).auth.resetPasswordForEmail(identifier, { redirectTo });
+  await authClient(clientIp).auth.resetPasswordForEmail(identifier, {
+    redirectTo: passwordRecoveryRedirect(request),
+  });
   return { status: "accepted" as const };
+}
+
+export function publicSiteOrigin(request?: Request): string {
+  const configured = process.env["PUBLIC_SITE_URL"]?.trim();
+  const candidate = configured || (request ? new URL(request.url).origin : "");
+  if (!candidate) throw new Error("PUBLIC_SITE_URL is required for this server operation.");
+  const url = new URL(candidate);
+  if (!(["https:", "http:"] as string[]).includes(url.protocol) || url.username || url.password) {
+    throw new Error("PUBLIC_SITE_URL must be a valid HTTP(S) origin.");
+  }
+  if (process.env["NODE_ENV"] === "production" && url.protocol !== "https:") {
+    throw new Error("PUBLIC_SITE_URL must use HTTPS in production.");
+  }
+  return url.origin;
+}
+
+export function passwordRecoveryRedirect(request?: Request): string {
+  return new URL("/parola-noua", `${publicSiteOrigin(request)}/`).toString();
 }
 
 export function isSameOrigin(request: Request): boolean {

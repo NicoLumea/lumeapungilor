@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, Search } from "lucide-react";
+import { Download, Mail, Search } from "lucide-react";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import {
   exportAdminUsersCsv,
   getAdminInterest,
   getAdminUsers,
+  sendAdminPasswordReset,
   type AdminUserRow,
   type AccountsPayload,
   type AdminUsersFailure,
@@ -26,6 +27,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/admin/utilizatori")({
   component: AdminUsersPage,
@@ -367,7 +379,7 @@ function AccountsTable({
     return <StateMessage>Nu există conturi pentru filtrele selectate.</StateMessage>;
   return (
     <div className={`mt-4 overflow-x-auto ${loading ? "opacity-60" : ""}`} aria-busy={loading}>
-      <table className="min-w-[1180px] w-full border-collapse text-sm">
+      <table className="min-w-[1380px] w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-border text-left">
             {[
@@ -382,6 +394,7 @@ function AccountsTable({
               "Coș",
               "Revenire stoc",
               "Sursă/status",
+              "Acțiuni",
             ].map((label) => (
               <th
                 key={label}
@@ -403,6 +416,25 @@ function AccountsTable({
 }
 
 function AccountRow({ row }: { row: AdminUserRow }) {
+  const sendReset = useServerFn(sendAdminPasswordReset);
+  const [sending, setSending] = useState(false);
+
+  async function sendPasswordReset() {
+    setSending(true);
+    try {
+      const result = await sendReset({ data: { userId: row.id } });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Instrucțiunile pentru resetarea parolei au fost trimise.");
+    } catch {
+      toast.error("Emailul de resetare nu a putut fi trimis.");
+    } finally {
+      setSending(false);
+    }
+  }
+
   return (
     <tr className="border-b border-border/60 align-top">
       <td className="px-2 py-3 font-medium">{row.email}</td>
@@ -421,6 +453,27 @@ function AccountRow({ row }: { row: AdminUserRow }) {
       <td className="px-2 py-3">{row.restock_count}</td>
       <td className="px-2 py-3">
         <Badge variant="secondary">{row.source_label}</Badge>
+      </td>
+      <td className="px-2 py-3">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" size="sm" disabled={sending}>
+              <Mail className="size-4" /> {sending ? "Se trimite…" : "Trimite email de resetare"}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Trimite emailul de resetare?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Trimite un email de resetare a parolei către {row.email}?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Anulează</AlertDialogCancel>
+              <AlertDialogAction onClick={sendPasswordReset}>Trimite emailul</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </td>
     </tr>
   );

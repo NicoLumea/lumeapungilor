@@ -10,6 +10,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { requestEmployeeAccess } from "@/lib/account.functions";
 import { useAuth } from "@/lib/use-auth";
 import { SUPPORT_EMAIL } from "@/lib/company";
+import { MIN_PASSWORD_LENGTH } from "@/lib/password-recovery";
 
 export const Route = createFileRoute("/cont")({
   ssr: false,
@@ -76,8 +77,8 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
-    if (password.next.length < 8) {
-      toast.error("Parola nouă trebuie să aibă cel puțin 8 caractere.");
+    if (password.next.length < MIN_PASSWORD_LENGTH) {
+      toast.error(`Parola nouă trebuie să aibă cel puțin ${MIN_PASSWORD_LENGTH} caractere.`);
       return;
     }
     const { error } = await supabase.auth.updateUser({
@@ -188,7 +189,7 @@ function AccountPage({ userId, email }: { userId: string; email: string }) {
           <input
             type="password"
             required
-            minLength={8}
+            minLength={MIN_PASSWORD_LENGTH}
             value={password.next}
             onChange={(e) => setPassword((p) => ({ ...p, next: e.target.value }))}
             className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"

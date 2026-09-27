@@ -2,12 +2,10 @@ import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { protectedPasswordReset, protectedSignIn, PublicAuthError } from "@/lib/auth-client";
+import { protectedSignIn, PublicAuthError } from "@/lib/auth-client";
+import { MIN_PASSWORD_LENGTH } from "@/lib/password-recovery";
 
-type Mode = "in" | "up" | "reset";
-
-/** Mirrors the minimum password length enforced by the authentication backend. */
-const MIN_PASSWORD_LENGTH = 8;
+type Mode = "in" | "up";
 
 function Field({
   id,
@@ -129,7 +127,7 @@ export function AuthPanel({
     const next: Record<string, string | undefined> = {};
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim()))
       next["email"] = "Introdu o adresă de e-mail validă.";
-    if (mode !== "reset" && !passwordLongEnough)
+    if (!passwordLongEnough)
       next["password"] = `Parola trebuie să aibă cel puțin ${MIN_PASSWORD_LENGTH} caractere.`;
     if (mode === "up") {
       if (password !== confirm) next["confirm"] = "Cele două parole nu coincid.";
@@ -169,8 +167,6 @@ export function AuthPanel({
         } else {
           onSignedUp?.(true);
         }
-      } else {
-        setSent(await protectedPasswordReset(email));
       }
     } catch (err) {
       toast.error(publicAuthError(err));
@@ -231,20 +227,28 @@ export function AuthPanel({
           error={errors["email"]}
           inputRef={emailRef}
         />
-        {mode !== "reset" ? (
-          <Field
-            id="auth-password"
-            label="Parolă"
-            type="password"
-            value={password}
-            onChange={(v) => {
-              setPassword(v);
-              setErrors((e) => ({ ...e, password: undefined }));
-            }}
-            autoComplete={mode === "up" ? "new-password" : "current-password"}
-            error={errors["password"]}
-            inputRef={passwordRef}
-          />
+        <Field
+          id="auth-password"
+          label="Parolă"
+          type="password"
+          value={password}
+          onChange={(v) => {
+            setPassword(v);
+            setErrors((e) => ({ ...e, password: undefined }));
+          }}
+          autoComplete={mode === "up" ? "new-password" : "current-password"}
+          error={errors["password"]}
+          inputRef={passwordRef}
+        />
+        {mode === "in" ? (
+          <div className="-mt-3 text-right">
+            <Link
+              to="/resetare-parola"
+              className="micro-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              Ai uitat parola?
+            </Link>
+          </div>
         ) : null}
         {mode === "up" ? (
           <>
@@ -284,26 +288,9 @@ export function AuthPanel({
           disabled={busy}
           className="micro min-h-11 w-full border border-foreground bg-foreground px-6 py-3 text-background disabled:opacity-40"
         >
-          {busy
-            ? "Se procesează…"
-            : mode === "in"
-              ? "Intră în cont"
-              : mode === "up"
-                ? "Creează cont"
-                : "Trimite link de resetare"}
+          {busy ? "Se procesează…" : mode === "in" ? "Intră în cont" : "Creează cont"}
         </button>
       </form>
-
-      <button
-        type="button"
-        className="micro-sm mt-5 text-muted-foreground underline underline-offset-4 hover:text-foreground"
-        onClick={() => {
-          setMode(mode === "reset" ? "in" : "reset");
-          setErrors({});
-        }}
-      >
-        {mode === "reset" ? "Înapoi la autentificare" : "Ai uitat parola?"}
-      </button>
     </div>
   );
 }
