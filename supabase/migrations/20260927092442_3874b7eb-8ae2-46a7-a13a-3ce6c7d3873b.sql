@@ -1,6 +1,3 @@
--- Complete, additive returns / product-complaint workflow.
--- Apply this migration through the normal Supabase deployment process before deploying the UI.
-
 alter table public.return_requests
   add column if not exists customer_name text,
   add column if not exists customer_phone text,
@@ -10,6 +7,8 @@ alter table public.return_requests
   add column if not exists approved_at timestamptz,
   add column if not exists refund_processed_at timestamptz,
   add column if not exists idempotency_key uuid;
+
+alter table public.return_requests drop constraint if exists return_requests_status_check;
 
 update public.return_requests
 set status = case status
@@ -30,7 +29,6 @@ create unique index if not exists return_requests_idempotency_key_idx
 create index if not exists return_requests_order_id_idx on public.return_requests (order_id);
 create index if not exists return_requests_user_id_idx on public.return_requests (user_id);
 
-alter table public.return_requests drop constraint if exists return_requests_status_check;
 alter table public.return_requests add constraint return_requests_status_check check (
   status in ('submitted','under_review','approved','rejected','awaiting_return','return_received','refund_pending','refunded','closed')
 );
@@ -70,8 +68,6 @@ create table if not exists public.guest_return_sessions (
   used_at timestamptz,
   created_at timestamptz not null default now()
 );
-comment on table public.guest_return_sessions is
-  'Server-only short-lived proof that a guest supplied the matching order number and e-mail.';
 create index if not exists guest_return_sessions_expiry_idx on public.guest_return_sessions (expires_at);
 
 grant select on public.return_request_items, public.return_request_images to authenticated;
@@ -94,13 +90,6 @@ create policy "owners read return image metadata" on public.return_request_image
 );
 drop policy if exists "staff read return image metadata" on public.return_request_images;
 create policy "staff read return image metadata" on public.return_request_images for select to authenticated using (public.is_staff());
-
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('return-evidence', 'return-evidence', false, 5242880, array['image/jpeg','image/png','image/webp'])
-on conflict (id) do update set
-  public = false,
-  file_size_limit = excluded.file_size_limit,
-  allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists "return owners read evidence" on storage.objects;
 create policy "return owners read evidence" on storage.objects for select to authenticated using (
@@ -128,3 +117,8 @@ end; $$;
 drop trigger if exists return_status_timestamps on public.return_requests;
 create trigger return_status_timestamps before update on public.return_requests
 for each row execute function public.set_return_status_timestamps();
+
+insert into public.site_content (key, value)
+values ('privacy', jsonb_build_object('title', 'Politica de confidențialitate', 'body', 'Protecția datelor cu caracter personal este importantă pentru Lumea Pungilor. Prezenta politică explică ce date putem prelucra atunci când utilizezi site-ul, scopurile pentru care sunt utilizate, temeiurile prelucrării și drepturile de care beneficiezi.'))
+on conflict (key) do update
+set value = coalesce(public.site_content.value, '{}'::jsonb) || excluded.value, updated_at = now();
