@@ -531,6 +531,10 @@ function CheckoutPage() {
               >
                 Politica de confidențialitate
               </a>
+              . Pentru informații despre retururi și reclamații, consultă{" "}
+              <a href="/retur" target="_blank" rel="noopener noreferrer" className="link-underline">
+                Politica de retur
+              </a>
               .
             </span>
           </label>

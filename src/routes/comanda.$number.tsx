@@ -57,6 +57,10 @@ function OrderConfirmation() {
         <p className="micro-sm mb-3 text-muted-foreground">Datele vânzătorului</p>
         <CompanyIdentity sellerLabel showPhones />
       </div>
+      <p className="mt-6 text-sm text-muted-foreground">
+        Pentru informații despre retururi și reclamații, consultă{" "}
+        <Link to="/retur" className="link-underline">Politica de retur</Link>.
+      </p>
       <Link
         to="/produse"
         className="micro mt-10 inline-flex border border-foreground px-8 py-4 transition-colors hover:bg-foreground hover:text-background"

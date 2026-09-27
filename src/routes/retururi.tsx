@@ -1,128 +1,111 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { z } from "zod";
 import { AccountNav } from "@/components/site/AccountNav";
 import { RequireAccess } from "@/components/site/RequireAccess";
-import { useMyReturns, RETURN_KIND_LABEL } from "@/lib/dashboard-data";
-import { submitReturnRequest } from "@/lib/account.functions";
+import { ReturnRequestForm } from "@/components/site/ReturnRequestForm";
+import { useMyReturns } from "@/lib/dashboard-data";
+import { RETURN_REASON_LABEL, RETURN_STATUS_LABEL, type ReturnReason } from "@/lib/returns-core";
+import { getEligibleReturnOrders } from "@/lib/returns.functions";
 
 export const Route = createFileRoute("/retururi")({
   ssr: false,
+  validateSearch: (search) => z.object({ order: z.string().optional() }).parse(search),
   head: () => ({
     meta: [
-      { title: "Retururi și reclamații — Lumea Pungilor" },
-      { name: "description", content: "Cererile tale de retur, retragere și reclamație." },
+      { title: "Retururile mele — Lumea Pungilor" },
+      {
+        name: "description",
+        content: "Trimite și urmărește cererile tale de retur sau reclamație.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: () => (
-    <RequireAccess level="customer">
-      {(auth) => <MyReturns userId={auth.user!.id} email={auth.user!.email ?? ""} />}
-    </RequireAccess>
+    <RequireAccess level="customer">{(auth) => <MyReturns userId={auth.user!.id} />}</RequireAccess>
   ),
 });
 
-const STATUS_LABEL: Record<string, string> = {
-  nou: "Nou",
-  in_lucru: "În lucru",
-  rezolvat: "Rezolvat",
-  respins: "Respins",
-};
-
-function MyReturns({ userId }: { userId: string; email: string }) {
+function MyReturns({ userId }: { userId: string }) {
+  const search = Route.useSearch();
   const qc = useQueryClient();
-  const { data, isLoading } = useMyReturns(userId);
-  const submit = useServerFn(submitReturnRequest);
-  const [form, setForm] = useState({ orderNumber: "", kind: "retur", message: "" });
-  const [busy, setBusy] = useState(false);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      const res = await submit({
-        data: {
-          orderNumber: form.orderNumber,
-          kind: form.kind as "retur",
-          message: form.message,
-        },
-      });
-      if (!res.ok) {
-        toast.error(res.error);
-        return;
-      }
-      toast.success("Cererea a fost trimisă.");
-      setForm({ orderNumber: "", kind: "retur", message: "" });
-      qc.invalidateQueries({ queryKey: ["account", "returns", userId] });
-    } catch {
-      toast.error("Cererea nu a putut fi trimisă.");
-    } finally {
-      setBusy(false);
-    }
-  }
+  const loadOrders = useServerFn(getEligibleReturnOrders);
+  const orders = useQuery({
+    queryKey: ["account", "return-eligible-orders", userId],
+    queryFn: () => loadOrders(),
+  });
+  const returns = useMyReturns(userId);
+  const [showForm, setShowForm] = useState(!!search.order);
+  useEffect(() => {
+    if (search.order) setShowForm(true);
+  }, [search.order]);
 
   return (
     <div className="site-container max-w-[1000px] py-10">
       <AccountNav />
-      <h1 className="display mt-10 text-3xl">Retururi și reclamații</h1>
-
-      <form onSubmit={onSubmit} className="mt-8 max-w-xl space-y-5 border border-border p-6">
-        <label className="block">
-          <span className="micro-sm text-muted-foreground">Număr comandă</span>
-          <input
-            required
-            value={form.orderNumber}
-            onChange={(e) => setForm((f) => ({ ...f, orderNumber: e.target.value }))}
-            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-          />
-        </label>
-        <label className="block">
-          <span className="micro-sm text-muted-foreground">Tipul cererii</span>
-          <select
-            value={form.kind}
-            onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value }))}
-            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm"
-          >
-            {Object.entries(RETURN_KIND_LABEL).map(([k, label]) => (
-              <option key={k} value={k}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="micro-sm text-muted-foreground">Detalii</span>
-          <textarea
-            required
-            rows={4}
-            value={form.message}
-            onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-          />
-        </label>
+      <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="display text-3xl">Retururile mele</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Poți trimite o cerere numai pentru comenzile achitate din contul tău.
+          </p>
+        </div>
         <button
-          type="submit"
-          disabled={busy}
-          className="micro min-h-11 border border-foreground bg-foreground px-6 py-3 text-background disabled:opacity-40"
+          type="button"
+          onClick={() => setShowForm((value) => !value)}
+          className="micro min-h-11 border border-foreground px-5"
         >
-          {busy ? "Se trimite…" : "Trimite cererea"}
+          {showForm ? "Închide formularul" : "Solicită retur / Trimite reclamație"}
         </button>
-      </form>
-
-      {isLoading ? <p className="mt-8 text-sm text-muted-foreground">Se încarcă…</p> : null}
-      <ul className="mt-8 space-y-4">
-        {(data ?? []).map((r) => (
-          <li key={r.id} className="border border-border p-5">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-              <span className="micro-sm">{RETURN_KIND_LABEL[r.kind] ?? r.kind}</span>
-              <span className="text-sm text-muted-foreground">{r.order_number ?? "—"}</span>
-              <span className="ml-auto text-sm">{STATUS_LABEL[r.status] ?? r.status}</span>
+      </div>
+      {showForm ? (
+        orders.isLoading ? (
+          <p className="mt-8 text-sm text-muted-foreground">Se încarcă comenzile eligibile…</p>
+        ) : orders.error ? (
+          <p className="mt-8 text-sm text-destructive">
+            Comenzile eligibile nu au putut fi încărcate.
+          </p>
+        ) : (
+          <ReturnRequestForm
+            orders={orders.data ?? []}
+            initialOrderNumber={search.order}
+            onSubmitted={() => {
+              qc.invalidateQueries({ queryKey: ["account", "returns", userId] });
+              qc.invalidateQueries({ queryKey: ["account", "orders", userId] });
+            }}
+          />
+        )
+      ) : null}
+      <div className="mt-12 flex items-center justify-between border-t border-border pt-8">
+        <h2 className="display text-2xl">Cereri trimise</h2>
+        <Link to="/retur" className="micro-sm link-underline">
+          Condiții și proces
+        </Link>
+      </div>
+      {returns.isLoading ? <p className="mt-6 text-sm text-muted-foreground">Se încarcă…</p> : null}
+      {!returns.isLoading && (returns.data ?? []).length === 0 ? (
+        <p className="mt-6 text-sm text-muted-foreground">Nu ai cereri înregistrate.</p>
+      ) : null}
+      <ul className="mt-6 space-y-4">
+        {(returns.data ?? []).map((request) => (
+          <li key={request.id} className="border border-border p-5">
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              <span className="micro-sm">Cererea {request.id.slice(0, 8).toUpperCase()}</span>
+              <span className="text-sm text-muted-foreground">{request.order_number}</span>
+              <span className="ml-auto text-sm">
+                {RETURN_STATUS_LABEL[request.status] ?? request.status}
+              </span>
             </div>
-            <p className="mt-3 whitespace-pre-line text-sm">{r.message}</p>
-            {r.resolution ? (
-              <p className="mt-3 border-l border-brand pl-4 text-sm">{r.resolution}</p>
+            <p className="mt-3 text-sm">
+              {RETURN_REASON_LABEL[request.reason as ReturnReason] ?? request.kind}
+            </p>
+            <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">
+              {request.message}
+            </p>
+            {request.resolution ? (
+              <p className="mt-3 border-l border-brand pl-4 text-sm">{request.resolution}</p>
             ) : null}
           </li>
         ))}

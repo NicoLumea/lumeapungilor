@@ -6,10 +6,27 @@ export type ReturnRequest = {
   order_number: string | null;
   email: string;
   kind: string;
+  reason: string | null;
   message: string;
   status: string;
   resolution: string | null;
   created_at: string;
+  customer_name: string | null;
+  customer_phone: string | null;
+  return_request_items: Array<{
+    id: string;
+    product_name: string;
+    variant_name: string | null;
+    purchased_quantity: number;
+    requested_quantity: number;
+  }>;
+  return_request_images: Array<{
+    id: string;
+    original_name: string;
+    storage_path: string;
+    mime_type: string;
+    size_bytes: number;
+  }>;
 };
 
 export type ContactRequest = {
@@ -35,7 +52,9 @@ export function useReturnRequests() {
     queryFn: async (): Promise<ReturnRequest[]> => {
       const { data, error } = await supabase
         .from("return_requests")
-        .select("id,order_number,email,kind,message,status,resolution,created_at")
+        .select(
+          "id,order_number,email,customer_name,customer_phone,kind,reason,message,status,resolution,created_at,return_request_items(id,product_name,variant_name,purchased_quantity,requested_quantity),return_request_images(id,original_name,storage_path,mime_type,size_bytes)",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as ReturnRequest[];
@@ -110,11 +129,9 @@ export function useTeam() {
         .in("role", ["employee", "admin", "owner"]);
       if (error) throw error;
       const ids = [...new Set((roles ?? []).map((r) => r.user_id))];
-      if (ids.length === 0) return [] as { user_id: string; email: string | null; roles: string[] }[];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id,email")
-        .in("id", ids);
+      if (ids.length === 0)
+        return [] as { user_id: string; email: string | null; roles: string[] }[];
+      const { data: profiles } = await supabase.from("profiles").select("id,email").in("id", ids);
       return ids.map((id) => ({
         user_id: id,
         email: (profiles ?? []).find((p) => p.id === id)?.email ?? null,
@@ -161,7 +178,9 @@ export function useMyOrders(userId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("id,order_number,status,payment_status,total,created_at,order_items(product_name,quantity,line_total)")
+        .select(
+          "id,order_number,status,payment_status,total,created_at,order_items(product_name,quantity,line_total),return_requests(id,status,return_request_items(order_item_id))",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -176,7 +195,9 @@ export function useMyReturns(userId: string | undefined) {
     queryFn: async (): Promise<ReturnRequest[]> => {
       const { data, error } = await supabase
         .from("return_requests")
-        .select("id,order_number,email,kind,message,status,resolution,created_at")
+        .select(
+          "id,order_number,email,customer_name,customer_phone,kind,reason,message,status,resolution,created_at,return_request_items(id,product_name,variant_name,purchased_quantity,requested_quantity),return_request_images(id,original_name,storage_path,mime_type,size_bytes)",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as ReturnRequest[];

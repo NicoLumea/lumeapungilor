@@ -706,46 +706,91 @@ export type Database = {
           },
         ]
       }
+      guest_return_sessions: {
+        Row: { created_at: string; email: string; expires_at: string; id: string; order_id: string; token_hash: string; used_at: string | null }
+        Insert: { created_at?: string; email: string; expires_at: string; id?: string; order_id: string; token_hash: string; used_at?: string | null }
+        Update: { created_at?: string; email?: string; expires_at?: string; id?: string; order_id?: string; token_hash?: string; used_at?: string | null }
+        Relationships: [{ foreignKeyName: "guest_return_sessions_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] }]
+      }
+      return_request_images: {
+        Row: { created_at: string; id: string; mime_type: string; original_name: string; return_request_id: string; size_bytes: number; storage_path: string }
+        Insert: { created_at?: string; id?: string; mime_type: string; original_name: string; return_request_id: string; size_bytes: number; storage_path: string }
+        Update: { created_at?: string; id?: string; mime_type?: string; original_name?: string; return_request_id?: string; size_bytes?: number; storage_path?: string }
+        Relationships: [{ foreignKeyName: "return_request_images_return_request_id_fkey"; columns: ["return_request_id"]; isOneToOne: false; referencedRelation: "return_requests"; referencedColumns: ["id"] }]
+      }
+      return_request_items: {
+        Row: { created_at: string; id: string; order_item_id: string; product_name: string; purchased_quantity: number; requested_quantity: number; return_request_id: string; variant_name: string | null }
+        Insert: { created_at?: string; id?: string; order_item_id: string; product_name: string; purchased_quantity: number; requested_quantity: number; return_request_id: string; variant_name?: string | null }
+        Update: { created_at?: string; id?: string; order_item_id?: string; product_name?: string; purchased_quantity?: number; requested_quantity?: number; return_request_id?: string; variant_name?: string | null }
+        Relationships: [
+          { foreignKeyName: "return_request_items_order_item_id_fkey"; columns: ["order_item_id"]; isOneToOne: false; referencedRelation: "order_items"; referencedColumns: ["id"] },
+          { foreignKeyName: "return_request_items_return_request_id_fkey"; columns: ["return_request_id"]; isOneToOne: false; referencedRelation: "return_requests"; referencedColumns: ["id"] },
+        ]
+      }
       return_requests: {
         Row: {
+          approved_at: string | null
           archived_at: string | null
           created_at: string
+          customer_name: string | null
+          customer_phone: string | null
           email: string
           id: string
+          idempotency_key: string | null
           kind: string
           message: string
           order_id: string | null
           order_number: string | null
+          reason: string | null
+          refund_processed_at: string | null
           resolution: string | null
+          reviewed_at: string | null
           status: string
+          submitted_at: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          approved_at?: string | null
           archived_at?: string | null
           created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
           email: string
           id?: string
+          idempotency_key?: string | null
           kind?: string
           message: string
           order_id?: string | null
           order_number?: string | null
+          reason?: string | null
+          refund_processed_at?: string | null
           resolution?: string | null
+          reviewed_at?: string | null
           status?: string
+          submitted_at?: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          approved_at?: string | null
           archived_at?: string | null
           created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
           email?: string
           id?: string
+          idempotency_key?: string | null
           kind?: string
           message?: string
           order_id?: string | null
           order_number?: string | null
+          reason?: string | null
+          refund_processed_at?: string | null
           resolution?: string | null
+          reviewed_at?: string | null
           status?: string
+          submitted_at?: string
           updated_at?: string
           user_id?: string | null
         }
