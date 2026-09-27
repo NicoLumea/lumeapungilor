@@ -25,6 +25,7 @@ import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
 import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
 import { Route as ProduseRouteImport } from './routes/produse'
+import { Route as ResetareParolaRouteImport } from './routes/resetare-parola'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
 import { Route as StaffRouteImport } from './routes/staff'
@@ -136,6 +137,11 @@ const ParolaNouaRoute = ParolaNouaRouteImport.update({
 const ProduseRoute = ProduseRouteImport.update({
   id: '/produse',
   path: '/produse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetareParolaRoute = ResetareParolaRouteImport.update({
+  id: '/resetare-parola',
+  path: '/resetare-parola',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReturRoute = ReturRouteImport.update({
@@ -316,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
+  '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
@@ -365,6 +372,7 @@ export interface FileRoutesByTo {
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
+  '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
@@ -415,6 +423,7 @@ export interface FileRoutesById {
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
+  '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
@@ -467,6 +476,7 @@ export interface FileRouteTypes {
     | '/magazin'
     | '/parola-noua'
     | '/produse'
+    | '/resetare-parola'
     | '/retur'
     | '/retururi'
     | '/staff'
@@ -516,6 +526,7 @@ export interface FileRouteTypes {
     | '/magazin'
     | '/parola-noua'
     | '/produse'
+    | '/resetare-parola'
     | '/retur'
     | '/retururi'
     | '/termeni'
@@ -565,6 +576,7 @@ export interface FileRouteTypes {
     | '/magazin'
     | '/parola-noua'
     | '/produse'
+    | '/resetare-parola'
     | '/retur'
     | '/retururi'
     | '/staff'
@@ -616,6 +628,7 @@ export interface RootRouteChildren {
   MagazinRoute: typeof MagazinRoute
   ParolaNouaRoute: typeof ParolaNouaRoute
   ProduseRoute: typeof ProduseRoute
+  ResetareParolaRoute: typeof ResetareParolaRoute
   ReturRoute: typeof ReturRoute
   RetururiRoute: typeof RetururiRoute
   StaffRoute: typeof StaffRouteWithChildren
@@ -740,6 +753,13 @@ declare module '@tanstack/react-router' {
       path: '/produse'
       fullPath: '/produse'
       preLoaderRoute: typeof ProduseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resetare-parola': {
+      id: '/resetare-parola'
+      path: '/resetare-parola'
+      fullPath: '/resetare-parola'
+      preLoaderRoute: typeof ResetareParolaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/retur': {
@@ -1046,6 +1066,7 @@ const rootRouteChildren: RootRouteChildren = {
   MagazinRoute: MagazinRoute,
   ParolaNouaRoute: ParolaNouaRoute,
   ProduseRoute: ProduseRoute,
+  ResetareParolaRoute: ResetareParolaRoute,
   ReturRoute: ReturRoute,
   RetururiRoute: RetururiRoute,
   StaffRoute: StaffRouteWithChildren,

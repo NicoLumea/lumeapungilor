@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { PASSWORD_RESET_GENERIC_MESSAGE } from "@/lib/password-recovery";
 
 type AuthErrorPayload = {
   error?: string;
@@ -49,8 +50,5 @@ export async function protectedPasswordReset(email: string): Promise<string> {
   });
   const payload = (await response.json()) as AuthErrorPayload & { ok?: boolean; message?: string };
   if (!response.ok || !payload.ok) throw new PublicAuthError(payload);
-  return (
-    payload.message ??
-    "Dacă există un cont pentru această adresă, vei primi un e-mail cu instrucțiuni."
-  );
+  return payload.message ?? PASSWORD_RESET_GENERIC_MESSAGE;
 }
