@@ -420,6 +420,7 @@ export type Database = {
           is_primary: boolean
           product_id: string
           sort_order: number
+          updated_at: string
           url: string
         }
         Insert: {
@@ -429,6 +430,7 @@ export type Database = {
           is_primary?: boolean
           product_id: string
           sort_order?: number
+          updated_at?: string
           url: string
         }
         Update: {
@@ -438,6 +440,7 @@ export type Database = {
           is_primary?: boolean
           product_id?: string
           sort_order?: number
+          updated_at?: string
           url?: string
         }
         Relationships: [
@@ -943,6 +946,14 @@ export type Database = {
           product_id: string
           sold: number
         }[]
+      }
+      update_product_image_gallery: {
+        Args: {
+          p_image_ids: string[]
+          p_primary_image_id: string
+          p_product_id: string
+        }
+        Returns: undefined
       }
       write_audit: {
         Args: {
