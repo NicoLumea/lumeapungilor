@@ -62,7 +62,7 @@ export function SiteFooter() {
             </li>
             <li>
               <Link to="/retur" className="link-underline">
-                Retur
+                Retururi și reclamații
               </Link>
             </li>
             <li>

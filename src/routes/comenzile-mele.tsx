@@ -3,6 +3,7 @@ import { AccountNav } from "@/components/site/AccountNav";
 import { RequireAccess } from "@/components/site/RequireAccess";
 import { useMyOrders } from "@/lib/dashboard-data";
 import { formatRon } from "@/lib/format";
+import { isPaidStatus, RETURN_STATUS_LABEL } from "@/lib/returns-core";
 
 export const Route = createFileRoute("/comenzile-mele")({
   ssr: false,
@@ -49,31 +50,49 @@ function MyOrders({ userId }: { userId: string }) {
       ) : null}
 
       <ul className="mt-8 space-y-4">
-        {(data ?? []).map((o) => (
-          <li key={o.id} className="border border-border p-5">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-              <Link
-                to="/comanda/$number"
-                params={{ number: o.order_number }}
-                className="micro link-underline"
-              >
-                {o.order_number}
-              </Link>
-              <span className="text-sm text-muted-foreground">
-                {new Date(o.created_at).toLocaleDateString("ro-RO")}
-              </span>
-              <span className="text-sm">{STATUS_LABEL[o.status] ?? o.status}</span>
-              <span className="ml-auto text-sm">{formatRon(Number(o.total))}</span>
-            </div>
-            <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-              {(o.order_items ?? []).map((i, idx) => (
-                <li key={idx}>
-                  {i.product_name} × {i.quantity} — {formatRon(Number(i.line_total))}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {(data ?? []).map((o) => {
+          const activeReturn = (o.return_requests ?? []).find(
+            (request) => !["rejected", "closed"].includes(request.status),
+          );
+          return (
+            <li key={o.id} className="border border-border p-5">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                <Link
+                  to="/comanda/$number"
+                  params={{ number: o.order_number }}
+                  className="micro link-underline"
+                >
+                  {o.order_number}
+                </Link>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(o.created_at).toLocaleDateString("ro-RO")}
+                </span>
+                <span className="text-sm">{STATUS_LABEL[o.status] ?? o.status}</span>
+                <span className="ml-auto text-sm">{formatRon(Number(o.total))}</span>
+              </div>
+              <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                {(o.order_items ?? []).map((i, idx) => (
+                  <li key={idx}>
+                    {i.product_name} × {i.quantity} — {formatRon(Number(i.line_total))}
+                  </li>
+                ))}
+              </ul>
+              {activeReturn ? (
+                <p className="micro-sm mt-4">
+                  Cerere de retur: {RETURN_STATUS_LABEL[activeReturn.status] ?? activeReturn.status}
+                </p>
+              ) : isPaidStatus(o.payment_status) ? (
+                <Link
+                  to="/retururi"
+                  search={{ order: o.order_number }}
+                  className="micro-sm mt-4 inline-flex min-h-11 items-center link-underline"
+                >
+                  Solicită retur / Trimite reclamație
+                </Link>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
