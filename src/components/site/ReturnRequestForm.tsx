@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
@@ -279,6 +280,13 @@ export function ReturnRequestForm({
       >
         {busy ? "Se trimite…" : "Trimite cererea"}
       </button>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        Datele și fotografiile sunt folosite pentru verificarea și soluționarea cererii. Detalii în{" "}
+        <Link to="/confidentialitate" target="_blank" className="link-underline">
+          Politica de confidențialitate
+        </Link>
+        .
+      </p>
     </form>
   );
 }

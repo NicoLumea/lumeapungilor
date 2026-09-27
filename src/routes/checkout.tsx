@@ -180,9 +180,7 @@ function CheckoutPage() {
     } else if (!billingSame && form.billing_address.trim().length < 5) {
       next.billing_address = "Introdu adresa de facturare.";
     }
-    if (!terms)
-      next.terms =
-        "Pentru a trimite cererea trebuie să accepți Termenii și Politica de confidențialitate.";
+    if (!terms) next.terms = "Pentru a trimite cererea trebuie să accepți Termenii și condițiile.";
     setErrors(next);
     const firstInvalid = Object.keys(next)[0];
     if (firstInvalid && firstInvalid !== "terms") {
@@ -521,8 +519,8 @@ function CheckoutPage() {
                 className="link-underline"
               >
                 Termenii și condițiile
-              </a>{" "}
-              și{" "}
+              </a>
+              . Am luat la cunoștință{" "}
               <a
                 href="/confidentialitate"
                 target="_blank"

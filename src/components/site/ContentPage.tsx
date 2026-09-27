@@ -1,22 +1,28 @@
 import { useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
+import type { ReactNode } from "react";
 
 export function ContentPage({
   contentKey,
   fallbackTitle,
+  titleOverride,
+  bodyOverride,
   showCompany = false,
+  children,
 }: {
   contentKey: string;
   fallbackTitle: string;
+  titleOverride?: string;
+  bodyOverride?: string;
   showCompany?: boolean;
+  children?: ReactNode;
 }) {
   const { data } = useContent();
   const block = data?.[contentKey];
-  const title = text(block, "title") ?? fallbackTitle;
-  const body = text(block, "body");
+  const title = titleOverride ?? text(block, "title") ?? fallbackTitle;
+  const body = bodyOverride ?? text(block, "body");
   const image = imageUrl(text(block, "image_url"));
-
 
   return (
     <article className="site-container max-w-[900px] py-20">
@@ -35,6 +41,7 @@ export function ContentPage({
           ))}
         </div>
       ) : null}
+      {children}
       {showCompany ? (
         <aside className="mt-12 border-y border-border py-6">
           <p className="micro-sm mb-4 text-muted-foreground">Datele operatorului</p>
@@ -42,6 +49,5 @@ export function ContentPage({
         </aside>
       ) : null}
     </article>
-
   );
 }
