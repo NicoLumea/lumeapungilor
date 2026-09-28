@@ -15,10 +15,21 @@ export const Route = createFileRoute("/api/public/img/$")({
 
         // The bucket is private with no public read policy; images are served
         // exclusively through this endpoint using the server-side admin client.
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.storage.from(BUCKET).download(path);
+        let data: Blob | null = null;
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const result = await supabaseAdmin.storage.from(BUCKET).download(path);
+          if (result.error) return new Response("Not found", { status: 404 });
+          data = result.data;
+        } catch (err) {
+          console.warn("[img] storage unavailable:", err instanceof Error ? err.message : err);
+          return new Response("Image temporarily unavailable", {
+            status: 503,
+            headers: { "Cache-Control": "no-store" },
+          });
+        }
 
-        if (error || !data) {
+        if (!data) {
           return new Response("Not found", { status: 404 });
         }
 
