@@ -24,7 +24,7 @@ export function BackToTop() {
       type="button"
       onClick={toTop}
       aria-label="Înapoi sus"
-      className="fixed bottom-6 right-4 z-30 grid size-11 place-items-center border border-foreground bg-background text-foreground shadow-none transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground md:bottom-8 md:right-8"
+      className="fixed bottom-6 right-20 z-30 grid size-11 place-items-center border border-foreground bg-background text-foreground shadow-none transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground md:bottom-10 md:right-28"
     >
       <ArrowUp className="size-4" aria-hidden="true" />
     </button>

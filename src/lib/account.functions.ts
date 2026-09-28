@@ -196,8 +196,7 @@ export const decideAdminPromotion = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<ActionResult> => {
     const roles = await rolesOf(context.userId);
     const ownerSecret = process.env["OWNER_SETUP_CODE"];
-    const authorised =
-      roles.includes("owner") || (!!ownerSecret && data.ownerCode === ownerSecret);
+    const authorised = roles.includes("owner") || (!!ownerSecret && data.ownerCode === ownerSecret);
     if (!authorised)
       return { ok: false, error: "Doar proprietarul proiectului poate aproba această cerere." };
 
@@ -250,7 +249,8 @@ export const guestOrderEligibility = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ allowed: boolean; reason?: string }> => {
     const { checkRateLimit } = await import("./rate-limit.server");
     const limit = await checkRateLimit("guest_eligibility", data.email, 20, 600);
-    if (!limit.allowed) return { allowed: false, reason: "Prea multe verificări. Încearcă mai târziu." };
+    if (!limit.allowed)
+      return { allowed: false, reason: "Prea multe verificări. Încearcă mai târziu." };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: used } = await supabaseAdmin
@@ -276,22 +276,36 @@ export const submitContactRequest = createServerFn({ method: "POST" })
         name: z.string().trim().min(2).max(120),
         email: z.string().trim().email().max(200),
         subject: z.string().trim().max(160).optional(),
-        message: z.string().trim().min(10).max(2000),
-        userId: z.string().uuid().nullable().optional(),
+        message: z.string().trim().min(10).max(3000),
       })
       .parse(data),
   )
   .handler(async ({ data }): Promise<ActionResult> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { checkRateLimit } = await import("./rate-limit.server");
-    const limit = await checkRateLimit("contact", data.email, 5, 3600);
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+
+    let userId: string | null = null;
+    let email = data.email.toLowerCase();
+    let name = data.name;
+    const authHeader = getRequestHeader("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const { data: authUser } = await supabaseAdmin.auth.getUser(authHeader.slice(7));
+      if (authUser.user) {
+        userId = authUser.user.id;
+        email = authUser.user.email?.toLowerCase() ?? email;
+        name = (authUser.user.user_metadata["full_name"] as string | undefined)?.trim() || name;
+      }
+    }
+
+    const limit = await checkRateLimit("contact", email, 5, 3600);
     if (!limit.allowed)
       return { ok: false, error: "Ai trimis prea multe mesaje. Te rugăm să reîncerci mai târziu." };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("contact_requests").insert({
-      user_id: data.userId ?? null,
-      name: data.name,
-      email: data.email,
+      user_id: userId,
+      name,
+      email,
       subject: data.subject ?? null,
       message: data.message,
     });

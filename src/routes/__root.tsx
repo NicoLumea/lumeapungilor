@@ -17,6 +17,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OrganizationStructuredData } from "@/components/site/OrganizationStructuredData";
 import { BackToTop } from "@/components/site/BackToTop";
+import { SupportWidget } from "@/components/site/SupportWidget";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -72,7 +73,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Încearcă din nou
           </button>
-            <a href="/magazin" className="micro border border-border px-6 py-3 transition-colors hover:bg-accent">
+          <a
+            href="/magazin"
+            className="micro border border-border px-6 py-3 transition-colors hover:bg-accent"
+          >
             Acasă
           </a>
         </div>
@@ -135,11 +139,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        {isAdmin || isGateway ? (
-          <Outlet />
-        ) : (
-          <PublicSiteFrame pathname={pathname} />
-        )}
+        {isAdmin || isGateway ? <Outlet /> : <PublicSiteFrame pathname={pathname} />}
         <Toaster position="bottom-right" />
       </CartProvider>
     </QueryClientProvider>
@@ -163,6 +163,7 @@ function PublicSiteFrame({ pathname }: { pathname: string }) {
       </main>
       <SiteFooter />
       {showBackToTop ? <BackToTop /> : null}
+      {!pathname.startsWith("/staff") ? <SupportWidget /> : null}
     </div>
   );
 }

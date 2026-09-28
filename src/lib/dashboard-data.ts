@@ -171,16 +171,17 @@ export function useGuestCartLimit() {
   });
 }
 
-export function useMyOrders(userId: string | undefined) {
+export function useMyOrders(userId: string | undefined, enabled = true) {
   return useQuery({
     queryKey: ["account", "orders", userId],
-    enabled: !!userId,
+    enabled: !!userId && enabled,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
         .select(
           "id,order_number,status,payment_status,total,created_at,order_items(product_name,quantity,line_total),return_requests(id,status,return_request_items(order_item_id))",
         )
+        .eq("user_id", userId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
