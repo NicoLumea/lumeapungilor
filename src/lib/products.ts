@@ -22,10 +22,12 @@ export function usePublishedProducts() {
   return useQuery({ queryKey: ["products", "published"], queryFn: fetchPublishedProducts });
 }
 
-export function useProduct(slug: string) {
+export function useProduct(slug: string | undefined) {
   return useQuery({
     queryKey: ["product", slug],
+    enabled: !!slug,
     queryFn: async () => {
+      if (!slug) return null;
       const { data, error } = await supabase
         .from("products")
         .select(PRODUCT_SELECT)
@@ -42,10 +44,7 @@ export function useProductsByIds(ids: string[]) {
     queryKey: ["products", "byIds", [...ids].sort().join(",")],
     enabled: ids.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(PRODUCT_SELECT)
-        .in("id", ids);
+      const { data, error } = await supabase.from("products").select(PRODUCT_SELECT).in("id", ids);
       if (error) throw error;
       return (data ?? []).map((d) => normalize(d as unknown as Record<string, unknown>));
     },
