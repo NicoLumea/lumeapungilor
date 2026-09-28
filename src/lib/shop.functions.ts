@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const lineSchema = z.object({
   productId: z.string().uuid(),
@@ -29,8 +30,7 @@ const orderSchema = z.object({
 });
 
 export type PlaceOrderResult =
-  | { ok: true; orderNumber: string; total: number; isTest: boolean }
-  | { ok: false; error: string };
+  { ok: true; orderNumber: string; total: number; isTest: boolean } | { ok: false; error: string };
 
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
@@ -43,7 +43,10 @@ export const placeOrder = createServerFn({ method: "POST" })
 
     const throttle = await checkRateLimit("checkout", email, 10, 900);
     if (!throttle.allowed) {
-      return { ok: false, error: "Prea multe încercări de comandă. Te rugăm să reîncerci mai târziu." };
+      return {
+        ok: false,
+        error: "Prea multe încercări de comandă. Te rugăm să reîncerci mai târziu.",
+      };
     }
 
     // Identify the signed-in customer from the bearer token, if any.
@@ -196,7 +199,12 @@ export const placeOrder = createServerFn({ method: "POST" })
       .eq("key", "settings")
       .maybeSingle();
     const settings = (settingsRow?.value ?? {}) as Record<string, unknown>;
-    const toNum = (v: unknown) => (typeof v === "number" ? v : typeof v === "string" && v !== "" && Number.isFinite(Number(v)) ? Number(v) : null);
+    const toNum = (v: unknown) =>
+      typeof v === "number"
+        ? v
+        : typeof v === "string" && v !== "" && Number.isFinite(Number(v))
+          ? Number(v)
+          : null;
 
     const flat = toNum(settings["shipping_flat"]);
     const freeOver = toNum(settings["free_shipping_over"]);
@@ -293,27 +301,29 @@ export const placeOrder = createServerFn({ method: "POST" })
 
 /** One-time owner setup: exchanges the private setup code for admin rights. */
 export const claimOwnerAccess = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) =>
-    z.object({ code: z.string().min(4).max(200), userId: z.string().uuid() }).parse(data),
-  )
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ code: z.string().min(4).max(200) }).parse(data))
+  .handler(async ({ data, context }): Promise<{ ok: boolean; error?: string }> => {
+    const { checkRateLimit } = await import("./rate-limit.server");
+    const limit = await checkRateLimit("owner_setup", context.userId, 5, 3600);
+    if (!limit.allowed)
+      return { ok: false, error: "Prea multe încercări. Te rugăm să reîncerci mai târziu." };
+
     const expected = process.env["OWNER_SETUP_CODE"];
     if (!expected) return { ok: false, error: "Codul de configurare nu este setat." };
     if (data.code !== expected) return { ok: false, error: "Cod de configurare incorect." };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: user, error: uErr } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    const { data: user, error: uErr } = await supabaseAdmin.auth.admin.getUserById(context.userId);
     if (uErr || !user?.user) return { ok: false, error: "Cont inexistent." };
 
-    const { error } = await supabaseAdmin
-      .from("user_roles")
-      .upsert(
-        [
-          { user_id: data.userId, role: "owner" as const },
-          { user_id: data.userId, role: "admin" as const },
-        ],
-        { onConflict: "user_id,role" },
-      );
+    const { error } = await supabaseAdmin.from("user_roles").upsert(
+      [
+        { user_id: context.userId, role: "owner" as const },
+        { user_id: context.userId, role: "admin" as const },
+      ],
+      { onConflict: "user_id,role" },
+    );
     if (error) return { ok: false, error: "Nu am putut acorda accesul." };
     return { ok: true };
   });
