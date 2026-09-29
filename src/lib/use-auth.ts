@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { effectiveRole, type AppRole } from "@/lib/authorization";
 
-export type AppRole = "customer" | "employee" | "admin" | "owner";
+export type { AppRole } from "@/lib/authorization";
 
 export type AuthState = {
   loading: boolean;
   user: User | null;
   roles: AppRole[];
+  effectiveRole: AppRole;
   isCustomer: boolean;
   isEmployee: boolean;
   isAdmin: boolean;
@@ -65,6 +67,7 @@ export function useAuth(): AuthState {
     loading: state.loading,
     user: state.user,
     roles,
+    effectiveRole: effectiveRole(roles),
     isCustomer: !!state.user,
     isEmployee,
     isAdmin,

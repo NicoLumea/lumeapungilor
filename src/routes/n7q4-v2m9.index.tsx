@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAdminProducts, useAdminOrders } from "@/lib/admin-data";
 import { useCategories } from "@/lib/content";
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/n7q4-v2m9/")({
   component: AdminHome,
 });
 
@@ -20,7 +20,9 @@ function AdminHome() {
   const { data: orders } = useAdminOrders();
   const { data: categories } = useCategories(true);
 
-  const published = (products ?? []).filter((p) => p.status === "published" && !p.is_archived).length;
+  const published = (products ?? []).filter(
+    (p) => p.status === "published" && !p.is_archived,
+  ).length;
   const drafts = (products ?? []).filter((p) => p.status === "draft").length;
   const newOrders = (orders ?? []).filter((o) => o.status === "nou").length;
 
@@ -40,15 +42,15 @@ function AdminHome() {
 
       <div className="mt-10 flex flex-wrap gap-4">
         <Link
-          to="/admin/products"
+          to="/n7q4-v2m9/products"
           className="micro border border-foreground bg-foreground px-6 py-3 text-background"
         >
           Adaugă un produs
         </Link>
-        <Link to="/admin/content" className="micro border border-foreground px-6 py-3">
+        <Link to="/n7q4-v2m9/content" className="micro border border-foreground px-6 py-3">
           Editează textele site-ului
         </Link>
-        <Link to="/admin/guide" className="micro border border-foreground px-6 py-3">
+        <Link to="/n7q4-v2m9/guide" className="micro border border-foreground px-6 py-3">
           Ghid pas cu pas
         </Link>
       </div>

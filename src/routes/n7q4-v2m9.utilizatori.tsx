@@ -39,14 +39,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/admin/utilizatori")({
+export const Route = createFileRoute("/n7q4-v2m9/utilizatori")({
   component: AdminUsersPage,
 });
 
 type Tab = "accounts" | "interest";
 type Filters = {
   search: string;
-  role: "all" | "customer" | "employee" | "admin";
+  role: "all" | "customer" | "employee" | "admin" | "owner";
   source: "all" | "account" | "order" | "restock";
   status: "all" | "active" | "disabled" | "pending";
   dateFrom: string;
@@ -64,7 +64,12 @@ const INITIAL_FILTERS: Filters = {
   sort: "newest",
 };
 
-const ROLE_LABEL = { customer: "Client", employee: "Angajat", admin: "Administrator" } as const;
+const ROLE_LABEL = {
+  customer: "Client",
+  employee: "Angajat",
+  admin: "Administrator",
+  owner: "Proprietar",
+} as const;
 const STATUS_LABEL = { active: "Activ", disabled: "Dezactivat", pending: "În așteptare" } as const;
 
 function startOfDay(value: string) {
@@ -183,11 +188,12 @@ function AdminUsersPage() {
       </div>
 
       {accountPayload ? (
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
           <Stat label="Total conturi" value={accountPayload.stats.total_accounts} />
           <Stat label="Clienți" value={accountPayload.stats.customers} />
           <Stat label="Angajați" value={accountPayload.stats.employees} />
           <Stat label="Administratori" value={accountPayload.stats.administrators} />
+          <Stat label="Proprietari" value={accountPayload.stats.owners} />
           <Stat
             label="Comandă sau semnal activ"
             value={accountPayload.stats.accounts_with_signal}
@@ -293,6 +299,7 @@ function FiltersBar({
             <SelectItem value="customer">Client</SelectItem>
             <SelectItem value="employee">Angajat</SelectItem>
             <SelectItem value="admin">Administrator</SelectItem>
+            <SelectItem value="owner">Proprietar</SelectItem>
           </FilterSelect>
           <FilterSelect
             value={filters.status}
@@ -379,12 +386,13 @@ function AccountsTable({
     return <StateMessage>Nu există conturi pentru filtrele selectate.</StateMessage>;
   return (
     <div className={`mt-4 overflow-x-auto ${loading ? "opacity-60" : ""}`} aria-busy={loading}>
-      <table className="min-w-[1380px] w-full border-collapse text-sm">
+      <table className="min-w-[1480px] w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-border text-left">
             {[
               "E-mail",
-              "Rol",
+              "Tip cont",
+              "Rol de sistem",
               "Creat",
               "Confirmare",
               "Ultima autentificare",
@@ -438,6 +446,7 @@ function AccountRow({ row }: { row: AdminUserRow }) {
   return (
     <tr className="border-b border-border/60 align-top">
       <td className="px-2 py-3 font-medium">{row.email}</td>
+      <td className="px-2 py-3">Client</td>
       <td className="px-2 py-3">{ROLE_LABEL[row.role]}</td>
       <td className="px-2 py-3 text-muted-foreground">{formatDate(row.created_at)}</td>
       <td className="px-2 py-3">{row.email_confirmed ? "Confirmat" : "Neconfirmat"}</td>

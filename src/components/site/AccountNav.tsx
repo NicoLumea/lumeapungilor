@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ROLE_LABEL } from "@/lib/authorization";
 import { useAuth } from "@/lib/use-auth";
 
 export function AccountNav() {
@@ -17,6 +18,9 @@ export function AccountNav() {
 
   return (
     <nav className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-border pb-4">
+      <span className="micro-sm border border-border px-2 py-1 text-muted-foreground">
+        Rol de sistem: {ROLE_LABEL[auth.effectiveRole]}
+      </span>
       <Link
         to="/cont"
         activeProps={{ className: "micro-sm text-foreground underline underline-offset-4" }}
@@ -38,10 +42,7 @@ export function AccountNav() {
       >
         Retururi și reclamații
       </Link>
-      <Link
-        to="/contact"
-        className="micro-sm text-muted-foreground hover:text-foreground"
-      >
+      <Link to="/contact" className="micro-sm text-muted-foreground hover:text-foreground">
         Contact
       </Link>
       {auth.isStaff ? (
@@ -50,7 +51,7 @@ export function AccountNav() {
         </Link>
       ) : null}
       {auth.isAdmin ? (
-        <Link to="/admin" className="micro-sm text-muted-foreground hover:text-foreground">
+        <Link to="/n7q4-v2m9" className="micro-sm text-muted-foreground hover:text-foreground">
           Administrare
         </Link>
       ) : null}

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCustomers } from "@/lib/dashboard-data";
 
-export const Route = createFileRoute("/admin/clienti")({
+export const Route = createFileRoute("/n7q4-v2m9/clienti")({
   component: CustomersPage,
 });
 
@@ -15,7 +15,9 @@ function CustomersPage() {
         Conturile de client înregistrate pe site. Comenzile lor se văd în secțiunea Comenzi.
       </p>
       {isLoading ? <p className="mt-8 text-sm text-muted-foreground">Se încarcă…</p> : null}
-      {error ? <p className="mt-8 text-sm text-destructive">Lista nu a putut fi încărcată.</p> : null}
+      {error ? (
+        <p className="mt-8 text-sm text-destructive">Lista nu a putut fi încărcată.</p>
+      ) : null}
       <table className="mt-8 w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-border text-left">
