@@ -177,9 +177,8 @@ export const requestAdminPromotion = createServerFn({ method: "POST" })
   });
 
 /**
- * Only the project owner can finalise an administrator promotion. Authorisation
- * is either the owner role or the server-side owner secret; neither is exposed
- * to the browser.
+ * Only an authenticated account that already has the owner role can finalise
+ * an administrator promotion. The bootstrap secret is never accepted here.
  */
 export const decideAdminPromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -188,16 +187,13 @@ export const decideAdminPromotion = createServerFn({ method: "POST" })
       .object({
         requestId: z.string().uuid(),
         decision: z.enum(["approved", "rejected"]),
-        ownerCode: z.string().min(4).max(200).optional(),
         note: z.string().trim().max(500).optional(),
       })
       .parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
     const roles = await rolesOf(context.userId);
-    const ownerSecret = process.env["OWNER_SETUP_CODE"];
-    const authorised = roles.includes("owner") || (!!ownerSecret && data.ownerCode === ownerSecret);
-    if (!authorised)
+    if (!roles.includes("owner"))
       return { ok: false, error: "Doar proprietarul proiectului poate aproba această cerere." };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

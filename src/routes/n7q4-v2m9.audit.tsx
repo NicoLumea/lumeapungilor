@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuditLogs } from "@/lib/dashboard-data";
 
-export const Route = createFileRoute("/admin/audit")({
+export const Route = createFileRoute("/n7q4-v2m9/audit")({
   component: AuditPage,
 });
 
@@ -12,12 +12,14 @@ function AuditPage() {
     <div className="mx-auto max-w-[1200px]">
       <h1 className="display text-3xl">Jurnal de audit</h1>
       <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-        Înregistrare permanentă a modificărilor importante: produse, prețuri, stoc, comenzi și conturi.
-        Înregistrările nu pot fi modificate sau șterse.
+        Înregistrare permanentă a modificărilor importante: produse, prețuri, stoc, comenzi și
+        conturi. Înregistrările nu pot fi modificate sau șterse.
       </p>
 
       {isLoading ? <p className="mt-8 text-sm text-muted-foreground">Se încarcă…</p> : null}
-      {error ? <p className="mt-8 text-sm text-destructive">Jurnalul nu a putut fi încărcat.</p> : null}
+      {error ? (
+        <p className="mt-8 text-sm text-destructive">Jurnalul nu a putut fi încărcat.</p>
+      ) : null}
 
       <table className="mt-8 w-full border-collapse text-sm">
         <thead>

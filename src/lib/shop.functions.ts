@@ -311,9 +311,18 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
 
     const expected = process.env["OWNER_SETUP_CODE"];
     if (!expected) return { ok: false, error: "Codul de configurare nu este setat." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existingOwner } = await supabaseAdmin
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "owner")
+      .limit(1)
+      .maybeSingle();
+    if (existingOwner) {
+      return { ok: false, error: "Configurarea inițială a proprietarului este închisă." };
+    }
     if (data.code !== expected) return { ok: false, error: "Cod de configurare incorect." };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: user, error: uErr } = await supabaseAdmin.auth.admin.getUserById(context.userId);
     if (uErr || !user?.user) return { ok: false, error: "Cont inexistent." };
 
@@ -325,5 +334,14 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
       { onConflict: "user_id,role" },
     );
     if (error) return { ok: false, error: "Nu am putut acorda accesul." };
+    const { audit } = await import("./rate-limit.server");
+    await audit({
+      actorId: context.userId,
+      actorEmail: (context.claims["email"] as string | undefined) ?? null,
+      action: "owner.bootstrap_claimed",
+      entity: "user_roles",
+      entityId: context.userId,
+      details: { bootstrap_closed: true },
+    });
     return { ok: true };
   });
