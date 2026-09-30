@@ -78,12 +78,12 @@ export function Catalogue({
 
   // Restore how much of the list was open before visiting a product page.
   useEffect(() => {
-    const saved = Number(window.sessionStorage.getItem(positionKey));
+    const saved = Number(storageGet("session", positionKey));
     if (Number.isFinite(saved) && saved > PAGE_SIZE) setShown(saved);
   }, [positionKey]);
 
   useEffect(() => {
-    window.sessionStorage.setItem(positionKey, String(shown));
+    storageSet("session", positionKey, String(shown));
   }, [positionKey, shown]);
 
   const scoped = useMemo(() => {

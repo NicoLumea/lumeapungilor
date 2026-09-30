@@ -77,13 +77,13 @@ export function SupportWidget() {
 
   useEffect(() => {
     if (!storageKey) return;
-    setMessages(restoreSupportMessages(window.sessionStorage.getItem(storageKey)));
+    setMessages(restoreSupportMessages(storageGet("session", storageKey)));
     setLoadedStorageKey(storageKey);
   }, [storageKey]);
 
   useEffect(() => {
     if (!storageKey || loadedStorageKey !== storageKey) return;
-    window.sessionStorage.setItem(storageKey, JSON.stringify(messages));
+    storageSet("session", storageKey, JSON.stringify(messages));
   }, [loadedStorageKey, messages, storageKey]);
 
   useEffect(() => {

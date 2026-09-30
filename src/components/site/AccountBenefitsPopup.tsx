@@ -26,17 +26,17 @@ export function AccountBenefitsPopup({
       setVisible(false);
       return;
     }
-    if (window.sessionStorage.getItem(SHOWN_KEY)) return;
-    const saved = Number(window.sessionStorage.getItem(START_KEY));
+    if (storageGet("session", SHOWN_KEY)) return;
+    const saved = Number(storageGet("session", START_KEY));
     const started = saved > 0 && saved <= Date.now() ? saved : Date.now();
-    window.sessionStorage.setItem(START_KEY, String(started));
+    storageSet("session", START_KEY, String(started));
     let timer: number;
     const showWhenReady = () => {
       if (document.querySelector('[role="dialog"][data-state="open"]')) {
         timer = window.setTimeout(showWhenReady, 10_000);
         return;
       }
-      window.sessionStorage.setItem(SHOWN_KEY, "1");
+      storageSet("session", SHOWN_KEY, "1");
       setVisible(true);
     };
     timer = window.setTimeout(showWhenReady, Math.max(0, 60_000 - (Date.now() - started)));
