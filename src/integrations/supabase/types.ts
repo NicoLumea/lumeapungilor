@@ -152,6 +152,66 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_feedback: {
+        Row: {
+          created_at: string
+          email: string | null
+          feedback_type: string
+          id: string
+          message: string
+          order_id: string | null
+          order_number: string | null
+          product_id: string | null
+          rating: number | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          feedback_type: string
+          id?: string
+          message: string
+          order_id?: string | null
+          order_number?: string | null
+          product_id?: string | null
+          rating?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          message?: string
+          order_id?: string | null
+          order_number?: string | null
+          product_id?: string | null
+          rating?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_feedback_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_feedback_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_requests: {
         Row: {
           created_at: string
@@ -191,69 +251,6 @@ export type Database = {
         }
         Relationships: []
       }
-      customer_feedback: {
-        Row: {
-          id: string
-          user_id: string | null
-          email: string | null
-          feedback_type: string
-          product_id: string | null
-          order_id: string | null
-          order_number: string | null
-          rating: number | null
-          message: string
-          status: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          email?: string | null
-          feedback_type: string
-          product_id?: string | null
-          order_id?: string | null
-          order_number?: string | null
-          rating?: number | null
-          message: string
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          email?: string | null
-          feedback_type?: string
-          product_id?: string | null
-          order_id?: string | null
-          order_number?: string | null
-          rating?: number | null
-          message?: string
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      guest_order_access: {
-        Row: {
-          order_id: string
-          token_hash: string
-          created_at: string
-        }
-        Insert: {
-          order_id: string
-          token_hash: string
-          created_at?: string
-        }
-        Update: {
-          order_id?: string
-          token_hash?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
       guest_checkout_usage: {
         Row: {
           email: string
@@ -274,6 +271,32 @@ export type Database = {
           order_count?: number
         }
         Relationships: []
+      }
+      guest_order_access: {
+        Row: {
+          created_at: string
+          order_id: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          order_id: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          order_id?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_order_access_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       guest_return_sessions: {
         Row: {
@@ -1015,6 +1038,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_content: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          is_public: boolean
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          is_public?: boolean
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          is_public?: boolean
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       staff_login_challenges: {
         Row: {
           attempts: number
@@ -1075,45 +1137,6 @@ export type Database = {
           expires_at?: string
           user_id?: string
           verified_at?: string
-        }
-        Relationships: []
-      }
-      site_content: {
-        Row: {
-          key: string
-          updated_at: string
-          value: Json
-        }
-        Insert: {
-          key: string
-          updated_at?: string
-          value?: Json
-        }
-        Update: {
-          key?: string
-          updated_at?: string
-          value?: Json
-        }
-        Relationships: []
-      }
-      site_settings: {
-        Row: {
-          is_public: boolean
-          key: string
-          updated_at: string
-          value: Json
-        }
-        Insert: {
-          is_public?: boolean
-          key: string
-          updated_at?: string
-          value?: Json
-        }
-        Update: {
-          is_public?: boolean
-          key?: string
-          updated_at?: string
-          value?: Json
         }
         Relationships: []
       }
@@ -1201,14 +1224,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: { Args: never; Returns: boolean }
       has_staff_verification: { Args: never; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
-      take_staff_mfa_attempt: {
-        Args: { _challenge_id: string }
-        Returns: number
-      }
       record_auth_rate_limit_event: {
         Args: {
           _account_key: string
@@ -1221,6 +1240,10 @@ export type Database = {
           _window_seconds: number
         }
         Returns: Json
+      }
+      take_staff_mfa_attempt: {
+        Args: { _challenge_id: string }
+        Returns: number
       }
       top_selling_products: {
         Args: { p_limit?: number }
@@ -1291,7 +1314,8 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -1315,7 +1339,8 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -1339,7 +1364,8 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
