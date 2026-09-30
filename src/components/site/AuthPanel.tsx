@@ -94,6 +94,9 @@ function romanianError(message: string): string {
 }
 
 function publicAuthError(error: unknown): string {
+  if (error instanceof PublicAuthError && error.code === "email_not_confirmed") {
+    return "Confirmă întâi adresa de e-mail din mesajul primit.";
+  }
   if (error instanceof PublicAuthError && error.code === "rate_limited") {
     const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 60) / 60));
     return `Prea multe încercări nereușite. Încearcă din nou în aproximativ ${minutes} minute.`;
@@ -278,7 +281,7 @@ export function AuthPanel({
               . Aceasta este o informare, nu un acord pentru marketing.
             </p>
             <p className="text-xs text-muted-foreground">
-              După înregistrare, este posibil să fie necesar să confirmi adresa de email înainte de
+              După înregistrare trebuie să confirmi adresa de email din mesajul primit înainte de
               autentificare.
             </p>
           </>

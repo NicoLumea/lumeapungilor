@@ -4,9 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { claimOwnerAccess } from "@/lib/shop.functions";
+import { claimOwnerAccess, getOwnerBootstrapStatus } from "@/lib/shop.functions";
 import { AccessDenied } from "@/components/site/AccessDenied";
+import { StaffVerification } from "@/components/site/StaffVerification";
 import { protectedSignIn, PublicAuthError } from "@/lib/auth-client";
+import { clearStaffVerification } from "@/lib/staff-mfa.functions";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -38,7 +40,9 @@ const NAV: { to: string; label: string; exact: boolean }[] = [
 ];
 
 function AdminLayout() {
-  const { user, isAdmin, loading, refresh } = useAuth();
+  const clearVerification = useServerFn(clearStaffVerification);
+  const auth = useAuth();
+  const { user, isAdmin, loading, refresh } = auth;
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isUsersDashboard = pathname === "/admin/utilizatori";
 
@@ -55,7 +59,15 @@ function AdminLayout() {
       />
     );
   }
-  if (!isAdmin) return <ClaimCard onClaimed={refresh} email={user.email ?? ""} />;
+  if (!isAdmin) return <OwnerBootstrapGate onClaimed={refresh} email={user.email ?? ""} />;
+  if (auth.staffVerificationRequired && !auth.staffVerified) {
+    if (auth.staffVerificationLoading) {
+      return (
+        <p className="py-32 text-center text-sm text-muted-foreground">Se verifică sesiunea…</p>
+      );
+    }
+    return <StaffVerification auth={auth} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,6 +92,11 @@ function AdminLayout() {
           type="button"
           className="micro-sm ml-auto text-muted-foreground hover:text-foreground"
           onClick={async () => {
+            try {
+              await clearVerification({ data: {} });
+            } catch {
+              // Supabase sign-out still revokes the authentication session.
+            }
             await supabase.auth.signOut();
             window.location.assign("/");
           }}
@@ -92,6 +109,35 @@ function AdminLayout() {
       </main>
     </div>
   );
+}
+
+function OwnerBootstrapGate({ onClaimed, email }: { onClaimed: () => void; email: string }) {
+  const getStatus = useServerFn(getOwnerBootstrapStatus);
+  const [available, setAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getStatus()
+      .then((result) => {
+        if (active) setAvailable(result.available);
+      })
+      .catch(() => {
+        if (active) setAvailable(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [getStatus]);
+
+  if (available === null) {
+    return <p className="py-32 text-center text-sm text-muted-foreground">Se verifică accesul…</p>;
+  }
+  if (!available) {
+    return (
+      <AccessDenied message="Contul tău nu are drepturile necesare pentru această secțiune. Configurarea inițială a proprietarului este închisă." />
+    );
+  }
+  return <ClaimCard onClaimed={onClaimed} email={email} />;
 }
 
 function AdminLoginRedirect() {
@@ -125,6 +171,8 @@ function AuthCard() {
         toast.error(
           `Prea multe încercări nereușite. Încearcă din nou în aproximativ ${minutes} minute.`,
         );
+      } else if (error instanceof PublicAuthError && error.code === "email_not_confirmed") {
+        toast.error("Confirmă întâi adresa de e-mail din mesajul primit.");
       } else {
         toast.error("E-mail sau parolă incorecte.");
       }

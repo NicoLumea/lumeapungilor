@@ -3,11 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import {
-  useEmployeeRequests,
-  useRoleChangeRequests,
-  useTeam,
-} from "@/lib/dashboard-data";
+import { useEmployeeRequests, useRoleChangeRequests, useTeam } from "@/lib/dashboard-data";
 import {
   decideEmployeeRequest,
   decideAdminPromotion,
@@ -38,7 +34,6 @@ function RolesPage() {
   const decidePromotion = useServerFn(decideAdminPromotion);
 
   const [candidate, setCandidate] = useState("");
-  const [ownerCode, setOwnerCode] = useState("");
   const [busy, setBusy] = useState(false);
 
   function refresh() {
@@ -91,7 +86,10 @@ function RolesPage() {
                   type="button"
                   disabled={busy}
                   onClick={() =>
-                    run(() => decide({ data: { requestId: r.id, decision: "approved" } }), "Acces aprobat.")
+                    run(
+                      () => decide({ data: { requestId: r.id, decision: "approved" } }),
+                      "Acces aprobat.",
+                    )
                   }
                   className="micro-sm min-h-9 border border-foreground bg-foreground px-3 py-1 text-background"
                 >
@@ -101,7 +99,10 @@ function RolesPage() {
                   type="button"
                   disabled={busy}
                   onClick={() =>
-                    run(() => decide({ data: { requestId: r.id, decision: "rejected" } }), "Cerere respinsă.")
+                    run(
+                      () => decide({ data: { requestId: r.id, decision: "rejected" } }),
+                      "Cerere respinsă.",
+                    )
                   }
                   className="micro-sm min-h-9 border border-foreground px-3 py-1"
                 >
@@ -117,12 +118,17 @@ function RolesPage() {
         <h2 className="display text-xl">Echipa</h2>
         <ul className="mt-5 space-y-3">
           {(team ?? []).map((m) => (
-            <li key={m.user_id} className="flex flex-wrap items-center gap-4 border border-border p-4">
+            <li
+              key={m.user_id}
+              className="flex flex-wrap items-center gap-4 border border-border p-4"
+            >
               <span className="text-sm">{m.email ?? m.user_id.slice(0, 8)}</span>
               <span className="micro-sm text-muted-foreground">
                 {m.roles.map((r) => ROLE_LABEL[r] ?? r).join(", ")}
               </span>
-              {m.roles.includes("employee") && !m.roles.includes("admin") && !m.roles.includes("owner") ? (
+              {m.roles.includes("employee") &&
+              !m.roles.includes("admin") &&
+              !m.roles.includes("owner") ? (
                 <button
                   type="button"
                   disabled={busy}
@@ -145,16 +151,17 @@ function RolesPage() {
       <section>
         <h2 className="display text-xl">Promovare administrator</h2>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-          O cerere de promovare rămâne în așteptare până când proprietarul proiectului o aprobă cu codul
-          său. Niciun administrator nu se poate promova singur.
+          O cerere de promovare rămâne în așteptare până când proprietarul autentificat și verificat
+          al proiectului o aprobă. Niciun administrator nu se poate promova singur.
         </p>
         <form
           className="mt-5 flex flex-wrap items-end gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            run(() => askPromotion({ data: { candidateEmail: candidate } }), "Cerere trimisă.").then(() =>
-              setCandidate(""),
-            );
+            run(
+              () => askPromotion({ data: { candidateEmail: candidate } }),
+              "Cerere trimisă.",
+            ).then(() => setCandidate(""));
           }}
         >
           <label className="block">
@@ -167,29 +174,22 @@ function RolesPage() {
               className="mt-2 w-72 max-w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             />
           </label>
-          <button type="submit" disabled={busy} className="micro min-h-11 border border-foreground px-5 py-2.5">
+          <button
+            type="submit"
+            disabled={busy}
+            className="micro min-h-11 border border-foreground px-5 py-2.5"
+          >
             Trimite cererea
           </button>
         </form>
-
-        <label className="mt-8 block max-w-sm">
-          <span className="micro-sm text-muted-foreground">
-            Cod de proprietar (necesar doar pentru aprobare)
-          </span>
-          <input
-            type="password"
-            value={ownerCode}
-            onChange={(e) => setOwnerCode(e.target.value)}
-            className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-          />
-        </label>
 
         <ul className="mt-6 space-y-3">
           {(promotions ?? []).map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-4 border border-border p-4">
               <span className="text-sm">{p.candidate_email}</span>
               <span className="micro-sm text-muted-foreground">
-                cerut de {p.requester_email} · {p.status === "pending_owner_approval" ? "în așteptarea proprietarului" : p.status}
+                cerut de {p.requester_email} ·{" "}
+                {p.status === "pending_owner_approval" ? "în așteptarea proprietarului" : p.status}
               </span>
               {p.status === "pending_owner_approval" ? (
                 <div className="ml-auto flex gap-3">
@@ -200,7 +200,7 @@ function RolesPage() {
                       run(
                         () =>
                           decidePromotion({
-                            data: { requestId: p.id, decision: "approved", ownerCode: ownerCode || undefined },
+                            data: { requestId: p.id, decision: "approved" },
                           }),
                         "Promovare aprobată.",
                       )
@@ -216,7 +216,7 @@ function RolesPage() {
                       run(
                         () =>
                           decidePromotion({
-                            data: { requestId: p.id, decision: "rejected", ownerCode: ownerCode || undefined },
+                            data: { requestId: p.id, decision: "rejected" },
                           }),
                         "Cerere respinsă.",
                       )

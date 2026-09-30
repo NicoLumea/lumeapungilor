@@ -22,7 +22,6 @@ const NAV: { to: string; label: string; exact: boolean }[] = [
   { to: "/staff/retururi", label: "Retururi", exact: false },
   { to: "/staff/stoc", label: "Cereri revenire stoc", exact: false },
   { to: "/staff/mesaje", label: "Mesaje", exact: false },
-  { to: "/staff/continut", label: "Conținut", exact: false },
 ];
 
 function StaffLayout() {
