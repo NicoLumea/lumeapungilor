@@ -152,6 +152,66 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_feedback: {
+        Row: {
+          created_at: string
+          email: string | null
+          feedback_type: string
+          id: string
+          message: string
+          order_id: string | null
+          order_number: string | null
+          product_id: string | null
+          rating: number | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          feedback_type: string
+          id?: string
+          message: string
+          order_id?: string | null
+          order_number?: string | null
+          product_id?: string | null
+          rating?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          message?: string
+          order_id?: string | null
+          order_number?: string | null
+          product_id?: string | null
+          rating?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_feedback_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_feedback_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_requests: {
         Row: {
           created_at: string
@@ -211,6 +271,32 @@ export type Database = {
           order_count?: number
         }
         Relationships: []
+      }
+      guest_order_access: {
+        Row: {
+          created_at: string
+          order_id: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          order_id: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          order_id?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_order_access_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       guest_return_sessions: {
         Row: {
@@ -292,6 +378,7 @@ export type Database = {
           line_total: number
           order_id: string
           product_id: string | null
+          product_image_url: string | null
           product_name: string
           quantity: number
           selling_unit: string | null
@@ -306,6 +393,7 @@ export type Database = {
           line_total: number
           order_id: string
           product_id?: string | null
+          product_image_url?: string | null
           product_name: string
           quantity: number
           selling_unit?: string | null
@@ -320,6 +408,7 @@ export type Database = {
           line_total?: number
           order_id?: string
           product_id?: string | null
+          product_image_url?: string | null
           product_name?: string
           quantity?: number
           selling_unit?: string | null
@@ -988,6 +1077,69 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_login_challenges: {
+        Row: {
+          attempts: number
+          auth_session_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          invalidated_at: string | null
+          resend_available_at: string
+          updated_at: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          auth_session_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          invalidated_at?: string | null
+          resend_available_at: string
+          updated_at?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          auth_session_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invalidated_at?: string | null
+          resend_available_at?: string
+          updated_at?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      staff_verified_sessions: {
+        Row: {
+          auth_session_id: string
+          created_at: string
+          expires_at: string
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          auth_session_id: string
+          created_at?: string
+          expires_at: string
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          auth_session_id?: string
+          created_at?: string
+          expires_at?: string
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1072,6 +1224,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_staff_verification: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
@@ -1087,6 +1240,10 @@ export type Database = {
           _window_seconds: number
         }
         Returns: Json
+      }
+      take_staff_mfa_attempt: {
+        Args: { _challenge_id: string }
+        Returns: number
       }
       top_selling_products: {
         Args: { p_limit?: number }
