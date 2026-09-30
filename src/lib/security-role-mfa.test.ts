@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { requiresStaffEmailVerification } from "./authorization.ts";
 import { roleAllows, sessionIdFromClaims } from "./authorization.server.ts";
 import { maskEmail, sessionIdFromAccessToken } from "./staff-mfa.server.ts";
 import {
@@ -20,6 +21,15 @@ test("enforces the role hierarchy without granting employee admin access", () =>
   assert.equal(roleAllows(["owner"], "admin"), true);
   assert.equal(roleAllows(["owner"], "owner"), true);
   assert.equal(roleAllows(["customer"], "employee"), false);
+});
+
+test("requires the additional email challenge only for effective Employee accounts", () => {
+  assert.equal(requiresStaffEmailVerification(["employee"]), true);
+  assert.equal(requiresStaffEmailVerification(["admin"]), false);
+  assert.equal(requiresStaffEmailVerification(["owner"]), false);
+  assert.equal(requiresStaffEmailVerification(["employee", "admin"]), false);
+  assert.equal(requiresStaffEmailVerification(["employee", "owner"]), false);
+  assert.equal(requiresStaffEmailVerification(["customer"]), false);
 });
 
 test("accepts only a server-verifiable session identifier", () => {
