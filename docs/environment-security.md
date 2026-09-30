@@ -9,8 +9,11 @@ Private values (`SUPABASE_SERVICE_ROLE_KEY`, optional `SUPABASE_SECRET_KEY`,
 `LOVABLE_CRON_SECRET`, `LOGIN_RATE_LIMIT_PEPPER`, and `OWNER_SETUP_CODE`) belong
 in the hosting environment's server-side secret settings. Server functions
 read them through `process.env`; admin screens must never return their values.
-Use `.env.example` only as a list of names and placeholders. A local `.env` or
-`.env.local` can be used during development, but it must stay untracked.
+Use `.env.example` only as a list of names and placeholders. The root `.env` is
+managed by Lovable Cloud, contains only public (publishable) connection values,
+and must stay tracked: the published site is built from Git and bakes those
+values into the browser bundle. Never put private keys in it. `.env.local` and
+other `.env.*` files stay untracked.
 
 The previously tracked `.env` contained Supabase project configuration and
 publishable keys, not a service-role or other private credential. Removing the
