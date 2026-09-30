@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { AUTHORIZATION_DENIED, hasVerifiedPrivilegedAccess } from "@/lib/authorization.server";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-const DENIED = "Nu ai permisiunea necesară pentru această acțiune.";
+const DENIED = AUTHORIZATION_DENIED;
 
 async function rolesOf(userId: string): Promise<string[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -52,8 +53,9 @@ export const decideEmployeeRequest = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
-    const roles = await rolesOf(context.userId);
-    if (!roles.includes("admin") && !roles.includes("owner")) return { ok: false, error: DENIED };
+    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+      return { ok: false, error: DENIED };
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { audit } = await import("./rate-limit.server");
@@ -101,8 +103,9 @@ export const setEmployeeSuspension = createServerFn({ method: "POST" })
     z.object({ userId: z.string().uuid(), revoke: z.boolean() }).parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
-    const roles = await rolesOf(context.userId);
-    if (!roles.includes("admin") && !roles.includes("owner")) return { ok: false, error: DENIED };
+    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+      return { ok: false, error: DENIED };
+    }
     if (data.userId === context.userId)
       return { ok: false, error: "Nu îți poți modifica propriul acces." };
 
@@ -140,8 +143,9 @@ export const requestAdminPromotion = createServerFn({ method: "POST" })
     z.object({ candidateEmail: z.string().trim().email().max(200) }).parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
-    const roles = await rolesOf(context.userId);
-    if (!roles.includes("admin") && !roles.includes("owner")) return { ok: false, error: DENIED };
+    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+      return { ok: false, error: DENIED };
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { audit } = await import("./rate-limit.server");
@@ -193,7 +197,7 @@ export const decideAdminPromotion = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
     const roles = await rolesOf(context.userId);
-    if (!roles.includes("owner"))
+    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "owner")))
       return { ok: false, error: "Doar proprietarul proiectului poate aproba această cerere." };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

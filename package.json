@@ -13,6 +13,7 @@
     "test:gallery": "node --test src/lib/product-gallery.test.ts",
     "test:returns": "node --test src/lib/returns-core.test.ts",
     "test:support": "node --test src/lib/support-widget.test.ts",
+    "test:security": "node --test src/lib/security-role-mfa.test.ts",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."

@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { Database } from "@/integrations/supabase/types";
+import { hasVerifiedPrivilegedAccess } from "@/lib/authorization.server";
 
 const filtersSchema = z.object({
   search: z.string().trim().max(200).optional(),
@@ -69,12 +68,6 @@ export type AccountsPayload = {
 export type InterestPayload = { rows: InterestRow[]; filteredCount: number };
 export type AdminUsersFailure = { ok: false; kind: "forbidden" | "error"; error: string };
 
-async function verifyAdmin(supabase: SupabaseClient<Database>, userId: string) {
-  const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-  if (error) throw new Error("Rolul contului nu a putut fi verificat.");
-  return (data ?? []).some((entry) => entry.role === "admin" || entry.role === "owner");
-}
-
 function rpcArgs(filters: z.infer<typeof filtersSchema>) {
   return {
     _sort: filters.sort,
@@ -92,7 +85,7 @@ export const getAdminUsers = createServerFn({ method: "GET" })
   .validator((input: unknown) => pageSchema.parse(input))
   .handler(
     async ({ data, context }): Promise<{ ok: true; data: AccountsPayload } | AdminUsersFailure> => {
-      if (!(await verifyAdmin(context.supabase, context.userId))) {
+      if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
         return { ok: false, kind: "forbidden", error: "Acces interzis." };
       }
       const { data: payload, error } = await context.supabase.rpc("admin_users_dashboard", {
@@ -112,7 +105,7 @@ export const getAdminInterest = createServerFn({ method: "GET" })
   .validator((input: unknown) => interestPageSchema.parse(input))
   .handler(
     async ({ data, context }): Promise<{ ok: true; data: InterestPayload } | AdminUsersFailure> => {
-      if (!(await verifyAdmin(context.supabase, context.userId))) {
+      if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
         return { ok: false, kind: "forbidden", error: "Acces interzis." };
       }
       const { data: payload, error } = await context.supabase.rpc("admin_interest_dashboard", {
@@ -134,7 +127,7 @@ export const sendAdminPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input: unknown) => passwordResetSchema.parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true } | AdminUsersFailure> => {
-    if (!(await verifyAdmin(context.supabase, context.userId))) {
+    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
       return { ok: false, kind: "forbidden", error: "Acces interzis." };
     }
 
@@ -205,7 +198,7 @@ export const exportAdminUsersCsv = createServerFn({ method: "POST" })
       | { ok: true; csv: string; rowCount: number; truncated: boolean; filename: string }
       | AdminUsersFailure
     > => {
-      if (!(await verifyAdmin(context.supabase, context.userId))) {
+      if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
         return { ok: false, kind: "forbidden", error: "Acces interzis." };
       }
       const { data: payload, error } = await context.supabase.rpc(

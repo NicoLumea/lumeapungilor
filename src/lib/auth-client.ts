@@ -19,7 +19,10 @@ export class PublicAuthError extends Error {
   }
 }
 
-export async function protectedSignIn(email: string, password: string): Promise<void> {
+export async function protectedSignIn(
+  email: string,
+  password: string,
+): Promise<{ requiresStaffVerification: boolean }> {
   const response = await fetch("/api/auth/login", {
     method: "POST",
     credentials: "same-origin",
@@ -30,6 +33,7 @@ export async function protectedSignIn(email: string, password: string): Promise<
     ok?: boolean;
     accessToken?: string;
     refreshToken?: string;
+    requiresStaffVerification?: boolean;
   };
   if (!response.ok || !payload.ok || !payload.accessToken || !payload.refreshToken) {
     throw new PublicAuthError(payload);
@@ -39,6 +43,7 @@ export async function protectedSignIn(email: string, password: string): Promise<
     refresh_token: payload.refreshToken,
   });
   if (error) throw new PublicAuthError({ error: "Autentificarea nu a putut fi finalizată." });
+  return { requiresStaffVerification: payload.requiresStaffVerification === true };
 }
 
 export async function protectedPasswordReset(email: string): Promise<string> {

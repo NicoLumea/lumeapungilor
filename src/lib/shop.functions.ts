@@ -310,7 +310,11 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
       return { ok: false, error: "Prea multe încercări. Te rugăm să reîncerci mai târziu." };
 
     const expected = process.env["OWNER_SETUP_CODE"];
-    if (!expected) return { ok: false, error: "Codul de configurare nu este setat." };
+    const expectedEmail = process.env["OWNER_SETUP_EMAIL"]?.trim().toLowerCase();
+    if (!expected || !expectedEmail) {
+      return { ok: false, error: "Configurarea proprietarului nu este disponibilă." };
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: existingOwner } = await supabaseAdmin
       .from("user_roles")
@@ -318,13 +322,17 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
       .eq("role", "owner")
       .limit(1)
       .maybeSingle();
-    if (existingOwner) {
-      return { ok: false, error: "Configurarea inițială a proprietarului este închisă." };
-    }
+    if (existingOwner)
+      return { ok: false, error: "Configurarea proprietarului este deja închisă." };
     if (data.code !== expected) return { ok: false, error: "Cod de configurare incorect." };
-
     const { data: user, error: uErr } = await supabaseAdmin.auth.admin.getUserById(context.userId);
     if (uErr || !user?.user) return { ok: false, error: "Cont inexistent." };
+    if (user.user.email?.trim().toLowerCase() !== expectedEmail) {
+      return { ok: false, error: "Configurarea proprietarului nu este disponibilă." };
+    }
+    if (!user.user.email_confirmed_at) {
+      return { ok: false, error: "Confirmă adresa de e-mail înainte de configurare." };
+    }
 
     const { error } = await supabaseAdmin.from("user_roles").upsert(
       [
@@ -337,11 +345,29 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
     const { audit } = await import("./rate-limit.server");
     await audit({
       actorId: context.userId,
-      actorEmail: (context.claims["email"] as string | undefined) ?? null,
+      actorEmail: user.user.email ?? null,
       action: "owner.bootstrap_claimed",
       entity: "user_roles",
       entityId: context.userId,
       details: { bootstrap_closed: true },
     });
     return { ok: true };
+  });
+
+export const getOwnerBootstrapStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ available: boolean }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data }, { data: user }] = await Promise.all([
+      supabaseAdmin.from("user_roles").select("user_id").eq("role", "owner").limit(1).maybeSingle(),
+      supabaseAdmin.auth.admin.getUserById(context.userId),
+    ]);
+    const intendedEmail = process.env["OWNER_SETUP_EMAIL"]?.trim().toLowerCase();
+    return {
+      available:
+        !data &&
+        !!process.env["OWNER_SETUP_CODE"] &&
+        !!intendedEmail &&
+        user.user?.email?.trim().toLowerCase() === intendedEmail,
+    };
   });

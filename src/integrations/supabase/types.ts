@@ -949,6 +949,69 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_login_challenges: {
+        Row: {
+          attempts: number
+          auth_session_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          invalidated_at: string | null
+          resend_available_at: string
+          updated_at: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          auth_session_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          invalidated_at?: string | null
+          resend_available_at: string
+          updated_at?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          auth_session_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invalidated_at?: string | null
+          resend_available_at?: string
+          updated_at?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      staff_verified_sessions: {
+        Row: {
+          auth_session_id: string
+          created_at: string
+          expires_at: string
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          auth_session_id: string
+          created_at?: string
+          expires_at: string
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          auth_session_id?: string
+          created_at?: string
+          expires_at?: string
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           key: string
@@ -1073,8 +1136,13 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      has_staff_verification: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      take_staff_mfa_attempt: {
+        Args: { _challenge_id: string }
+        Returns: number
+      }
       record_auth_rate_limit_event: {
         Args: {
           _account_key: string

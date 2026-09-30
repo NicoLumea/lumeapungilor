@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { clearStaffVerification } from "@/lib/staff-mfa.functions";
 
 export type DashboardNavItem = { to: string; label: string; exact: boolean };
 
@@ -16,10 +18,16 @@ export function DashboardShell({
 }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const clearVerification = useServerFn(clearStaffVerification);
 
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
+    try {
+      await clearVerification({ data: {} });
+    } catch {
+      // Supabase sign-out still revokes the authentication session.
+    }
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
   }
