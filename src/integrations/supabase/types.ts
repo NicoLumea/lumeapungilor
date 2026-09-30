@@ -191,69 +191,6 @@ export type Database = {
         }
         Relationships: []
       }
-      customer_feedback: {
-        Row: {
-          id: string
-          user_id: string | null
-          email: string | null
-          feedback_type: string
-          product_id: string | null
-          order_id: string | null
-          order_number: string | null
-          rating: number | null
-          message: string
-          status: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          email?: string | null
-          feedback_type: string
-          product_id?: string | null
-          order_id?: string | null
-          order_number?: string | null
-          rating?: number | null
-          message: string
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          email?: string | null
-          feedback_type?: string
-          product_id?: string | null
-          order_id?: string | null
-          order_number?: string | null
-          rating?: number | null
-          message?: string
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      guest_order_access: {
-        Row: {
-          order_id: string
-          token_hash: string
-          created_at: string
-        }
-        Insert: {
-          order_id: string
-          token_hash: string
-          created_at?: string
-        }
-        Update: {
-          order_id?: string
-          token_hash?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
       guest_checkout_usage: {
         Row: {
           email: string
@@ -355,7 +292,6 @@ export type Database = {
           line_total: number
           order_id: string
           product_id: string | null
-          product_image_url: string | null
           product_name: string
           quantity: number
           selling_unit: string | null
@@ -370,7 +306,6 @@ export type Database = {
           line_total: number
           order_id: string
           product_id?: string | null
-          product_image_url?: string | null
           product_name: string
           quantity: number
           selling_unit?: string | null
@@ -385,7 +320,6 @@ export type Database = {
           line_total?: number
           order_id?: string
           product_id?: string | null
-          product_image_url?: string | null
           product_name?: string
           quantity?: number
           selling_unit?: string | null
@@ -1015,69 +949,6 @@ export type Database = {
         }
         Relationships: []
       }
-      staff_login_challenges: {
-        Row: {
-          attempts: number
-          auth_session_id: string
-          created_at: string
-          expires_at: string
-          id: string
-          invalidated_at: string | null
-          resend_available_at: string
-          updated_at: string
-          used_at: string | null
-          user_id: string
-        }
-        Insert: {
-          attempts?: number
-          auth_session_id: string
-          created_at?: string
-          expires_at: string
-          id?: string
-          invalidated_at?: string | null
-          resend_available_at: string
-          updated_at?: string
-          used_at?: string | null
-          user_id: string
-        }
-        Update: {
-          attempts?: number
-          auth_session_id?: string
-          created_at?: string
-          expires_at?: string
-          id?: string
-          invalidated_at?: string | null
-          resend_available_at?: string
-          updated_at?: string
-          used_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      staff_verified_sessions: {
-        Row: {
-          auth_session_id: string
-          created_at: string
-          expires_at: string
-          user_id: string
-          verified_at: string
-        }
-        Insert: {
-          auth_session_id: string
-          created_at?: string
-          expires_at: string
-          user_id: string
-          verified_at?: string
-        }
-        Update: {
-          auth_session_id?: string
-          created_at?: string
-          expires_at?: string
-          user_id?: string
-          verified_at?: string
-        }
-        Relationships: []
-      }
       site_content: {
         Row: {
           key: string
@@ -1202,13 +1073,8 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
-      has_staff_verification: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
-      take_staff_mfa_attempt: {
-        Args: { _challenge_id: string }
-        Returns: number
-      }
       record_auth_rate_limit_event: {
         Args: {
           _account_key: string
@@ -1291,7 +1157,8 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -1315,7 +1182,8 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -1339,7 +1207,8 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
