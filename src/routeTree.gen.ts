@@ -23,6 +23,7 @@ import { Route as DespreRouteImport } from './routes/despre'
 import { Route as DezabonareRouteImport } from './routes/dezabonare'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
+import { Route as N7q4V2m9RouteImport } from './routes/n7q4-v2m9'
 import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
 import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ResetareParolaRouteImport } from './routes/resetare-parola'
@@ -30,27 +31,26 @@ import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminAuditRouteImport } from './routes/admin.audit'
-import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
-import { Route as AdminClientiRouteImport } from './routes/admin.clienti'
-import { Route as AdminContentRouteImport } from './routes/admin.content'
-import { Route as AdminGuideRouteImport } from './routes/admin.guide'
-import { Route as AdminMesajeRouteImport } from './routes/admin.mesaje'
-import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
-import { Route as AdminProductsRouteImport } from './routes/admin.products'
-import { Route as AdminRetururiRouteImport } from './routes/admin.retururi'
-import { Route as AdminRoluriRouteImport } from './routes/admin.roluri'
-import { Route as AdminSetariRouteImport } from './routes/admin.setari'
-import { Route as AdminStocRouteImport } from './routes/admin.stoc'
-import { Route as AdminUtilizatoriRouteImport } from './routes/admin.utilizatori'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
+import { Route as N7q4V2m9IndexRouteImport } from './routes/n7q4-v2m9.index'
+import { Route as N7q4V2m9AuditRouteImport } from './routes/n7q4-v2m9.audit'
+import { Route as N7q4V2m9CategoriesRouteImport } from './routes/n7q4-v2m9.categories'
+import { Route as N7q4V2m9ClientiRouteImport } from './routes/n7q4-v2m9.clienti'
+import { Route as N7q4V2m9ContentRouteImport } from './routes/n7q4-v2m9.content'
+import { Route as N7q4V2m9GuideRouteImport } from './routes/n7q4-v2m9.guide'
+import { Route as N7q4V2m9MesajeRouteImport } from './routes/n7q4-v2m9.mesaje'
+import { Route as N7q4V2m9OrdersRouteImport } from './routes/n7q4-v2m9.orders'
+import { Route as N7q4V2m9ProductsRouteImport } from './routes/n7q4-v2m9.products'
+import { Route as N7q4V2m9RetururiRouteImport } from './routes/n7q4-v2m9.retururi'
+import { Route as N7q4V2m9RoluriRouteImport } from './routes/n7q4-v2m9.roluri'
+import { Route as N7q4V2m9SetariRouteImport } from './routes/n7q4-v2m9.setari'
+import { Route as N7q4V2m9StocRouteImport } from './routes/n7q4-v2m9.stoc'
+import { Route as N7q4V2m9UtilizatoriRouteImport } from './routes/n7q4-v2m9.utilizatori'
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffCategoriiRouteImport } from './routes/staff.categorii'
 import { Route as StaffComenziRouteImport } from './routes/staff.comenzi'
-import { Route as StaffContinutRouteImport } from './routes/staff.continut'
 import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
 import { Route as StaffProduseRouteImport } from './routes/staff.produse'
 import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
@@ -129,6 +129,11 @@ const MagazinRoute = MagazinRouteImport.update({
   path: '/magazin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const N7q4V2m9Route = N7q4V2m9RouteImport.update({
+  id: '/n7q4-v2m9',
+  path: '/n7q4-v2m9',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ParolaNouaRoute = ParolaNouaRouteImport.update({
   id: '/parola-noua',
   path: '/parola-noua',
@@ -164,76 +169,6 @@ const TermeniRoute = TermeniRouteImport.update({
   path: '/termeni',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminClientiRoute = AdminClientiRouteImport.update({
-  id: '/clienti',
-  path: '/clienti',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminContentRoute = AdminContentRouteImport.update({
-  id: '/content',
-  path: '/content',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGuideRoute = AdminGuideRouteImport.update({
-  id: '/guide',
-  path: '/guide',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMesajeRoute = AdminMesajeRouteImport.update({
-  id: '/mesaje',
-  path: '/mesaje',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminOrdersRoute = AdminOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProductsRoute = AdminProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRetururiRoute = AdminRetururiRouteImport.update({
-  id: '/retururi',
-  path: '/retururi',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRoluriRoute = AdminRoluriRouteImport.update({
-  id: '/roluri',
-  path: '/roluri',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSetariRoute = AdminSetariRouteImport.update({
-  id: '/setari',
-  path: '/setari',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminStocRoute = AdminStocRouteImport.update({
-  id: '/stoc',
-  path: '/stoc',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminUtilizatoriRoute = AdminUtilizatoriRouteImport.update({
-  id: '/utilizatori',
-  path: '/utilizatori',
-  getParentRoute: () => AdminRoute,
-} as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
   id: '/categorie/$slug',
   path: '/categorie/$slug',
@@ -243,6 +178,76 @@ const ComandaNumberRoute = ComandaNumberRouteImport.update({
   id: '/comanda/$number',
   path: '/comanda/$number',
   getParentRoute: () => rootRouteImport,
+} as any)
+const N7q4V2m9IndexRoute = N7q4V2m9IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9AuditRoute = N7q4V2m9AuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9CategoriesRoute = N7q4V2m9CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9ClientiRoute = N7q4V2m9ClientiRouteImport.update({
+  id: '/clienti',
+  path: '/clienti',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9ContentRoute = N7q4V2m9ContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9GuideRoute = N7q4V2m9GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9MesajeRoute = N7q4V2m9MesajeRouteImport.update({
+  id: '/mesaje',
+  path: '/mesaje',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9OrdersRoute = N7q4V2m9OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9ProductsRoute = N7q4V2m9ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9RetururiRoute = N7q4V2m9RetururiRouteImport.update({
+  id: '/retururi',
+  path: '/retururi',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9RoluriRoute = N7q4V2m9RoluriRouteImport.update({
+  id: '/roluri',
+  path: '/roluri',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9SetariRoute = N7q4V2m9SetariRouteImport.update({
+  id: '/setari',
+  path: '/setari',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9StocRoute = N7q4V2m9StocRouteImport.update({
+  id: '/stoc',
+  path: '/stoc',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
+const N7q4V2m9UtilizatoriRoute = N7q4V2m9UtilizatoriRouteImport.update({
+  id: '/utilizatori',
+  path: '/utilizatori',
+  getParentRoute: () => N7q4V2m9Route,
 } as any)
 const ProdusSlugRoute = ProdusSlugRouteImport.update({
   id: '/produs/$slug',
@@ -262,11 +267,6 @@ const StaffCategoriiRoute = StaffCategoriiRouteImport.update({
 const StaffComenziRoute = StaffComenziRouteImport.update({
   id: '/comenzi',
   path: '/comenzi',
-  getParentRoute: () => StaffRoute,
-} as any)
-const StaffContinutRoute = StaffContinutRouteImport.update({
-  id: '/continut',
-  path: '/continut',
   getParentRoute: () => StaffRoute,
 } as any)
 const StaffMesajeRoute = StaffMesajeRouteImport.update({
@@ -307,7 +307,7 @@ const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/ajutor-comanda': typeof AjutorComandaRoute
   '/autentificare': typeof AutentificareRoute
   '/checkout': typeof CheckoutRoute
@@ -320,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/n7q4-v2m9': typeof N7q4V2m9RouteWithChildren
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/resetare-parola': typeof ResetareParolaRoute
@@ -327,30 +328,29 @@ export interface FileRoutesByFullPath {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
-  '/admin/audit': typeof AdminAuditRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/clienti': typeof AdminClientiRoute
-  '/admin/content': typeof AdminContentRoute
-  '/admin/guide': typeof AdminGuideRoute
-  '/admin/mesaje': typeof AdminMesajeRoute
-  '/admin/orders': typeof AdminOrdersRoute
-  '/admin/products': typeof AdminProductsRoute
-  '/admin/retururi': typeof AdminRetururiRoute
-  '/admin/roluri': typeof AdminRoluriRoute
-  '/admin/setari': typeof AdminSetariRoute
-  '/admin/stoc': typeof AdminStocRoute
-  '/admin/utilizatori': typeof AdminUtilizatoriRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
+  '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
+  '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
+  '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
+  '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
+  '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
+  '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
+  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
+  '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
+  '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
+  '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
+  '/n7q4-v2m9/setari': typeof N7q4V2m9SetariRoute
+  '/n7q4-v2m9/stoc': typeof N7q4V2m9StocRoute
+  '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
   '/staff/comenzi': typeof StaffComenziRoute
-  '/staff/continut': typeof StaffContinutRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
   '/staff/stoc': typeof StaffStocRoute
-  '/admin/': typeof AdminIndexRoute
+  '/n7q4-v2m9/': typeof N7q4V2m9IndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
@@ -358,6 +358,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/ajutor-comanda': typeof AjutorComandaRoute
   '/autentificare': typeof AutentificareRoute
   '/checkout': typeof CheckoutRoute
@@ -376,30 +377,29 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
-  '/admin/audit': typeof AdminAuditRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/clienti': typeof AdminClientiRoute
-  '/admin/content': typeof AdminContentRoute
-  '/admin/guide': typeof AdminGuideRoute
-  '/admin/mesaje': typeof AdminMesajeRoute
-  '/admin/orders': typeof AdminOrdersRoute
-  '/admin/products': typeof AdminProductsRoute
-  '/admin/retururi': typeof AdminRetururiRoute
-  '/admin/roluri': typeof AdminRoluriRoute
-  '/admin/setari': typeof AdminSetariRoute
-  '/admin/stoc': typeof AdminStocRoute
-  '/admin/utilizatori': typeof AdminUtilizatoriRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
+  '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
+  '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
+  '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
+  '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
+  '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
+  '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
+  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
+  '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
+  '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
+  '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
+  '/n7q4-v2m9/setari': typeof N7q4V2m9SetariRoute
+  '/n7q4-v2m9/stoc': typeof N7q4V2m9StocRoute
+  '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
   '/staff/comenzi': typeof StaffComenziRoute
-  '/staff/continut': typeof StaffContinutRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
   '/staff/stoc': typeof StaffStocRoute
-  '/admin': typeof AdminIndexRoute
+  '/n7q4-v2m9': typeof N7q4V2m9IndexRoute
   '/staff': typeof StaffIndexRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
@@ -408,7 +408,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/ajutor-comanda': typeof AjutorComandaRoute
   '/autentificare': typeof AutentificareRoute
   '/checkout': typeof CheckoutRoute
@@ -421,6 +421,7 @@ export interface FileRoutesById {
   '/dezabonare': typeof DezabonareRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/n7q4-v2m9': typeof N7q4V2m9RouteWithChildren
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/resetare-parola': typeof ResetareParolaRoute
@@ -428,30 +429,29 @@ export interface FileRoutesById {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
-  '/admin/audit': typeof AdminAuditRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/clienti': typeof AdminClientiRoute
-  '/admin/content': typeof AdminContentRoute
-  '/admin/guide': typeof AdminGuideRoute
-  '/admin/mesaje': typeof AdminMesajeRoute
-  '/admin/orders': typeof AdminOrdersRoute
-  '/admin/products': typeof AdminProductsRoute
-  '/admin/retururi': typeof AdminRetururiRoute
-  '/admin/roluri': typeof AdminRoluriRoute
-  '/admin/setari': typeof AdminSetariRoute
-  '/admin/stoc': typeof AdminStocRoute
-  '/admin/utilizatori': typeof AdminUtilizatoriRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
+  '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
+  '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
+  '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
+  '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
+  '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
+  '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
+  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
+  '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
+  '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
+  '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
+  '/n7q4-v2m9/setari': typeof N7q4V2m9SetariRoute
+  '/n7q4-v2m9/stoc': typeof N7q4V2m9StocRoute
+  '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
   '/staff/comenzi': typeof StaffComenziRoute
-  '/staff/continut': typeof StaffContinutRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
   '/staff/stoc': typeof StaffStocRoute
-  '/admin/': typeof AdminIndexRoute
+  '/n7q4-v2m9/': typeof N7q4V2m9IndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
@@ -474,6 +474,7 @@ export interface FileRouteTypes {
     | '/dezabonare'
     | '/livrare'
     | '/magazin'
+    | '/n7q4-v2m9'
     | '/parola-noua'
     | '/produse'
     | '/resetare-parola'
@@ -481,30 +482,29 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
-    | '/admin/audit'
-    | '/admin/categories'
-    | '/admin/clienti'
-    | '/admin/content'
-    | '/admin/guide'
-    | '/admin/mesaje'
-    | '/admin/orders'
-    | '/admin/products'
-    | '/admin/retururi'
-    | '/admin/roluri'
-    | '/admin/setari'
-    | '/admin/stoc'
-    | '/admin/utilizatori'
     | '/categorie/$slug'
     | '/comanda/$number'
+    | '/n7q4-v2m9/audit'
+    | '/n7q4-v2m9/categories'
+    | '/n7q4-v2m9/clienti'
+    | '/n7q4-v2m9/content'
+    | '/n7q4-v2m9/guide'
+    | '/n7q4-v2m9/mesaje'
+    | '/n7q4-v2m9/orders'
+    | '/n7q4-v2m9/products'
+    | '/n7q4-v2m9/retururi'
+    | '/n7q4-v2m9/roluri'
+    | '/n7q4-v2m9/setari'
+    | '/n7q4-v2m9/stoc'
+    | '/n7q4-v2m9/utilizatori'
     | '/produs/$slug'
     | '/staff/categorii'
     | '/staff/comenzi'
-    | '/staff/continut'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
     | '/staff/stoc'
-    | '/admin/'
+    | '/n7q4-v2m9/'
     | '/staff/'
     | '/api/auth/login'
     | '/api/auth/password-reset'
@@ -512,6 +512,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/ajutor-comanda'
     | '/autentificare'
     | '/checkout'
@@ -530,30 +531,29 @@ export interface FileRouteTypes {
     | '/retur'
     | '/retururi'
     | '/termeni'
-    | '/admin/audit'
-    | '/admin/categories'
-    | '/admin/clienti'
-    | '/admin/content'
-    | '/admin/guide'
-    | '/admin/mesaje'
-    | '/admin/orders'
-    | '/admin/products'
-    | '/admin/retururi'
-    | '/admin/roluri'
-    | '/admin/setari'
-    | '/admin/stoc'
-    | '/admin/utilizatori'
     | '/categorie/$slug'
     | '/comanda/$number'
+    | '/n7q4-v2m9/audit'
+    | '/n7q4-v2m9/categories'
+    | '/n7q4-v2m9/clienti'
+    | '/n7q4-v2m9/content'
+    | '/n7q4-v2m9/guide'
+    | '/n7q4-v2m9/mesaje'
+    | '/n7q4-v2m9/orders'
+    | '/n7q4-v2m9/products'
+    | '/n7q4-v2m9/retururi'
+    | '/n7q4-v2m9/roluri'
+    | '/n7q4-v2m9/setari'
+    | '/n7q4-v2m9/stoc'
+    | '/n7q4-v2m9/utilizatori'
     | '/produs/$slug'
     | '/staff/categorii'
     | '/staff/comenzi'
-    | '/staff/continut'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
     | '/staff/stoc'
-    | '/admin'
+    | '/n7q4-v2m9'
     | '/staff'
     | '/api/auth/login'
     | '/api/auth/password-reset'
@@ -574,6 +574,7 @@ export interface FileRouteTypes {
     | '/dezabonare'
     | '/livrare'
     | '/magazin'
+    | '/n7q4-v2m9'
     | '/parola-noua'
     | '/produse'
     | '/resetare-parola'
@@ -581,30 +582,29 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
-    | '/admin/audit'
-    | '/admin/categories'
-    | '/admin/clienti'
-    | '/admin/content'
-    | '/admin/guide'
-    | '/admin/mesaje'
-    | '/admin/orders'
-    | '/admin/products'
-    | '/admin/retururi'
-    | '/admin/roluri'
-    | '/admin/setari'
-    | '/admin/stoc'
-    | '/admin/utilizatori'
     | '/categorie/$slug'
     | '/comanda/$number'
+    | '/n7q4-v2m9/audit'
+    | '/n7q4-v2m9/categories'
+    | '/n7q4-v2m9/clienti'
+    | '/n7q4-v2m9/content'
+    | '/n7q4-v2m9/guide'
+    | '/n7q4-v2m9/mesaje'
+    | '/n7q4-v2m9/orders'
+    | '/n7q4-v2m9/products'
+    | '/n7q4-v2m9/retururi'
+    | '/n7q4-v2m9/roluri'
+    | '/n7q4-v2m9/setari'
+    | '/n7q4-v2m9/stoc'
+    | '/n7q4-v2m9/utilizatori'
     | '/produs/$slug'
     | '/staff/categorii'
     | '/staff/comenzi'
-    | '/staff/continut'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
     | '/staff/stoc'
-    | '/admin/'
+    | '/n7q4-v2m9/'
     | '/staff/'
     | '/api/auth/login'
     | '/api/auth/password-reset'
@@ -613,7 +613,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
+  AdminRoute: typeof AdminRoute
   AjutorComandaRoute: typeof AjutorComandaRoute
   AutentificareRoute: typeof AutentificareRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -626,6 +626,7 @@ export interface RootRouteChildren {
   DezabonareRoute: typeof DezabonareRoute
   LivrareRoute: typeof LivrareRoute
   MagazinRoute: typeof MagazinRoute
+  N7q4V2m9Route: typeof N7q4V2m9RouteWithChildren
   ParolaNouaRoute: typeof ParolaNouaRoute
   ProduseRoute: typeof ProduseRoute
   ResetareParolaRoute: typeof ResetareParolaRoute
@@ -741,6 +742,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagazinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/n7q4-v2m9': {
+      id: '/n7q4-v2m9'
+      path: '/n7q4-v2m9'
+      fullPath: '/n7q4-v2m9'
+      preLoaderRoute: typeof N7q4V2m9RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/parola-noua': {
       id: '/parola-noua'
       path: '/parola-noua'
@@ -790,104 +798,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermeniRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/audit': {
-      id: '/admin/audit'
-      path: '/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AdminAuditRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/categories': {
-      id: '/admin/categories'
-      path: '/categories'
-      fullPath: '/admin/categories'
-      preLoaderRoute: typeof AdminCategoriesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/clienti': {
-      id: '/admin/clienti'
-      path: '/clienti'
-      fullPath: '/admin/clienti'
-      preLoaderRoute: typeof AdminClientiRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/content': {
-      id: '/admin/content'
-      path: '/content'
-      fullPath: '/admin/content'
-      preLoaderRoute: typeof AdminContentRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/guide': {
-      id: '/admin/guide'
-      path: '/guide'
-      fullPath: '/admin/guide'
-      preLoaderRoute: typeof AdminGuideRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/mesaje': {
-      id: '/admin/mesaje'
-      path: '/mesaje'
-      fullPath: '/admin/mesaje'
-      preLoaderRoute: typeof AdminMesajeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/orders': {
-      id: '/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AdminOrdersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/products': {
-      id: '/admin/products'
-      path: '/products'
-      fullPath: '/admin/products'
-      preLoaderRoute: typeof AdminProductsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/retururi': {
-      id: '/admin/retururi'
-      path: '/retururi'
-      fullPath: '/admin/retururi'
-      preLoaderRoute: typeof AdminRetururiRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/roluri': {
-      id: '/admin/roluri'
-      path: '/roluri'
-      fullPath: '/admin/roluri'
-      preLoaderRoute: typeof AdminRoluriRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/setari': {
-      id: '/admin/setari'
-      path: '/setari'
-      fullPath: '/admin/setari'
-      preLoaderRoute: typeof AdminSetariRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/stoc': {
-      id: '/admin/stoc'
-      path: '/stoc'
-      fullPath: '/admin/stoc'
-      preLoaderRoute: typeof AdminStocRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/utilizatori': {
-      id: '/admin/utilizatori'
-      path: '/utilizatori'
-      fullPath: '/admin/utilizatori'
-      preLoaderRoute: typeof AdminUtilizatoriRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/categorie/$slug': {
       id: '/categorie/$slug'
       path: '/categorie/$slug'
@@ -901,6 +811,104 @@ declare module '@tanstack/react-router' {
       fullPath: '/comanda/$number'
       preLoaderRoute: typeof ComandaNumberRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/n7q4-v2m9/': {
+      id: '/n7q4-v2m9/'
+      path: '/'
+      fullPath: '/n7q4-v2m9/'
+      preLoaderRoute: typeof N7q4V2m9IndexRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/audit': {
+      id: '/n7q4-v2m9/audit'
+      path: '/audit'
+      fullPath: '/n7q4-v2m9/audit'
+      preLoaderRoute: typeof N7q4V2m9AuditRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/categories': {
+      id: '/n7q4-v2m9/categories'
+      path: '/categories'
+      fullPath: '/n7q4-v2m9/categories'
+      preLoaderRoute: typeof N7q4V2m9CategoriesRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/clienti': {
+      id: '/n7q4-v2m9/clienti'
+      path: '/clienti'
+      fullPath: '/n7q4-v2m9/clienti'
+      preLoaderRoute: typeof N7q4V2m9ClientiRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/content': {
+      id: '/n7q4-v2m9/content'
+      path: '/content'
+      fullPath: '/n7q4-v2m9/content'
+      preLoaderRoute: typeof N7q4V2m9ContentRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/guide': {
+      id: '/n7q4-v2m9/guide'
+      path: '/guide'
+      fullPath: '/n7q4-v2m9/guide'
+      preLoaderRoute: typeof N7q4V2m9GuideRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/mesaje': {
+      id: '/n7q4-v2m9/mesaje'
+      path: '/mesaje'
+      fullPath: '/n7q4-v2m9/mesaje'
+      preLoaderRoute: typeof N7q4V2m9MesajeRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/orders': {
+      id: '/n7q4-v2m9/orders'
+      path: '/orders'
+      fullPath: '/n7q4-v2m9/orders'
+      preLoaderRoute: typeof N7q4V2m9OrdersRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/products': {
+      id: '/n7q4-v2m9/products'
+      path: '/products'
+      fullPath: '/n7q4-v2m9/products'
+      preLoaderRoute: typeof N7q4V2m9ProductsRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/retururi': {
+      id: '/n7q4-v2m9/retururi'
+      path: '/retururi'
+      fullPath: '/n7q4-v2m9/retururi'
+      preLoaderRoute: typeof N7q4V2m9RetururiRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/roluri': {
+      id: '/n7q4-v2m9/roluri'
+      path: '/roluri'
+      fullPath: '/n7q4-v2m9/roluri'
+      preLoaderRoute: typeof N7q4V2m9RoluriRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/setari': {
+      id: '/n7q4-v2m9/setari'
+      path: '/setari'
+      fullPath: '/n7q4-v2m9/setari'
+      preLoaderRoute: typeof N7q4V2m9SetariRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/stoc': {
+      id: '/n7q4-v2m9/stoc'
+      path: '/stoc'
+      fullPath: '/n7q4-v2m9/stoc'
+      preLoaderRoute: typeof N7q4V2m9StocRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
+    '/n7q4-v2m9/utilizatori': {
+      id: '/n7q4-v2m9/utilizatori'
+      path: '/utilizatori'
+      fullPath: '/n7q4-v2m9/utilizatori'
+      preLoaderRoute: typeof N7q4V2m9UtilizatoriRouteImport
+      parentRoute: typeof N7q4V2m9Route
     }
     '/produs/$slug': {
       id: '/produs/$slug'
@@ -928,13 +936,6 @@ declare module '@tanstack/react-router' {
       path: '/comenzi'
       fullPath: '/staff/comenzi'
       preLoaderRoute: typeof StaffComenziRouteImport
-      parentRoute: typeof StaffRoute
-    }
-    '/staff/continut': {
-      id: '/staff/continut'
-      path: '/continut'
-      fullPath: '/staff/continut'
-      preLoaderRoute: typeof StaffContinutRouteImport
       parentRoute: typeof StaffRoute
     }
     '/staff/mesaje': {
@@ -989,46 +990,47 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminRouteChildren {
-  AdminAuditRoute: typeof AdminAuditRoute
-  AdminCategoriesRoute: typeof AdminCategoriesRoute
-  AdminClientiRoute: typeof AdminClientiRoute
-  AdminContentRoute: typeof AdminContentRoute
-  AdminGuideRoute: typeof AdminGuideRoute
-  AdminMesajeRoute: typeof AdminMesajeRoute
-  AdminOrdersRoute: typeof AdminOrdersRoute
-  AdminProductsRoute: typeof AdminProductsRoute
-  AdminRetururiRoute: typeof AdminRetururiRoute
-  AdminRoluriRoute: typeof AdminRoluriRoute
-  AdminSetariRoute: typeof AdminSetariRoute
-  AdminStocRoute: typeof AdminStocRoute
-  AdminUtilizatoriRoute: typeof AdminUtilizatoriRoute
-  AdminIndexRoute: typeof AdminIndexRoute
+interface N7q4V2m9RouteChildren {
+  N7q4V2m9AuditRoute: typeof N7q4V2m9AuditRoute
+  N7q4V2m9CategoriesRoute: typeof N7q4V2m9CategoriesRoute
+  N7q4V2m9ClientiRoute: typeof N7q4V2m9ClientiRoute
+  N7q4V2m9ContentRoute: typeof N7q4V2m9ContentRoute
+  N7q4V2m9GuideRoute: typeof N7q4V2m9GuideRoute
+  N7q4V2m9MesajeRoute: typeof N7q4V2m9MesajeRoute
+  N7q4V2m9OrdersRoute: typeof N7q4V2m9OrdersRoute
+  N7q4V2m9ProductsRoute: typeof N7q4V2m9ProductsRoute
+  N7q4V2m9RetururiRoute: typeof N7q4V2m9RetururiRoute
+  N7q4V2m9RoluriRoute: typeof N7q4V2m9RoluriRoute
+  N7q4V2m9SetariRoute: typeof N7q4V2m9SetariRoute
+  N7q4V2m9StocRoute: typeof N7q4V2m9StocRoute
+  N7q4V2m9UtilizatoriRoute: typeof N7q4V2m9UtilizatoriRoute
+  N7q4V2m9IndexRoute: typeof N7q4V2m9IndexRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminAuditRoute: AdminAuditRoute,
-  AdminCategoriesRoute: AdminCategoriesRoute,
-  AdminClientiRoute: AdminClientiRoute,
-  AdminContentRoute: AdminContentRoute,
-  AdminGuideRoute: AdminGuideRoute,
-  AdminMesajeRoute: AdminMesajeRoute,
-  AdminOrdersRoute: AdminOrdersRoute,
-  AdminProductsRoute: AdminProductsRoute,
-  AdminRetururiRoute: AdminRetururiRoute,
-  AdminRoluriRoute: AdminRoluriRoute,
-  AdminSetariRoute: AdminSetariRoute,
-  AdminStocRoute: AdminStocRoute,
-  AdminUtilizatoriRoute: AdminUtilizatoriRoute,
-  AdminIndexRoute: AdminIndexRoute,
+const N7q4V2m9RouteChildren: N7q4V2m9RouteChildren = {
+  N7q4V2m9AuditRoute: N7q4V2m9AuditRoute,
+  N7q4V2m9CategoriesRoute: N7q4V2m9CategoriesRoute,
+  N7q4V2m9ClientiRoute: N7q4V2m9ClientiRoute,
+  N7q4V2m9ContentRoute: N7q4V2m9ContentRoute,
+  N7q4V2m9GuideRoute: N7q4V2m9GuideRoute,
+  N7q4V2m9MesajeRoute: N7q4V2m9MesajeRoute,
+  N7q4V2m9OrdersRoute: N7q4V2m9OrdersRoute,
+  N7q4V2m9ProductsRoute: N7q4V2m9ProductsRoute,
+  N7q4V2m9RetururiRoute: N7q4V2m9RetururiRoute,
+  N7q4V2m9RoluriRoute: N7q4V2m9RoluriRoute,
+  N7q4V2m9SetariRoute: N7q4V2m9SetariRoute,
+  N7q4V2m9StocRoute: N7q4V2m9StocRoute,
+  N7q4V2m9UtilizatoriRoute: N7q4V2m9UtilizatoriRoute,
+  N7q4V2m9IndexRoute: N7q4V2m9IndexRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const N7q4V2m9RouteWithChildren = N7q4V2m9Route._addFileChildren(
+  N7q4V2m9RouteChildren,
+)
 
 interface StaffRouteChildren {
   StaffCategoriiRoute: typeof StaffCategoriiRoute
   StaffComenziRoute: typeof StaffComenziRoute
-  StaffContinutRoute: typeof StaffContinutRoute
   StaffMesajeRoute: typeof StaffMesajeRoute
   StaffProduseRoute: typeof StaffProduseRoute
   StaffRetururiRoute: typeof StaffRetururiRoute
@@ -1039,7 +1041,6 @@ interface StaffRouteChildren {
 const StaffRouteChildren: StaffRouteChildren = {
   StaffCategoriiRoute: StaffCategoriiRoute,
   StaffComenziRoute: StaffComenziRoute,
-  StaffContinutRoute: StaffContinutRoute,
   StaffMesajeRoute: StaffMesajeRoute,
   StaffProduseRoute: StaffProduseRoute,
   StaffRetururiRoute: StaffRetururiRoute,
@@ -1051,7 +1052,7 @@ const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
+  AdminRoute: AdminRoute,
   AjutorComandaRoute: AjutorComandaRoute,
   AutentificareRoute: AutentificareRoute,
   CheckoutRoute: CheckoutRoute,
@@ -1064,6 +1065,7 @@ const rootRouteChildren: RootRouteChildren = {
   DezabonareRoute: DezabonareRoute,
   LivrareRoute: LivrareRoute,
   MagazinRoute: MagazinRoute,
+  N7q4V2m9Route: N7q4V2m9RouteWithChildren,
   ParolaNouaRoute: ParolaNouaRoute,
   ProduseRoute: ProduseRoute,
   ResetareParolaRoute: ResetareParolaRoute,

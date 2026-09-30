@@ -2,17 +2,10 @@ import type { ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { AccessDenied } from "@/components/site/AccessDenied";
 import { StaffVerification } from "@/components/site/StaffVerification";
+import { hasAccess, type AccessLevel } from "@/lib/authorization";
 import { useAuth, type AuthState } from "@/lib/use-auth";
 
-export type AccessLevel = "customer" | "staff" | "admin" | "owner";
-
-function allowed(auth: AuthState, level: AccessLevel): boolean {
-  if (level === "customer") return !!auth.user;
-  if (auth.staffVerificationRequired && !auth.staffVerified) return false;
-  if (level === "staff") return auth.isStaff;
-  if (level === "admin") return auth.isAdmin;
-  return auth.isOwner;
-}
+export type { AccessLevel } from "@/lib/authorization";
 
 export function RequireAccess({
   level,
@@ -53,7 +46,7 @@ export function RequireAccess({
     return <StaffVerification auth={auth} />;
   }
 
-  if (!allowed(auth, level)) {
+  if (!hasAccess(!!auth.user, auth.roles, level)) {
     return (
       <AccessDenied message="Contul tău nu are drepturile necesare pentru această secțiune. Dacă ai nevoie de acces, contactează un administrator." />
     );

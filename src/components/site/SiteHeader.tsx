@@ -77,39 +77,6 @@ export function SiteHeader() {
         compact && "is-compact border-foreground/10 bg-background/90 backdrop-blur-[10px]",
       )}
     >
-      <div className="utility-bar hidden h-8 bg-muted/70 min-[769px]:block">
-        <div className="mx-auto flex h-full w-full max-w-[110rem] items-center justify-end gap-6 px-[clamp(20px,3vw,56px)]">
-          <Link
-            to="/contact"
-            className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Contact
-          </Link>
-          <Link
-            to="/ajutor-comanda"
-            className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Ajutor
-          </Link>
-          {auth.user ? (
-            <Link
-              to="/cont"
-              className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Contul meu
-            </Link>
-          ) : (
-            <Link
-              to="/autentificare"
-              search={{ redirect: "/cont" }}
-              className="text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Contul meu
-            </Link>
-          )}
-        </div>
-      </div>
-
       <div className="site-header-inner mx-auto grid h-[3.75rem] w-full max-w-[110rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-[clamp(20px,3vw,56px)] min-[769px]:h-[4.5rem] min-[1100px]:grid-cols-[minmax(15rem,1fr)_auto_minmax(15rem,1fr)] min-[1100px]:gap-[clamp(24px,2.5vw,48px)]">
         <div className="min-[1100px]:hidden">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>

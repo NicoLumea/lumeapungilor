@@ -325,7 +325,6 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
     if (existingOwner)
       return { ok: false, error: "Configurarea proprietarului este deja închisă." };
     if (data.code !== expected) return { ok: false, error: "Cod de configurare incorect." };
-
     const { data: user, error: uErr } = await supabaseAdmin.auth.admin.getUserById(context.userId);
     if (uErr || !user?.user) return { ok: false, error: "Cont inexistent." };
     if (user.user.email?.trim().toLowerCase() !== expectedEmail) {
@@ -350,6 +349,7 @@ export const claimOwnerAccess = createServerFn({ method: "POST" })
       action: "owner.bootstrap_claimed",
       entity: "user_roles",
       entityId: context.userId,
+      details: { bootstrap_closed: true },
     });
     return { ok: true };
   });

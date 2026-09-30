@@ -30,15 +30,16 @@ Every Employee/Admin/Owner capability in the table additionally requires a non-e
 
 - Customer: `/cont`, `/comenzile-mele`, `/retururi`.
 - Employee: `/staff`, `/staff/produse`, `/staff/categorii`, `/staff/comenzi`,
-  `/staff/retururi`, `/staff/stoc`, `/staff/mesaje`, `/staff/continut`.
-- Administrator: `/admin`, products, categories, orders, users, customers, roles, returns,
-  restock, messages, content, settings, audit and guide children.
+  `/staff/retururi`, `/staff/stoc`, `/staff/mesaje`.
+- Administrator: `/n7q4-v2m9` and its products, categories, orders, users, customers, roles,
+  returns, restock, messages, content, settings, audit and guide children. The legacy `/admin`
+  address intentionally renders a public 404 and exposes no authentication or bootstrap UI.
 - Authentication: `/autentificare`, `/api/auth/login`, password-reset routes.
 
-The `/staff` and `/admin` layouts previously relied on client role state for route presentation.
+The `/staff` and internal administration layouts previously relied on client role state for route presentation.
 Their children use direct Supabase queries, so RLS was the final data boundary. The layouts now also
-block rendering until application verification succeeds. `/staff/continut` is retained only as a
-direct-link compatibility route and now requires Admin/Owner; it is removed from employee navigation.
+block rendering until application verification succeeds. Employee content navigation and the former
+`/staff/continut` route are removed; global content is available only inside the Admin/Owner portal.
 
 ## Server functions audited
 

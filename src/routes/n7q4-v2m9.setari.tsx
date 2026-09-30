@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useGuestCartLimit } from "@/lib/dashboard-data";
 import { useMethods, type MethodEntry, type MethodKey } from "@/lib/methods";
 
-export const Route = createFileRoute("/admin/setari")({
+export const Route = createFileRoute("/n7q4-v2m9/setari")({
   component: SettingsPage,
 });
 
@@ -40,7 +40,8 @@ function SettingsPage() {
     <div className="mx-auto max-w-[720px]">
       <h1 className="display text-3xl">Setări</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Setări operaționale ale magazinului. Costurile de livrare și TVA se schimbă din „Conținut site”.
+        Setări operaționale ale magazinului. Costurile de livrare și TVA se schimbă din „Conținut
+        site”.
       </p>
 
       <form onSubmit={save} className="mt-10 space-y-5 border border-border p-6">
@@ -59,8 +60,8 @@ function SettingsPage() {
           />
         </label>
         <p className="text-sm text-muted-foreground">
-          Limita este verificată și pe server, la trimiterea comenzii. Fiecare adresă de e-mail poate
-          plasa o singură comandă fără cont.
+          Limita este verificată și pe server, la trimiterea comenzii. Fiecare adresă de e-mail
+          poate plasa o singură comandă fără cont.
         </p>
         <button
           type="submit"
@@ -177,7 +178,9 @@ function MethodsEditor({
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => setRows((prev) => [...prev, { label: "", description: "", enabled: false }])}
+              onClick={() =>
+                setRows((prev) => [...prev, { label: "", description: "", enabled: false }])
+              }
               className="micro min-h-11 border border-foreground px-5"
             >
               Adaugă opțiune

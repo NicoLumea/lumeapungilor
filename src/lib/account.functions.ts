@@ -181,9 +181,8 @@ export const requestAdminPromotion = createServerFn({ method: "POST" })
   });
 
 /**
- * Only the project owner can finalise an administrator promotion. Authorisation
- * is either the owner role or the server-side owner secret; neither is exposed
- * to the browser.
+ * Only an authenticated account that already has the owner role can finalise
+ * an administrator promotion. The bootstrap secret is never accepted here.
  */
 export const decideAdminPromotion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

@@ -316,7 +316,9 @@
 .featured-product {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 480ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay), transform 480ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+  transition:
+    opacity 480ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+    transform 480ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
 }
 
 .featured-product.is-revealed {
@@ -349,17 +351,6 @@
 
 .site-header.is-compact .site-header-inner {
   height: 3.5rem;
-}
-
-.site-header .utility-bar {
-  transition-property: height, opacity;
-  transition-duration: 280ms;
-}
-
-.site-header.is-compact .utility-bar {
-  height: 0;
-  opacity: 0;
-  overflow: hidden;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -416,8 +407,7 @@
   .featured-product-name,
   .featured-product-link,
   .site-header,
-  .site-header-inner,
-  .site-header .utility-bar {
+  .site-header-inner {
     transition-duration: 0.01ms;
     transition-delay: 0ms;
   }

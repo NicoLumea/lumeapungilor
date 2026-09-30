@@ -11,7 +11,7 @@ import {
   setEmployeeSuspension,
 } from "@/lib/account.functions";
 
-export const Route = createFileRoute("/admin/roluri")({
+export const Route = createFileRoute("/n7q4-v2m9/roluri")({
   component: RolesPage,
 });
 
@@ -152,7 +152,8 @@ function RolesPage() {
         <h2 className="display text-xl">Promovare administrator</h2>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground">
           O cerere de promovare rămâne în așteptare până când proprietarul autentificat și verificat
-          al proiectului o aprobă. Niciun administrator nu se poate promova singur.
+          al proiectului o aprobă. Codul inițial de configurare nu poate aproba promovări și niciun
+          administrator nu se poate promova singur.
         </p>
         <form
           className="mt-5 flex flex-wrap items-end gap-4"

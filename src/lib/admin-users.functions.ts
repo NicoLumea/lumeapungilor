@@ -5,7 +5,7 @@ import { hasVerifiedPrivilegedAccess } from "@/lib/authorization.server";
 
 const filtersSchema = z.object({
   search: z.string().trim().max(200).optional(),
-  role: z.enum(["customer", "employee", "admin"]).optional(),
+  role: z.enum(["customer", "employee", "admin", "owner"]).optional(),
   source: z.enum(["account", "order", "restock"]).optional(),
   status: z.enum(["active", "disabled", "pending"]).optional(),
   dateFrom: z.string().datetime().optional(),
@@ -26,7 +26,8 @@ const passwordResetSchema = z.object({ userId: z.string().uuid() });
 export type AdminUserRow = {
   id: string;
   email: string;
-  role: "customer" | "employee" | "admin";
+  account_type: "customer";
+  role: "customer" | "employee" | "admin" | "owner";
   created_at: string;
   email_confirmed: boolean;
   last_sign_in_at: string | null;
@@ -44,6 +45,7 @@ export type AccountStats = {
   customers: number;
   employees: number;
   administrators: number;
+  owners: number;
   accounts_with_signal: number;
 };
 
@@ -213,7 +215,8 @@ export const exportAdminUsersCsv = createServerFn({ method: "POST" })
       };
       const header = [
         "Email",
-        "Rol",
+        "Tip cont",
+        "Rol de sistem",
         "Creat la",
         "Email confirmat",
         "Ultima autentificare",
@@ -227,6 +230,7 @@ export const exportAdminUsersCsv = createServerFn({ method: "POST" })
       const lines = exportPayload.rows.map((row) =>
         [
           row.email,
+          "Client",
           row.role,
           row.created_at,
           row.email_confirmed,

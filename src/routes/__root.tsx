@@ -133,13 +133,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isAdmin = pathname.startsWith("/admin");
+  const isInternalDashboard = pathname.startsWith("/n7q4-v2m9");
   const isGateway = pathname === "/";
 
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        {isAdmin || isGateway ? <Outlet /> : <PublicSiteFrame pathname={pathname} />}
+        {isInternalDashboard || isGateway ? <Outlet /> : <PublicSiteFrame pathname={pathname} />}
         <Toaster position="bottom-right" />
       </CartProvider>
     </QueryClientProvider>
