@@ -133,6 +133,11 @@ function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<FormKey | "terms", string | undefined>>>({});
   const [busy, setBusy] = useState(false);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
+  const [guestAccessToken] = useState(() =>
+    Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join(""),
+  );
 
   // Going back to the cart and returning must not lose what was already typed.
   useEffect(() => {
@@ -209,6 +214,7 @@ function CheckoutPage() {
       const result = await submit({
         data: {
           idempotencyKey,
+          guestAccessToken: auth.user ? undefined : guestAccessToken,
           expectedTotal: total,
           termsAccepted: true as const,
           customer: {
@@ -231,6 +237,9 @@ function CheckoutPage() {
       }
       clear();
       window.sessionStorage.removeItem(DRAFT_KEY);
+      if (!auth.user) {
+        window.sessionStorage.setItem(`lp-order-access:${result.orderNumber}`, guestAccessToken);
+      }
       navigate({ to: "/comanda/$number", params: { number: result.orderNumber } });
     } catch {
       toast.error("Cererea de comandă nu a putut fi trimisă. Încearcă din nou.");

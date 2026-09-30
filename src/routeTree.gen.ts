@@ -21,6 +21,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CosRouteImport } from './routes/cos'
 import { Route as DespreRouteImport } from './routes/despre'
 import { Route as DezabonareRouteImport } from './routes/dezabonare'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
 import { Route as N7q4V2m9RouteImport } from './routes/n7q4-v2m9'
@@ -38,6 +39,7 @@ import { Route as N7q4V2m9AuditRouteImport } from './routes/n7q4-v2m9.audit'
 import { Route as N7q4V2m9CategoriesRouteImport } from './routes/n7q4-v2m9.categories'
 import { Route as N7q4V2m9ClientiRouteImport } from './routes/n7q4-v2m9.clienti'
 import { Route as N7q4V2m9ContentRouteImport } from './routes/n7q4-v2m9.content'
+import { Route as N7q4V2m9FeedbackRouteImport } from './routes/n7q4-v2m9.feedback'
 import { Route as N7q4V2m9GuideRouteImport } from './routes/n7q4-v2m9.guide'
 import { Route as N7q4V2m9MesajeRouteImport } from './routes/n7q4-v2m9.mesaje'
 import { Route as N7q4V2m9OrdersRouteImport } from './routes/n7q4-v2m9.orders'
@@ -51,6 +53,7 @@ import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffCategoriiRouteImport } from './routes/staff.categorii'
 import { Route as StaffComenziRouteImport } from './routes/staff.comenzi'
+import { Route as StaffFeedbackRouteImport } from './routes/staff.feedback'
 import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
 import { Route as StaffProduseRouteImport } from './routes/staff.produse'
 import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
@@ -117,6 +120,11 @@ const DespreRoute = DespreRouteImport.update({
 const DezabonareRoute = DezabonareRouteImport.update({
   id: '/dezabonare',
   path: '/dezabonare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivrareRoute = LivrareRouteImport.update({
@@ -204,6 +212,11 @@ const N7q4V2m9ContentRoute = N7q4V2m9ContentRouteImport.update({
   path: '/content',
   getParentRoute: () => N7q4V2m9Route,
 } as any)
+const N7q4V2m9FeedbackRoute = N7q4V2m9FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
 const N7q4V2m9GuideRoute = N7q4V2m9GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
@@ -269,6 +282,11 @@ const StaffComenziRoute = StaffComenziRouteImport.update({
   path: '/comenzi',
   getParentRoute: () => StaffRoute,
 } as any)
+const StaffFeedbackRoute = StaffFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => StaffRoute,
+} as any)
 const StaffMesajeRoute = StaffMesajeRouteImport.update({
   id: '/mesaje',
   path: '/mesaje',
@@ -318,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/dezabonare': typeof DezabonareRoute
+  '/feedback': typeof FeedbackRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/n7q4-v2m9': typeof N7q4V2m9RouteWithChildren
@@ -334,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
   '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
   '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
+  '/n7q4-v2m9/feedback': typeof N7q4V2m9FeedbackRoute
   '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
   '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
   '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
@@ -346,6 +366,7 @@ export interface FileRoutesByFullPath {
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
   '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/feedback': typeof StaffFeedbackRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
@@ -369,6 +390,7 @@ export interface FileRoutesByTo {
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/dezabonare': typeof DezabonareRoute
+  '/feedback': typeof FeedbackRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/parola-noua': typeof ParolaNouaRoute
@@ -383,6 +405,7 @@ export interface FileRoutesByTo {
   '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
   '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
   '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
+  '/n7q4-v2m9/feedback': typeof N7q4V2m9FeedbackRoute
   '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
   '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
   '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
@@ -395,6 +418,7 @@ export interface FileRoutesByTo {
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
   '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/feedback': typeof StaffFeedbackRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
@@ -419,6 +443,7 @@ export interface FileRoutesById {
   '/cos': typeof CosRoute
   '/despre': typeof DespreRoute
   '/dezabonare': typeof DezabonareRoute
+  '/feedback': typeof FeedbackRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
   '/n7q4-v2m9': typeof N7q4V2m9RouteWithChildren
@@ -435,6 +460,7 @@ export interface FileRoutesById {
   '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
   '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
   '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
+  '/n7q4-v2m9/feedback': typeof N7q4V2m9FeedbackRoute
   '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
   '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
   '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
@@ -447,6 +473,7 @@ export interface FileRoutesById {
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
   '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/feedback': typeof StaffFeedbackRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
@@ -472,6 +499,7 @@ export interface FileRouteTypes {
     | '/cos'
     | '/despre'
     | '/dezabonare'
+    | '/feedback'
     | '/livrare'
     | '/magazin'
     | '/n7q4-v2m9'
@@ -488,6 +516,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/categories'
     | '/n7q4-v2m9/clienti'
     | '/n7q4-v2m9/content'
+    | '/n7q4-v2m9/feedback'
     | '/n7q4-v2m9/guide'
     | '/n7q4-v2m9/mesaje'
     | '/n7q4-v2m9/orders'
@@ -500,6 +529,7 @@ export interface FileRouteTypes {
     | '/produs/$slug'
     | '/staff/categorii'
     | '/staff/comenzi'
+    | '/staff/feedback'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
@@ -523,6 +553,7 @@ export interface FileRouteTypes {
     | '/cos'
     | '/despre'
     | '/dezabonare'
+    | '/feedback'
     | '/livrare'
     | '/magazin'
     | '/parola-noua'
@@ -537,6 +568,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/categories'
     | '/n7q4-v2m9/clienti'
     | '/n7q4-v2m9/content'
+    | '/n7q4-v2m9/feedback'
     | '/n7q4-v2m9/guide'
     | '/n7q4-v2m9/mesaje'
     | '/n7q4-v2m9/orders'
@@ -549,6 +581,7 @@ export interface FileRouteTypes {
     | '/produs/$slug'
     | '/staff/categorii'
     | '/staff/comenzi'
+    | '/staff/feedback'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
@@ -572,6 +605,7 @@ export interface FileRouteTypes {
     | '/cos'
     | '/despre'
     | '/dezabonare'
+    | '/feedback'
     | '/livrare'
     | '/magazin'
     | '/n7q4-v2m9'
@@ -588,6 +622,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/categories'
     | '/n7q4-v2m9/clienti'
     | '/n7q4-v2m9/content'
+    | '/n7q4-v2m9/feedback'
     | '/n7q4-v2m9/guide'
     | '/n7q4-v2m9/mesaje'
     | '/n7q4-v2m9/orders'
@@ -600,6 +635,7 @@ export interface FileRouteTypes {
     | '/produs/$slug'
     | '/staff/categorii'
     | '/staff/comenzi'
+    | '/staff/feedback'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
@@ -624,6 +660,7 @@ export interface RootRouteChildren {
   CosRoute: typeof CosRoute
   DespreRoute: typeof DespreRoute
   DezabonareRoute: typeof DezabonareRoute
+  FeedbackRoute: typeof FeedbackRoute
   LivrareRoute: typeof LivrareRoute
   MagazinRoute: typeof MagazinRoute
   N7q4V2m9Route: typeof N7q4V2m9RouteWithChildren
@@ -726,6 +763,13 @@ declare module '@tanstack/react-router' {
       path: '/dezabonare'
       fullPath: '/dezabonare'
       preLoaderRoute: typeof DezabonareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/livrare': {
@@ -847,6 +891,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof N7q4V2m9ContentRouteImport
       parentRoute: typeof N7q4V2m9Route
     }
+    '/n7q4-v2m9/feedback': {
+      id: '/n7q4-v2m9/feedback'
+      path: '/feedback'
+      fullPath: '/n7q4-v2m9/feedback'
+      preLoaderRoute: typeof N7q4V2m9FeedbackRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
     '/n7q4-v2m9/guide': {
       id: '/n7q4-v2m9/guide'
       path: '/guide'
@@ -938,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffComenziRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/staff/feedback': {
+      id: '/staff/feedback'
+      path: '/feedback'
+      fullPath: '/staff/feedback'
+      preLoaderRoute: typeof StaffFeedbackRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/staff/mesaje': {
       id: '/staff/mesaje'
       path: '/mesaje'
@@ -995,6 +1053,7 @@ interface N7q4V2m9RouteChildren {
   N7q4V2m9CategoriesRoute: typeof N7q4V2m9CategoriesRoute
   N7q4V2m9ClientiRoute: typeof N7q4V2m9ClientiRoute
   N7q4V2m9ContentRoute: typeof N7q4V2m9ContentRoute
+  N7q4V2m9FeedbackRoute: typeof N7q4V2m9FeedbackRoute
   N7q4V2m9GuideRoute: typeof N7q4V2m9GuideRoute
   N7q4V2m9MesajeRoute: typeof N7q4V2m9MesajeRoute
   N7q4V2m9OrdersRoute: typeof N7q4V2m9OrdersRoute
@@ -1012,6 +1071,7 @@ const N7q4V2m9RouteChildren: N7q4V2m9RouteChildren = {
   N7q4V2m9CategoriesRoute: N7q4V2m9CategoriesRoute,
   N7q4V2m9ClientiRoute: N7q4V2m9ClientiRoute,
   N7q4V2m9ContentRoute: N7q4V2m9ContentRoute,
+  N7q4V2m9FeedbackRoute: N7q4V2m9FeedbackRoute,
   N7q4V2m9GuideRoute: N7q4V2m9GuideRoute,
   N7q4V2m9MesajeRoute: N7q4V2m9MesajeRoute,
   N7q4V2m9OrdersRoute: N7q4V2m9OrdersRoute,
@@ -1031,6 +1091,7 @@ const N7q4V2m9RouteWithChildren = N7q4V2m9Route._addFileChildren(
 interface StaffRouteChildren {
   StaffCategoriiRoute: typeof StaffCategoriiRoute
   StaffComenziRoute: typeof StaffComenziRoute
+  StaffFeedbackRoute: typeof StaffFeedbackRoute
   StaffMesajeRoute: typeof StaffMesajeRoute
   StaffProduseRoute: typeof StaffProduseRoute
   StaffRetururiRoute: typeof StaffRetururiRoute
@@ -1041,6 +1102,7 @@ interface StaffRouteChildren {
 const StaffRouteChildren: StaffRouteChildren = {
   StaffCategoriiRoute: StaffCategoriiRoute,
   StaffComenziRoute: StaffComenziRoute,
+  StaffFeedbackRoute: StaffFeedbackRoute,
   StaffMesajeRoute: StaffMesajeRoute,
   StaffProduseRoute: StaffProduseRoute,
   StaffRetururiRoute: StaffRetururiRoute,
@@ -1063,6 +1125,7 @@ const rootRouteChildren: RootRouteChildren = {
   CosRoute: CosRoute,
   DespreRoute: DespreRoute,
   DezabonareRoute: DezabonareRoute,
+  FeedbackRoute: FeedbackRoute,
   LivrareRoute: LivrareRoute,
   MagazinRoute: MagazinRoute,
   N7q4V2m9Route: N7q4V2m9RouteWithChildren,
