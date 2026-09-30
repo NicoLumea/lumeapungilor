@@ -4,7 +4,6 @@ import { extname, join, relative, resolve, sep } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const ignoredPaths = [
-  ".env",
   ".env.local",
   ".env.production",
   ".env.development.local",
@@ -26,6 +25,8 @@ const tracked = execFileSync("git", ["ls-files", "-z"], { cwd: root })
   .filter(Boolean);
 for (const path of tracked) {
   const name = path.split("/").at(-1)?.toLowerCase() ?? "";
+  // Root .env is platform-managed and contains only publishable values.
+  if (path === ".env") continue;
   if ((name === ".env" || name.startsWith(".env.")) && name !== ".env.example") {
     throw new Error(`Tracked environment file: ${path}`);
   }
