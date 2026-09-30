@@ -1241,6 +1241,15 @@ export type Database = {
         }
         Returns: Json
       }
+      save_product_catalog_entry: {
+        Args: {
+          p_images?: Json
+          p_product: Json
+          p_product_id: string | null
+          p_variants?: Json
+        }
+        Returns: string
+      }
       take_staff_mfa_attempt: {
         Args: { _challenge_id: string }
         Returns: number

@@ -8,11 +8,17 @@ export function MessagesPanel() {
   const { data, isLoading, error } = useContactRequests();
 
   async function toggle(id: string, status: string) {
-    const { error: err } = await supabase.from("contact_requests").update({ status }).eq("id", id);
+    const { error: err } = await supabase
+      .from("contact_requests")
+      .update({ status })
+      .eq("id", id)
+      .select("id")
+      .single();
     if (err) {
-      toast.error("Nu am putut actualiza mesajul.");
+      toast.error(err.message || "Nu am putut actualiza mesajul.");
       return;
     }
+    toast.success("Mesaj actualizat.");
     qc.invalidateQueries({ queryKey: ["dashboard", "messages"] });
   }
 
@@ -20,7 +26,9 @@ export function MessagesPanel() {
     <div className="mx-auto max-w-[1200px]">
       <h1 className="display text-3xl">Mesaje</h1>
       {isLoading ? <p className="mt-8 text-sm text-muted-foreground">Se încarcă…</p> : null}
-      {error ? <p className="mt-8 text-sm text-destructive">Mesajele nu au putut fi încărcate.</p> : null}
+      {error ? (
+        <p className="mt-8 text-sm text-destructive">Mesajele nu au putut fi încărcate.</p>
+      ) : null}
       {!isLoading && (data ?? []).length === 0 ? (
         <p className="mt-8 text-sm text-muted-foreground">Nu există mesaje.</p>
       ) : null}

@@ -26,7 +26,9 @@ function SettingsPage() {
     const { error } = await supabase
       .from("site_settings")
       .update({ value: { value } })
-      .eq("key", "guest_cart_max_distinct_products");
+      .eq("key", "guest_cart_max_distinct_products")
+      .select("key")
+      .single();
     setBusy(false);
     if (error) {
       toast.error("Setarea nu a putut fi salvată.");
@@ -114,7 +116,9 @@ function MethodsEditor({
     const { error } = await supabase
       .from("site_settings")
       .update({ value: { methods: clean } })
-      .eq("key", settingKey);
+      .eq("key", settingKey)
+      .select("key")
+      .single();
     setBusy(false);
     if (error) {
       toast.error("Setarea nu a putut fi salvată.");
