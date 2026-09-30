@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { storageGet, storageSet } from "@/lib/safe-storage";
 
 export type CartLine = {
   productId: string;
@@ -53,7 +54,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+    storageSet("local", STORAGE_KEY, JSON.stringify(lines));
   }, [lines, hydrated]);
 
   const add = useCallback((line: CartLine) => {

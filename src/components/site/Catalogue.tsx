@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { storageGet, storageSet } from "@/lib/safe-storage";
 import { Search, X } from "lucide-react";
 import { usePublishedProducts } from "@/lib/products";
 import { useCategories } from "@/lib/content";

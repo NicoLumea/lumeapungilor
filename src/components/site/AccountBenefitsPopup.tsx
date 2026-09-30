@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { storageGet, storageSet } from "@/lib/safe-storage";
 import { useEffect, useState } from "react";
 
 const START_KEY = "lp-account-benefits-start";
