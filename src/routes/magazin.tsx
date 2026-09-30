@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RecommendedProducts } from "@/components/site/RecommendedProducts";
+import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
 import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
@@ -125,6 +126,7 @@ function Shop() {
       </section>
 
       <RecommendedProducts />
+      <PreviouslyPurchased />
 
       {edTitle || edBody || edImage ? (
         <section className="rule-t">

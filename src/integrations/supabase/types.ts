@@ -191,6 +191,69 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_feedback: {
+        Row: {
+          id: string
+          user_id: string | null
+          email: string | null
+          feedback_type: string
+          product_id: string | null
+          order_id: string | null
+          order_number: string | null
+          rating: number | null
+          message: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          email?: string | null
+          feedback_type: string
+          product_id?: string | null
+          order_id?: string | null
+          order_number?: string | null
+          rating?: number | null
+          message: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          email?: string | null
+          feedback_type?: string
+          product_id?: string | null
+          order_id?: string | null
+          order_number?: string | null
+          rating?: number | null
+          message?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      guest_order_access: {
+        Row: {
+          order_id: string
+          token_hash: string
+          created_at: string
+        }
+        Insert: {
+          order_id: string
+          token_hash: string
+          created_at?: string
+        }
+        Update: {
+          order_id?: string
+          token_hash?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       guest_checkout_usage: {
         Row: {
           email: string
@@ -292,6 +355,7 @@ export type Database = {
           line_total: number
           order_id: string
           product_id: string | null
+          product_image_url: string | null
           product_name: string
           quantity: number
           selling_unit: string | null
@@ -306,6 +370,7 @@ export type Database = {
           line_total: number
           order_id: string
           product_id?: string | null
+          product_image_url?: string | null
           product_name: string
           quantity: number
           selling_unit?: string | null
@@ -320,6 +385,7 @@ export type Database = {
           line_total?: number
           order_id?: string
           product_id?: string | null
+          product_image_url?: string | null
           product_name?: string
           quantity?: number
           selling_unit?: string | null
@@ -1225,8 +1291,7 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -1250,8 +1315,7 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -1275,8 +1339,7 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }

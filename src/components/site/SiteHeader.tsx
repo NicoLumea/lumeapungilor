@@ -15,6 +15,7 @@ import { companyInfo } from "@/lib/company";
 import { useCategories, useContent } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/use-auth";
+import { AccountBenefitsPopup } from "@/components/site/AccountBenefitsPopup";
 
 function headerCategoryLabel(name: string): string {
   return name.replace(/\bFARA\b/gi, "FĂRĂ").replace(/\bMANER\b/gi, "MÂNER");
@@ -206,6 +207,7 @@ export function SiteHeader() {
           </Link>
         </div>
       </div>
+      <AccountBenefitsPopup loading={auth.loading} signedIn={!!auth.user} />
     </header>
   );
 }
