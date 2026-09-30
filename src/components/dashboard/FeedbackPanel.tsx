@@ -46,11 +46,14 @@ export function FeedbackPanel() {
     const { error } = await supabase
       .from("customer_feedback")
       .update({ status: next })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id")
+      .single();
     if (error) {
-      toast.error("Starea nu a putut fi actualizată.");
+      toast.error(error.message || "Starea nu a putut fi actualizată.");
       return;
     }
+    toast.success("Stare actualizată.");
     await client.invalidateQueries({ queryKey: ["dashboard", "feedback"] });
   }
 

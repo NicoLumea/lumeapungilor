@@ -29,7 +29,7 @@ const blank: Draft = {
 
 export function CategoriesPanel() {
   const qc = useQueryClient();
-  const { data: categories, isLoading } = useCategories(true);
+  const { data: categories, isLoading, error: categoriesError } = useCategories(true);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -53,8 +53,8 @@ export function CategoriesPanel() {
       is_visible: draft.is_visible,
     };
     const { error } = draft.id
-      ? await supabase.from("categories").update(payload).eq("id", draft.id)
-      : await supabase.from("categories").insert(payload);
+      ? await supabase.from("categories").update(payload).eq("id", draft.id).select("id").single()
+      : await supabase.from("categories").insert(payload).select("id").single();
     setBusy(false);
     if (error) {
       toast.error(error.message);
@@ -67,7 +67,12 @@ export function CategoriesPanel() {
 
   async function remove(cat: Category) {
     if (!confirm(`Ștergi categoria „${cat.name}”? Produsele rămân, dar fără categorie.`)) return;
-    const { error } = await supabase.from("categories").delete().eq("id", cat.id);
+    const { error } = await supabase
+      .from("categories")
+      .delete()
+      .eq("id", cat.id)
+      .select("id")
+      .single();
     if (error) {
       toast.error(error.message);
       return;
@@ -187,7 +192,11 @@ export function CategoriesPanel() {
         </div>
       ) : null}
 
-      {isLoading ? (
+      {categoriesError ? (
+        <p className="py-16 text-sm text-destructive">
+          Categoriile nu au putut fi încărcate. Verifică sesiunea și încearcă din nou.
+        </p>
+      ) : isLoading ? (
         <p className="py-16 text-sm text-muted-foreground">Se încarcă…</p>
       ) : (categories ?? []).length === 0 ? (
         <p className="py-16 text-sm text-muted-foreground">Nu există încă nicio categorie.</p>
@@ -197,7 +206,11 @@ export function CategoriesPanel() {
             <li key={c.id} className="flex flex-wrap items-center gap-4 py-4">
               <div className="size-14 shrink-0 bg-field p-1">
                 {c.image_url ? (
-                  <img src={imageUrl(c.image_url) ?? ""} alt="" className="size-full object-contain" />
+                  <img
+                    src={imageUrl(c.image_url) ?? ""}
+                    alt=""
+                    className="size-full object-contain"
+                  />
                 ) : null}
               </div>
               <div className="flex-1">
