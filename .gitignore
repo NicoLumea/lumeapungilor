@@ -16,9 +16,15 @@ dist-ssr
 .nitro
 *.local
 
+# Environment and deployment secrets (keep only the safe template in Git).
+.env
+.env.*
+!.env.example
+.dev.vars*
+.npmrc
+
 # Wrangler / Cloudflare
 .wrangler/
-.dev.vars
 
 # Editor directories and files
 .vscode/*

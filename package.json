@@ -14,6 +14,7 @@
     "test:returns": "node --test src/lib/returns-core.test.ts",
     "test:support": "node --test src/lib/support-widget.test.ts",
     "test:security": "node --test src/lib/security-role-mfa.test.ts",
+    "test:env-security": "node --test src/lib/sensitive-paths.test.ts && node scripts/check-env-security.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
