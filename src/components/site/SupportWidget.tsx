@@ -1,4 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { storageGet, storageSet } from "@/lib/safe-storage";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -77,13 +78,13 @@ export function SupportWidget() {
 
   useEffect(() => {
     if (!storageKey) return;
-    setMessages(restoreSupportMessages(window.sessionStorage.getItem(storageKey)));
+    setMessages(restoreSupportMessages(storageGet("session", storageKey)));
     setLoadedStorageKey(storageKey);
   }, [storageKey]);
 
   useEffect(() => {
     if (!storageKey || loadedStorageKey !== storageKey) return;
-    window.sessionStorage.setItem(storageKey, JSON.stringify(messages));
+    storageSet("session", storageKey, JSON.stringify(messages));
   }, [loadedStorageKey, messages, storageKey]);
 
   useEffect(() => {
