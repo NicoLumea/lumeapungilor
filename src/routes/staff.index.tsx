@@ -14,6 +14,7 @@ const CARDS: { to: string; title: string; text: string }[] = [
   { to: "/staff/comenzi", title: "Comenzi", text: "Vezi comenzile și schimbă-le statusul." },
   { to: "/staff/retururi", title: "Retururi", text: "Cereri de retur, retragere și reclamații." },
   { to: "/staff/mesaje", title: "Mesaje", text: "Mesajele primite prin formularul de contact." },
+  { to: "/staff/feedback", title: "Feedback", text: "Păreri despre site, produse și experiență." },
 ];
 
 function StaffHome() {

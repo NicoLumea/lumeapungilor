@@ -2,7 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { Phone } from "lucide-react";
 import { useCategories, useContent, text } from "@/lib/content";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref, whatsappHref, CONSUMER_LINKS, SUPPORT_EMAIL } from "@/lib/company";
+import {
+  companyInfo,
+  telephoneHref,
+  whatsappHref,
+  CONSUMER_LINKS,
+  SUPPORT_EMAIL,
+} from "@/lib/company";
 import whatsappIcon from "@/assets/whatsapp-icon.png.asset.json";
 
 export function SiteFooter() {
@@ -56,6 +62,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link to="/feedback" className="link-underline">
+                Trimite feedback
+              </Link>
+            </li>
+            <li>
               <Link to="/livrare" className="link-underline">
                 Livrare
               </Link>
@@ -83,25 +94,38 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
             {company.phonePrimary ? (
               <li>
-                <a href={telephoneHref(company.phonePrimary)} className="inline-flex min-h-11 items-center link-underline text-foreground">
+                <a
+                  href={telephoneHref(company.phonePrimary)}
+                  className="inline-flex min-h-11 items-center link-underline text-foreground"
+                >
                   {company.phonePrimary}
                 </a>
               </li>
             ) : null}
             {company.phoneSecondary ? (
               <li>
-                <a href={telephoneHref(company.phoneSecondary)} className="inline-flex min-h-11 items-center link-underline text-foreground">
+                <a
+                  href={telephoneHref(company.phoneSecondary)}
+                  className="inline-flex min-h-11 items-center link-underline text-foreground"
+                >
                   {company.phoneSecondary}
                 </a>
-                {company.secondaryPhoneNote ? <span className="block text-xs">{company.secondaryPhoneNote}</span> : null}
+                {company.secondaryPhoneNote ? (
+                  <span className="block text-xs">{company.secondaryPhoneNote}</span>
+                ) : null}
               </li>
             ) : null}
             <li>
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex min-h-11 items-center link-underline text-foreground">
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="inline-flex min-h-11 items-center link-underline text-foreground"
+              >
                 {SUPPORT_EMAIL}
               </a>
             </li>
-            {company.operatingDays ? <li className="pt-4 text-foreground">{company.operatingDays}</li> : null}
+            {company.operatingDays ? (
+              <li className="pt-4 text-foreground">{company.operatingDays}</li>
+            ) : null}
             {company.operatingHours ? <li>{company.operatingHours}</li> : null}
           </ul>
           {company.phonePrimary ? (
@@ -122,7 +146,12 @@ export function SiteFooter() {
                 title="Scrie-ne pe WhatsApp"
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                <img src={whatsappIcon.url} alt="" aria-hidden="true" className="size-8 rounded-full object-contain" />
+                <img
+                  src={whatsappIcon.url}
+                  alt=""
+                  aria-hidden="true"
+                  className="size-8 rounded-full object-contain"
+                />
               </a>
             </div>
           ) : null}
@@ -130,14 +159,24 @@ export function SiteFooter() {
             <ul className="mt-4 flex gap-4">
               {facebook ? (
                 <li>
-                  <a href={facebook} className="micro-sm link-underline" rel="noreferrer" target="_blank">
+                  <a
+                    href={facebook}
+                    className="micro-sm link-underline"
+                    rel="noreferrer"
+                    target="_blank"
+                  >
                     Facebook
                   </a>
                 </li>
               ) : null}
               {instagram ? (
                 <li>
-                  <a href={instagram} className="micro-sm link-underline" rel="noreferrer" target="_blank">
+                  <a
+                    href={instagram}
+                    className="micro-sm link-underline"
+                    rel="noreferrer"
+                    target="_blank"
+                  >
                     Instagram
                   </a>
                 </li>
@@ -151,11 +190,21 @@ export function SiteFooter() {
         <div className="site-container py-6">
           <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
             Informații pentru consumatori:{" "}
-            <a href={CONSUMER_LINKS.anpc} target="_blank" rel="noreferrer noopener" className="link-underline">
+            <a
+              href={CONSUMER_LINKS.anpc}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="link-underline"
+            >
               Autoritatea Națională pentru Protecția Consumatorilor (ANPC)
             </a>{" "}
             și{" "}
-            <a href={CONSUMER_LINKS.sal} target="_blank" rel="noreferrer noopener" className="link-underline">
+            <a
+              href={CONSUMER_LINKS.sal}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="link-underline"
+            >
               platforma SAL – soluționarea alternativă a litigiilor
             </a>
             .
