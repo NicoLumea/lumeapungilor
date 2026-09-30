@@ -14,7 +14,7 @@ phone MFA would be required for native AAL2.
 | Browse public catalogue/content                       | Yes   | Yes                                                     | Yes      | Yes   | Yes                |
 | Guest checkout/order verification                     | Yes   | Yes                                                     | Yes      | Yes   | Yes                |
 | Own profile/orders/returns/support                    | No    | Yes                                                     | Yes      | Yes   | Yes                |
-| Staff dashboard before email check                    | No    | No                                                      | No       | No    | No                 |
+| Staff dashboard before employee email check           | No    | No                                                      | No       | Yes   | Yes                |
 | Orders, operational statuses, returns, support inbox  | No    | No                                                      | Yes      | Yes   | Yes                |
 | Products, categories, stock and product images        | No    | No                                                      | Yes      | Yes   | Yes                |
 | Global content, legal pages and private site settings | No    | No                                                      | No       | Yes   | Yes                |
@@ -23,8 +23,10 @@ phone MFA would be required for native AAL2.
 | Approve administrator promotion                       | No    | No                                                      | No       | No    | Yes                |
 | Initial owner bootstrap                               | No    | Confirmed account only, and only before an owner exists | Same     | Same  | Closed after claim |
 
-Every Employee/Admin/Owner capability in the table additionally requires a non-expired
-`staff_verified_sessions` row bound to both the authenticated user and the JWT `session_id`.
+Employee capabilities additionally require a non-expired `staff_verified_sessions` row bound to
+both the authenticated user and the JWT `session_id`. Admin and Owner capabilities require a valid
+authenticated Supabase session plus the corresponding role in trusted `user_roles` state; they do
+not require the additional email-code challenge.
 
 ## Routes audited
 
@@ -38,7 +40,8 @@ Every Employee/Admin/Owner capability in the table additionally requires a non-e
 
 The `/staff` and internal administration layouts previously relied on client role state for route presentation.
 Their children use direct Supabase queries, so RLS was the final data boundary. The layouts now also
-block rendering until application verification succeeds. Employee content navigation and the former
+block Employee rendering until application verification succeeds. Admin/Owner rendering relies on
+the authenticated session and trusted role. Employee content navigation and the former
 `/staff/continut` route are removed; global content is available only inside the Admin/Owner portal.
 
 ## Server functions audited
@@ -52,25 +55,26 @@ block rendering until application verification succeeds. Employee content naviga
 - `restock.functions.ts`: public subscription/unsubscription.
 - `recommendations.functions.ts`: public aggregate product identifiers only.
 
-Privileged service-role functions now call the reusable `hasVerifiedPrivilegedAccess` check. It
-verifies the role from trusted database state and checks the current JWT session against the
-server-only verification table. Browser-provided role values are never accepted.
+Privileged service-role functions call the reusable `hasVerifiedPrivilegedAccess` check. It
+requires a valid current JWT session and verifies the role from trusted database state. Employee
+access additionally checks the session against the server-only verification table; Admin/Owner
+access does not. Browser-provided role values are never accepted.
 
 ## RLS policies audited
 
 - `user_roles`: self-read remains; team-wide read is Admin/Owner only; client writes remain revoked.
 - `profiles`: self access remains; the latest checked-in policy limits cross-account reads to Admin.
-- `orders` and `order_items`: own-customer reads remain; operational staff access uses verified
-  `is_staff()`.
+- `orders` and `order_items`: own-customer reads remain; operational access uses `is_staff()`,
+  which accepts verified Employees or trusted Admin/Owner sessions.
 - `return_requests`, return items, image metadata and evidence storage: ownership policies remain;
-  staff policies now require verified staff state.
-- `contact_requests`: customer own-read remains; staff inbox read/update requires verified staff.
+  Employee access requires verified staff state; Admin/Owner access uses the trusted role.
+- `contact_requests`: customer own-read remains; staff inbox read/update follows the same rule.
 - products, categories, variants, images and product-image storage: public published reads remain;
-  employee modification remains intentionally supported but requires verified staff.
+  Employee modification remains intentionally supported and requires Employee verification.
 - `site_content`, `content_sections`, and `site_settings`: Employee write/read policies for private
-  CMS/configuration data are removed; Admin/Owner verification is required.
+  CMS/configuration data are removed; a trusted Admin/Owner session is required.
 - `audit_logs`, employee requests, role-change requests and admin dashboard RPCs: Admin/Owner checks
-  inherit verified-session enforcement.
+  inherit trusted Admin/Owner role enforcement without the additional email challenge.
 - authentication throttles, staff challenges, verified sessions and guest-return sessions remain
   service-role only with RLS enabled and no client policies.
 
@@ -78,17 +82,18 @@ server-only verification table. Browser-provided role values are never accepted.
 
 1. Employees had a visible content route and a `staff manage content` RLS policy. Both boundaries are
    now Admin/Owner only.
-2. Staff role checks did not distinguish password authentication from a privileged verified login.
-   The RLS helpers now require a short-lived server-side session verification.
-3. Privileged service-role functions checked roles but not a second login step. They now use the
-   shared server authorization helper.
+2. Employee role checks did not distinguish password authentication from a privileged verified
+   login. Employee RLS access now requires a short-lived server-side session verification.
+3. Privileged service-role functions now use the shared server authorization helper: Employees
+   require the second login step, while Admin/Owner access requires the normal session and trusted
+   database role.
 4. The admin user functions could infer authorization by selecting the caller's own role, which did
    not prove staff verification. They now verify role plus session server-side.
 5. The owner bootstrap accepted the setup secret even after initialization. It now checks that no
    owner exists before checking the secret, requires confirmed email, is rate-limited, is audited,
    and is protected against concurrent double claims by a single-owner index.
 6. The administrator-promotion decision accepted the owner setup secret as an ongoing bypass. Only
-   a verified Owner may now decide it.
+   an authenticated user with the trusted Owner role may now decide it.
 7. Signup wording treated confirmation as optional. The UI and login endpoint now require a
    confirmed address; Supabase Auth must also have Confirm Email enabled.
 8. Content/settings changes did not have a dedicated audit trigger. Key-only audit entries are now
@@ -96,6 +101,8 @@ server-only verification table. Browser-provided role values are never accepted.
 
 ## Staff email-code design
 
+- The additional email-code flow applies only to effective Employee accounts. Admin and Owner
+  accounts skip it and proceed using their normal authenticated session plus trusted database role.
 - Password verification happens first through the existing rate-limited login endpoint.
 - The role is read with the service-role client, never from browser input.
 - Supabase Auth sends and hashes the six-digit email OTP; the application never stores plaintext.
@@ -112,14 +119,14 @@ server-only verification table. Browser-provided role values are never accepted.
 
 ## Staff session handoff and redirect restoration
 
-The email OTP verification call creates a fresh Supabase authentication session. Previously, the
+For Employees, the email OTP verification call creates a fresh Supabase authentication session. Previously, the
 application discarded that returned session and wrote the privileged-verification record against
 the earlier password session. A refresh or session-policy invalidation could therefore leave the
 browser using an unverified or obsolete session and restart the MFA challenge.
 
 The completed flow now:
 
-1. sanitizes and remembers an internal staff destination before password login starts the email
+1. sanitizes and remembers an internal Employee destination before password login starts the email
    challenge;
 2. verifies the OTP and user identity server-side;
 3. binds `staff_verified_sessions` to the fresh session ID returned by Supabase OTP verification;
@@ -128,13 +135,14 @@ The completed flow now:
 6. replaces the current page with the authorized destination so reloads and normal navigation use
    the same verified session.
 
-External, protocol-relative, encoded-slash and malformed destinations are rejected. Employees
+Admin/Owner login bypasses this handoff because no email challenge is started. External,
+protocol-relative, encoded-slash and malformed destinations are rejected. Employees
 cannot restore Admin destinations, Customers cannot restore either staff area, and a missing or
 unauthorized destination falls back to the dashboard allowed by the trusted role.
 
 ## Tests run
 
-- Role hierarchy and employee/Admin separation unit tests.
+- Role hierarchy, employee/Admin separation and email-challenge classification unit tests.
 - Session-binding parsing and masked-email tests.
 - Session handoff destination sanitization, trusted-role defaults and redirect authorization tests.
 - Existing authentication, password recovery, product gallery, return and support tests.
@@ -146,8 +154,8 @@ These require the target Supabase project, SMTP delivery and disposable Guest/Cu
 Admin/Owner accounts:
 
 - apply the migration in a staging/preview database and run the full 44-case role matrix;
-- verify direct REST/RPC calls with anon, customer, unverified employee, verified employee,
-  unverified admin and verified admin tokens;
+- verify direct REST/RPC calls with anon, customer, unverified employee, verified employee and
+  authenticated Admin/Owner tokens;
 - confirm the email template produces a six-digit OTP and that expiry/cooldown behavior matches;
 - verify account confirmation, checkout, password reset, returns and support with real email;
 - confirm password change/session revocation behavior in the project's configured Supabase session
@@ -157,8 +165,9 @@ Admin/Owner accounts:
 
 ## Deployment requirements
 
-1. Apply `20260928120000_role_security_staff_mfa.sql` through the normal reviewed Supabase migration
-   process. GitHub/Lovable sync does not apply database migrations.
+1. Apply the checked-in Supabase migrations through
+   `20261001120000_remove_admin_email_verification.sql` using the normal reviewed migration process.
+   GitHub/Lovable sync does not apply database migrations.
 2. In Supabase Auth, enable **Confirm Email**.
 3. Configure the email OTP template to include `{{ .Token }}` and set OTP expiry to 600 seconds.
 4. Configure production Custom SMTP and test delivery. Until this is done:

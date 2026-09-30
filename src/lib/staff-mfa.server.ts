@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { rolesForUser, sessionIdFromClaims } from "./authorization.server.ts";
+import { requiresStaffEmailVerification } from "./authorization.ts";
 
 const CHALLENGE_MINUTES = 10;
 const MAX_ATTEMPTS = 5;
@@ -11,10 +12,6 @@ function positiveInteger(name: string, fallback: number): number {
   const parsed = Number(raw);
   if (!Number.isSafeInteger(parsed) || parsed < 1) throw new Error(`Invalid ${name}`);
   return parsed;
-}
-
-function isPrivileged(roles: string[]): boolean {
-  return roles.some((role) => role === "employee" || role === "admin" || role === "owner");
 }
 
 export function maskEmail(email: string): string {
@@ -54,7 +51,7 @@ export async function beginStaffChallenge(
   force = false,
 ): Promise<StaffChallengeResult> {
   const roles = await rolesForUser(userId);
-  if (!isPrivileged(roles)) return { ok: true, required: false };
+  if (!requiresStaffEmailVerification(roles)) return { ok: true, required: false };
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: authUser, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
@@ -126,7 +123,7 @@ export async function beginStaffChallenge(
 
 export async function staffVerificationStatus(userId: string, sessionId: string) {
   const roles = await rolesForUser(userId);
-  if (!isPrivileged(roles)) return { required: false, verified: true as const };
+  if (!requiresStaffEmailVerification(roles)) return { required: false, verified: true as const };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const now = new Date().toISOString();
   const [{ data: verified }, { data: user }, { data: challenge }] = await Promise.all([

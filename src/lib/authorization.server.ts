@@ -1,4 +1,5 @@
 import type { JwtPayload } from "@supabase/supabase-js";
+import { requiresStaffEmailVerification } from "./authorization.ts";
 
 export type PrivilegedRole = "employee" | "admin" | "owner";
 
@@ -30,6 +31,10 @@ export async function hasVerifiedPrivilegedAccess(
   if (!sessionId) return false;
   const roles = await rolesForUser(userId);
   if (!roleAllows(roles, required)) return false;
+
+  // Administrators still need a valid authenticated session and a trusted
+  // database role, but no longer need the additional email-code challenge.
+  if (!requiresStaffEmailVerification(roles)) return true;
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
