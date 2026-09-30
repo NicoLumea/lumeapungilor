@@ -15,8 +15,8 @@ export const getTopSellingProducts = createServerFn({ method: "GET" }).handler(
       const res = await supabaseAdmin.rpc("top_selling_products", { p_limit: 5 });
       if (res.error) throw res.error;
       data = res.data as unknown[] | null;
-    } catch (err) {
-      console.error("[recommendations] falling back to featured products", err);
+    } catch {
+      console.error("[recommendations] falling back to featured products");
       return { fromSales: false, productIds: [] };
     }
     if (!data || data.length === 0) return { fromSales: false, productIds: [] };
