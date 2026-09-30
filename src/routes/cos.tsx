@@ -215,7 +215,7 @@ function CartPage() {
                   <div className="mt-6">
                     <AuthPanel
                       emailRedirectTo="/checkout"
-                      onSignedIn={() => void navigate({ to: "/checkout" })}
+                      onSignedIn={(destination) => window.location.assign(destination)}
                       onSignedUp={(authenticated) => {
                         if (authenticated) void navigate({ to: "/checkout" });
                       }}

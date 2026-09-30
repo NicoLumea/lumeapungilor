@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { sessionIdFromClaims } from "./authorization.server";
+import { rolesForUser, sessionIdFromClaims } from "./authorization.server";
+import { resolvePostAuthDestination } from "./staff-auth-flow";
 
 const SESSION_ERROR = "Sesiunea de autentificare nu este validă.";
 
@@ -26,12 +27,25 @@ export const resendStaffVerificationCode = createServerFn({ method: "POST" })
 
 export const confirmStaffVerificationCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: unknown) => z.object({ code: z.string().regex(/^\d{6}$/) }).parse(input))
+  .validator((input: unknown) =>
+    z
+      .object({
+        code: z.string().regex(/^\d{6}$/),
+        destination: z.string().max(1000).optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data, context }) => {
     const sessionId = sessionIdFromClaims(context.claims);
     if (!sessionId) return { ok: false as const, error: SESSION_ERROR };
     const { verifyStaffCode } = await import("./staff-mfa.server");
-    return verifyStaffCode(context.userId, sessionId, data.code);
+    const result = await verifyStaffCode(context.userId, sessionId, data.code);
+    if (!result.ok) return result;
+    const roles = await rolesForUser(context.userId);
+    return {
+      ...result,
+      destination: resolvePostAuthDestination(data.destination, roles),
+    };
   });
 
 export const clearStaffVerification = createServerFn({ method: "POST" })
