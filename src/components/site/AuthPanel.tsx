@@ -109,7 +109,7 @@ export function AuthPanel({
   onSignedUp,
   emailRedirectTo = "/cont",
 }: {
-  onSignedIn?: () => void;
+  onSignedIn?: (destination: string) => void;
   onSignedUp?: (authenticated: boolean) => void;
   emailRedirectTo?: string;
 }) {
@@ -149,9 +149,9 @@ export function AuthPanel({
     setBusy(true);
     try {
       if (mode === "in") {
-        await protectedSignIn(email, password);
+        const result = await protectedSignIn(email, password, emailRedirectTo);
         toast.success("Bine ai revenit.");
-        onSignedIn?.();
+        onSignedIn?.(result.nextDestination);
       } else if (mode === "up") {
         const safeEmailRedirect =
           emailRedirectTo.startsWith("/") && !emailRedirectTo.startsWith("//")

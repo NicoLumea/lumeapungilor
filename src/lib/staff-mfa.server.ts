@@ -217,32 +217,48 @@ export async function verifyStaffCode(userId: string, sessionId: string, code: s
     return { ok: false as const, error: "Codul de verificare este invalid sau a expirat." };
   }
 
+  const verifiedSession = verifiedOtp.session;
+  const verifiedSessionId = verifiedSession
+    ? sessionIdFromAccessToken(verifiedSession.access_token)
+    : null;
+  if (!verifiedSession || !verifiedSessionId) {
+    return { ok: false as const, error: "Sesiunea verificată nu a putut fi stabilită." };
+  }
+
   const expiresAt = new Date(
     now.getTime() + positiveInteger("STAFF_MFA_SESSION_HOURS", 12) * 60 * 60 * 1000,
   ).toISOString();
-  await supabaseAdmin
-    .from("staff_login_challenges")
-    .update({ used_at: now.toISOString() })
-    .eq("id", challenge.id);
-  await supabaseAdmin.from("staff_verified_sessions").upsert(
+  const { error: sessionWriteError } = await supabaseAdmin.from("staff_verified_sessions").upsert(
     {
-      auth_session_id: sessionId,
+      auth_session_id: verifiedSessionId,
       user_id: userId,
       verified_at: now.toISOString(),
       expires_at: expiresAt,
     },
     { onConflict: "auth_session_id" },
   );
+  if (sessionWriteError) {
+    return { ok: false as const, error: "Sesiunea verificată nu a putut fi salvată." };
+  }
+  await supabaseAdmin
+    .from("staff_login_challenges")
+    .update({ used_at: now.toISOString() })
+    .eq("id", challenge.id);
   const { audit } = await import("./rate-limit.server");
   await audit({
     actorId: userId,
     actorEmail: email,
     action: "staff_mfa.verified",
     entity: "auth.session",
-    entityId: sessionId,
+    entityId: verifiedSessionId,
     details: { expires_at: expiresAt, assurance: "application_email_check" },
   });
-  return { ok: true as const, expiresAt };
+  return {
+    ok: true as const,
+    expiresAt,
+    accessToken: verifiedSession.access_token,
+    refreshToken: verifiedSession.refresh_token,
+  };
 }
 
 export async function clearStaffSession(userId: string, sessionId: string): Promise<void> {

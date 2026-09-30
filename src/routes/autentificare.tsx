@@ -1,12 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthPanel } from "@/components/site/AuthPanel";
+import { sanitizeInternalDestination } from "@/lib/staff-auth-flow";
 
 type AuthSearch = { redirect?: string };
 
 function safeRedirect(value: unknown): string {
-  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//")
-    ? value
-    : "/cont";
+  return sanitizeInternalDestination(value) ?? "/cont";
 }
 
 export const Route = createFileRoute("/autentificare")({
@@ -27,7 +26,8 @@ function AuthenticationPage() {
   const navigate = useNavigate();
   const { redirect = "/cont" } = Route.useSearch();
   const destination = safeRedirect(redirect);
-  const continueToDestination = () => void navigate({ to: destination });
+  const continueToDestination = (nextDestination = destination) =>
+    void navigate({ to: safeRedirect(nextDestination) });
 
   return (
     <div className="site-container max-w-[34rem] py-12 md:py-20">
