@@ -30,7 +30,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setLines(JSON.parse(raw) as CartLine[]);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) {
+        setLines(
+          parsed
+            .filter(
+              (l): l is CartLine =>
+                !!l &&
+                typeof l === "object" &&
+                typeof (l as CartLine).productId === "string" &&
+                Number.isFinite((l as CartLine).qty) &&
+                (l as CartLine).qty > 0,
+            )
+            .map((l) => ({ productId: l.productId, variantId: l.variantId ?? null, qty: l.qty })),
+        );
+      }
     } catch {
       /* ignore malformed cart */
     }
