@@ -4,6 +4,7 @@ import { useMyOrders } from "@/lib/dashboard-data";
 import { recentPurchasedProductIds } from "@/lib/order-experience";
 import { usePublishedProducts } from "@/lib/products";
 import { useAuth } from "@/lib/use-auth";
+import { productAvailableStock } from "@/lib/shop-types";
 
 export function PreviouslyPurchased() {
   const auth = useAuth();
@@ -16,7 +17,7 @@ export function PreviouslyPurchased() {
       .map((id) => byId.get(id))
       .filter(
         (product): product is NonNullable<typeof product> =>
-          !!product && (!product.track_stock || product.stock > 0),
+          !!product && (!product.track_stock || productAvailableStock(product) > 0),
       )
       .slice(0, 5);
   }, [orders.data, products.data]);

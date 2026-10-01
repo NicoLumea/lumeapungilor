@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ProductCard } from "@/components/site/ProductCard";
 import { usePublishedProducts } from "@/lib/products";
 import { getTopSellingProducts } from "@/lib/recommendations.functions";
+import { productAvailableStock } from "@/lib/shop-types";
 
 export function RecommendedProducts({ concise = false }: { concise?: boolean }) {
   const { data: products } = usePublishedProducts();
@@ -13,7 +14,7 @@ export function RecommendedProducts({ concise = false }: { concise?: boolean }) 
     staleTime: 5 * 60 * 1000,
   });
   const availableProducts = (products ?? []).filter(
-    (product) => !product.track_stock || product.stock > 0,
+    (product) => !product.track_stock || productAvailableStock(product) > 0,
   );
   const salesRanked = (sales?.productIds ?? [])
     .map((id) => availableProducts.find((product) => product.id === id))

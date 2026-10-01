@@ -46,6 +46,7 @@ export type Product = {
   qty_increment: number;
   stock: number;
   track_stock: boolean;
+  variant_stock_tracked?: boolean;
   status: string;
   is_featured: boolean;
   is_archived: boolean;
@@ -59,6 +60,12 @@ export type Product = {
 };
 
 export const PRODUCT_SELECT = "*, product_images(*), product_variants(*), categories(slug,name)";
+
+export function productAvailableStock(product: Product): number {
+  return product.variant_stock_tracked
+    ? (product.product_variants ?? []).reduce((sum, variant) => sum + variant.stock, 0)
+    : product.stock;
+}
 
 export function sortedImages(p: Product): ProductImage[] {
   return [...(p.product_images ?? [])].sort(

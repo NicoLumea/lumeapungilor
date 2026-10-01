@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useProduct } from "@/lib/products";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
-import { normalizeQty, primaryImage, sortedImages } from "@/lib/shop-types";
+import { normalizeQty, primaryImage, productAvailableStock, sortedImages } from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
 import { RestockNotice } from "@/components/site/RestockNotice";
 
@@ -109,8 +109,11 @@ function ProductPage() {
 
   const variant = variants.find((v) => v.id === variantId) ?? null;
   const unitPrice = Number(variant?.price ?? product.price);
-  const variantsStocked = variants.some((v) => v.stock > 0);
-  const stock = variant && variantsStocked ? variant.stock : product.stock;
+  const stock = variant
+    ? product.variant_stock_tracked
+      ? variant.stock
+      : product.stock
+    : productAvailableStock(product);
   const inStock = !product.track_stock || stock > 0;
   const min = Math.max(1, product.min_order_qty || 1);
   const step = Math.max(1, product.qty_increment || 1);

@@ -19,6 +19,8 @@ const NAV: { to: string; label: string; exact: boolean }[] = [
   { to: "/staff/produse", label: "Produse și stoc", exact: false },
   { to: "/staff/categorii", label: "Categorii", exact: false },
   { to: "/staff/comenzi", label: "Comenzi", exact: false },
+  { to: "/staff/clienti", label: "Clienți", exact: false },
+  { to: "/staff/livrare", label: "Livrare", exact: false },
   { to: "/staff/retururi", label: "Retururi", exact: false },
   { to: "/staff/stoc", label: "Cereri revenire stoc", exact: false },
   { to: "/staff/mesaje", label: "Mesaje", exact: false },

@@ -375,6 +375,7 @@ export type Database = {
       order_items: {
         Row: {
           id: string
+          inventory_source: string | null
           line_total: number
           order_id: string
           product_id: string | null
@@ -390,6 +391,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          inventory_source?: string | null
           line_total: number
           order_id: string
           product_id?: string | null
@@ -405,6 +407,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          inventory_source?: string | null
           line_total?: number
           order_id?: string
           product_id?: string | null
@@ -451,6 +454,7 @@ export type Database = {
           notification_status: string
           notified_at: string | null
           order_number: string
+          payment_method: string
           payment_reference: string | null
           payment_status: string
           phone: string | null
@@ -459,10 +463,12 @@ export type Database = {
           shipping_total: number
           status: string
           stock_applied: boolean
+          stock_released: boolean
           subtotal: number
           tax_total: number
           total: number
           updated_at: string
+          updated_by: string | null
           user_id: string | null
         }
         Insert: {
@@ -487,6 +493,7 @@ export type Database = {
           notification_status?: string
           notified_at?: string | null
           order_number?: string
+          payment_method?: string
           payment_reference?: string | null
           payment_status?: string
           phone?: string | null
@@ -495,10 +502,12 @@ export type Database = {
           shipping_total?: number
           status?: string
           stock_applied?: boolean
+          stock_released?: boolean
           subtotal?: number
           tax_total?: number
           total?: number
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Update: {
@@ -523,6 +532,7 @@ export type Database = {
           notification_status?: string
           notified_at?: string | null
           order_number?: string
+          payment_method?: string
           payment_reference?: string | null
           payment_status?: string
           phone?: string | null
@@ -531,10 +541,12 @@ export type Database = {
           shipping_total?: number
           status?: string
           stock_applied?: boolean
+          stock_released?: boolean
           subtotal?: number
           tax_total?: number
           total?: number
           updated_at?: string
+          updated_by?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -644,6 +656,7 @@ export type Database = {
           track_stock: boolean
           units_per_pack: number | null
           updated_at: string
+          variant_stock_tracked: boolean
         }
         Insert: {
           category_id?: string | null
@@ -667,6 +680,7 @@ export type Database = {
           track_stock?: boolean
           units_per_pack?: number | null
           updated_at?: string
+          variant_stock_tracked?: boolean
         }
         Update: {
           category_id?: string | null
@@ -690,6 +704,7 @@ export type Database = {
           track_stock?: boolean
           units_per_pack?: number | null
           updated_at?: string
+          variant_stock_tracked?: boolean
         }
         Relationships: [
           {
@@ -1217,6 +1232,35 @@ export type Database = {
           total: number
         }[]
       }
+      staff_order_catalog: {
+        Args: {
+          p_search?: string | null
+          p_status?: string | null
+          p_payment_status?: string | null
+          p_payment_method?: string | null
+          p_customer_type?: string | null
+          p_from?: string | null
+          p_to?: string | null
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: Database["public"]["Tables"]["orders"]["Row"][]
+      }
+      staff_customer_catalog: {
+        Args: { p_search?: string | null; p_limit?: number; p_offset?: number }
+        Returns: {
+          id: string
+          email: string | null
+          full_name: string | null
+          company_name: string | null
+          phone: string | null
+          created_at: string
+          completed_orders: number
+          last_order_at: string | null
+          total_spent: number
+        }[]
+      }
+      set_delivery_fee: { Args: { p_fee: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

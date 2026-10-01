@@ -6,7 +6,7 @@ import { useCategories } from "@/lib/content";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { matchesQuery } from "@/lib/search";
-import type { Product } from "@/lib/shop-types";
+import { productAvailableStock, type Product } from "@/lib/shop-types";
 
 type Sort = "recent" | "pret-asc" | "pret-desc" | "nume";
 
@@ -102,13 +102,17 @@ export function Catalogue({
     if (cat) list = list.filter((p) => p.categories?.slug === cat);
     if (material)
       list = list.filter((p) =>
-        p.specs.some((s) => s.label.trim().toLowerCase() === "material" && s.value.trim() === material),
+        p.specs.some(
+          (s) => s.label.trim().toLowerCase() === "material" && s.value.trim() === material,
+        ),
       );
     if (size)
       list = list.filter((p) =>
-        p.specs.some((s) => s.label.trim().toLowerCase() === "dimensiuni" && s.value.trim() === size),
+        p.specs.some(
+          (s) => s.label.trim().toLowerCase() === "dimensiuni" && s.value.trim() === size,
+        ),
       );
-    if (inStockOnly) list = list.filter((p) => !p.track_stock || p.stock > 0);
+    if (inStockOnly) list = list.filter((p) => !p.track_stock || productAvailableStock(p) > 0);
     const max = Number(maxPrice);
     if (maxPrice !== "" && Number.isFinite(max)) list = list.filter((p) => Number(p.price) <= max);
 
@@ -134,7 +138,9 @@ export function Catalogue({
   }, [query, cat, material, size, inStockOnly, maxPrice, sort]);
 
   const visible = filtered.slice(0, shown);
-  const activeFilters = [cat, material, size, maxPrice, inStockOnly ? "1" : ""].filter(Boolean).length;
+  const activeFilters = [cat, material, size, maxPrice, inStockOnly ? "1" : ""].filter(
+    Boolean,
+  ).length;
 
   function resetFilters() {
     setCat("");
@@ -185,7 +191,9 @@ export function Catalogue({
   return (
     <div className="catalogue-container py-14">
       <h1 className="display text-3xl md:text-4xl">{title}</h1>
-      {intro ? <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">{intro}</p> : null}
+      {intro ? (
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">{intro}</p>
+      ) : null}
 
       <div className="mt-8 hidden md:block">{searchField}</div>
 
@@ -313,7 +321,11 @@ export function Catalogue({
             <span className="micro-sm">Doar în stoc</span>
           </label>
 
-          <button type="button" onClick={resetFilters} className="micro-sm self-end text-left link-underline">
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="micro-sm self-end text-left link-underline"
+          >
             Resetează filtrele
           </button>
         </div>
@@ -355,7 +367,11 @@ export function Catalogue({
               ? `Niciun produs nu corespunde căutării „${query.trim()}”.`
               : "Niciun produs nu corespunde filtrelor alese."}
           </p>
-          <button type="button" onClick={resetFilters} className="micro mt-6 min-h-11 link-underline">
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="micro mt-6 min-h-11 link-underline"
+          >
             Resetează căutarea și filtrele
           </button>
         </div>

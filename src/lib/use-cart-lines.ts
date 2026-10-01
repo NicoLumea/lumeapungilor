@@ -3,6 +3,7 @@ import { useCart } from "@/lib/cart";
 import { useProductsByIds } from "@/lib/products";
 import { num, useContent } from "@/lib/content";
 import { primaryImage, type Product, type ProductVariant } from "@/lib/shop-types";
+import { calculateOrderTotals } from "@/lib/order-totals";
 
 export type ResolvedLine = {
   product: Product;
@@ -35,10 +36,7 @@ export function useCartLines() {
         unitPrice,
         lineTotal: Math.round(unitPrice * line.qty * 100) / 100,
         imageUrlPath: primaryImage(product)?.url ?? null,
-        stock:
-          variant && (product.product_variants ?? []).some((v) => v.stock > 0)
-            ? variant.stock
-            : product.stock,
+        stock: variant && product.variant_stock_tracked ? variant.stock : product.stock,
       });
     }
     return out;
@@ -51,9 +49,7 @@ export function useCartLines() {
   const vatRate = num(settings, "vat_rate");
   const paymentsConfigured = settings?.["payments_configured"] === true;
 
-  const shipping = flat === null ? 0 : freeOver !== null && subtotal >= freeOver ? 0 : flat;
-  const tax = vatRate === null ? 0 : Math.round(subtotal * (vatRate / 100) * 100) / 100;
-  const total = Math.round((subtotal + shipping + tax) * 100) / 100;
+  const { shipping, tax, total } = calculateOrderTotals(subtotal, flat ?? 0, freeOver, vatRate);
 
   return {
     lines: resolved,
