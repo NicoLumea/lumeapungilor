@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthPanel } from "@/components/site/AuthPanel";
 
-type AuthSearch = { redirect?: string };
+type AuthSearch = { redirect?: string; reset?: "success" };
 
 function safeRedirect(value: unknown): string {
   return typeof value === "string" && value.startsWith("/") && !value.startsWith("//")
@@ -12,6 +12,7 @@ function safeRedirect(value: unknown): string {
 export const Route = createFileRoute("/autentificare")({
   validateSearch: (search: Record<string, unknown>): AuthSearch => ({
     redirect: safeRedirect(search["redirect"]),
+    ...(search["reset"] === "success" ? { reset: "success" as const } : {}),
   }),
   head: () => ({
     meta: [
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/autentificare")({
 
 function AuthenticationPage() {
   const navigate = useNavigate();
-  const { redirect = "/cont" } = Route.useSearch();
+  const { redirect = "/cont", reset } = Route.useSearch();
   const destination = safeRedirect(redirect);
   const continueToDestination = () => void navigate({ to: destination });
 
@@ -42,6 +43,11 @@ function AuthenticationPage() {
         </p>
       </div>
       <div className="mt-8">
+        {reset === "success" ? (
+          <p role="status" className="mb-6 border border-border bg-field p-4 text-sm">
+            Parola a fost actualizată. Conectează-te folosind noua parolă.
+          </p>
+        ) : null}
         <AuthPanel
           emailRedirectTo={destination}
           onSignedIn={continueToDestination}

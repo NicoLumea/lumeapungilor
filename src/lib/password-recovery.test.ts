@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  hasRecoveryError,
-  hasRecoveryMarker,
+  normalizeRecoveryCode,
   PASSWORD_RESET_GENERIC_MESSAGE,
   passwordValidationError,
 } from "./password-recovery.ts";
@@ -23,16 +22,9 @@ test("password policy rejects short and mismatched passwords", () => {
   assert.equal(passwordValidationError("parola-lunga", "parola-lunga"), null);
 });
 
-test("recovery markers and provider errors are recognized without exposing tokens", () => {
-  assert.equal(
-    hasRecoveryMarker(
-      "https://example.ro/parola-noua#access_token=secret&refresh_token=secret2&type=recovery",
-    ),
-    true,
-  );
-  assert.equal(hasRecoveryMarker("https://example.ro/parola-noua"), false);
-  assert.equal(
-    hasRecoveryError("https://example.ro/parola-noua#error=access_denied&error_code=otp_expired"),
-    true,
-  );
+test("only six numeric recovery-code characters are accepted", () => {
+  assert.equal(normalizeRecoveryCode(" 012345 "), "012345");
+  assert.equal(normalizeRecoveryCode("12345"), null);
+  assert.equal(normalizeRecoveryCode("12a456"), null);
+  assert.equal(normalizeRecoveryCode("1234567"), null);
 });
