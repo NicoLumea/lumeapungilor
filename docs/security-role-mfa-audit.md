@@ -1,5 +1,9 @@
 # Security role and staff email-verification audit
 
+> Historical PR #12 audit. The recovery branch `fix/manual-revert-pr12-staff-mfa`
+> removes the staff email verification gate. Its role-only migration supersedes
+> the OTP requirements and setup steps documented below.
+
 ## Scope and assurance boundary
 
 This audit covers the React/TanStack application, privileged server functions, and the checked-in

@@ -45,38 +45,11 @@ export const Route = createFileRoute("/api/auth/login")({
               { status: 401, headers },
             );
           }
-          if (!result.session.user.email_confirmed_at) {
-            return Response.json(
-              {
-                ok: false,
-                code: "email_not_confirmed",
-                error: "Confirmă adresa de e-mail înainte de autentificare.",
-              },
-              { status: 403, headers },
-            );
-          }
-          const { beginStaffChallenge, sessionIdFromAccessToken } =
-            await import("@/lib/staff-mfa.server");
-          const sessionId = sessionIdFromAccessToken(result.session.access_token);
-          if (!sessionId) {
-            return Response.json(
-              { ok: false, error: "Autentificarea nu a putut fi finalizată." },
-              { status: 503, headers },
-            );
-          }
-          const staffChallenge = await beginStaffChallenge(result.session.user.id, sessionId);
-          if (!staffChallenge.ok) {
-            return Response.json(
-              { ok: false, error: staffChallenge.error },
-              { status: 503, headers },
-            );
-          }
           return Response.json(
             {
               ok: true,
               accessToken: result.session.access_token,
               refreshToken: result.session.refresh_token,
-              requiresStaffVerification: staffChallenge.required,
             },
             { status: 200, headers },
           );

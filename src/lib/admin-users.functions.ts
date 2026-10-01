@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { hasVerifiedPrivilegedAccess } from "@/lib/authorization.server";
+import { hasPrivilegedAccess } from "@/lib/authorization.server";
 
 const filtersSchema = z.object({
   search: z.string().trim().max(200).optional(),
@@ -85,7 +85,7 @@ export const getAdminUsers = createServerFn({ method: "GET" })
   .validator((input: unknown) => pageSchema.parse(input))
   .handler(
     async ({ data, context }): Promise<{ ok: true; data: AccountsPayload } | AdminUsersFailure> => {
-      if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+      if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
         return { ok: false, kind: "forbidden", error: "Acces interzis." };
       }
       const { data: payload, error } = await context.supabase.rpc("admin_users_dashboard", {
@@ -105,7 +105,7 @@ export const getAdminInterest = createServerFn({ method: "GET" })
   .validator((input: unknown) => interestPageSchema.parse(input))
   .handler(
     async ({ data, context }): Promise<{ ok: true; data: InterestPayload } | AdminUsersFailure> => {
-      if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+      if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
         return { ok: false, kind: "forbidden", error: "Acces interzis." };
       }
       const { data: payload, error } = await context.supabase.rpc("admin_interest_dashboard", {
@@ -127,7 +127,7 @@ export const sendAdminPasswordReset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input: unknown) => passwordResetSchema.parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true } | AdminUsersFailure> => {
-    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+    if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
       return { ok: false, kind: "forbidden", error: "Acces interzis." };
     }
 
@@ -198,7 +198,7 @@ export const exportAdminUsersCsv = createServerFn({ method: "POST" })
       | { ok: true; csv: string; rowCount: number; truncated: boolean; filename: string }
       | AdminUsersFailure
     > => {
-      if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+      if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
         return { ok: false, kind: "forbidden", error: "Acces interzis." };
       }
       const { data: payload, error } = await context.supabase.rpc(
