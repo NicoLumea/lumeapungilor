@@ -1,10 +1,7 @@
 import { text, type ContentMap } from "@/lib/content";
+import { COMPANY_LEGAL, COMPANY_PHONE } from "@/lib/company-legal";
 
-/** Official customer-service address, used everywhere the shop offers help. */
-export const SUPPORT_EMAIL = "contact@lumeapungilor.ro";
-
-/** Current public company contact number; hosted content may still contain retired numbers. */
-export const COMPANY_PHONE = "+40 54039462";
+export { COMPANY_PHONE, SUPPORT_EMAIL } from "@/lib/company-legal";
 
 /** Official Romanian consumer-protection references (ANPC / SAL). */
 export const CONSUMER_LINKS = {
@@ -18,6 +15,7 @@ export type CompanyInfo = {
   address: string | null;
   cui: string | null;
   tradeRegisterNumber: string | null;
+  vatStatement: string;
   phonePrimary: string | null;
   phoneSecondary: string | null;
   secondaryPhoneNote: string | null;
@@ -31,10 +29,11 @@ export function companyInfo(content: ContentMap | undefined): CompanyInfo {
   const company = content?.["company"];
   return {
     brandName: text(company, "brand_name") ?? text(company, "name"),
-    legalName: text(company, "legal_company_name"),
-    address: text(company, "registered_address") ?? text(company, "address"),
-    cui: text(company, "cui"),
-    tradeRegisterNumber: text(company, "trade_register_number") ?? text(company, "reg_com"),
+    legalName: COMPANY_LEGAL.name,
+    address: COMPANY_LEGAL.registeredOffice,
+    cui: COMPANY_LEGAL.cui,
+    tradeRegisterNumber: COMPANY_LEGAL.tradeRegisterNumber,
+    vatStatement: COMPANY_LEGAL.vatStatement,
     phonePrimary: COMPANY_PHONE,
     phoneSecondary: null,
     secondaryPhoneNote: null,

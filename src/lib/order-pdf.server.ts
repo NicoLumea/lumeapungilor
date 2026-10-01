@@ -1,7 +1,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import type { ConfirmationOrder } from "./order-confirmation.server";
 import { deliveryEstimate } from "./order-experience.ts";
-import { supabaseAdmin } from "../integrations/supabase/client.server.ts";
+import { COMPANY_LEGAL, COMPANY_PHONE, SUPPORT_EMAIL } from "./company-legal.ts";
 
 const PAGE_WIDTH = 595;
 const PAGE_HEIGHT = 842;
@@ -43,22 +43,7 @@ function wrap(text: string, font: PDFFont, size: number, width: number): string[
   return lines.length ? lines : [""];
 }
 
-export async function renderOrderPdf(
-  order: ConfirmationOrder,
-  companyDetails?: Record<string, unknown>,
-): Promise<Uint8Array> {
-  let company = companyDetails;
-  if (!company) {
-    const { data } = await supabaseAdmin
-      .from("site_content")
-      .select("value")
-      .eq("key", "company")
-      .maybeSingle();
-    company = (data?.value ?? {}) as Record<string, unknown>;
-  }
-  const field = (key: string): string | null =>
-    typeof company[key] === "string" ? (company[key] as string) : null;
-
+export async function renderOrderPdf(order: ConfirmationOrder): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   pdf.setTitle(`Confirmare comanda ${order.order_number}`);
   pdf.setAuthor("Lumea Pungilor");
@@ -113,14 +98,13 @@ export async function renderOrderPdf(
   line(deliveryEstimate(order.city));
 
   section("Vanzator");
-  line(field("legal_company_name") ?? field("name") ?? "Lumea Pungilor");
-  if (field("registered_address") ?? field("address"))
-    line((field("registered_address") ?? field("address"))!);
-  if (field("cui")) line(`CUI: ${field("cui")}`);
-  if (field("trade_register_number") ?? field("reg_com"))
-    line(`Registrul Comertului: ${field("trade_register_number") ?? field("reg_com")}`);
-  if (field("phone_primary")) line(`Telefon: ${field("phone_primary")}`);
-  line("E-mail: contact@lumeapungilor.ro");
+  line(COMPANY_LEGAL.name);
+  line(COMPANY_LEGAL.registeredOffice);
+  line(`CUI: ${COMPANY_LEGAL.cui}`);
+  line(`Registrul Comertului: ${COMPANY_LEGAL.tradeRegisterNumber}`);
+  line(COMPANY_LEGAL.vatStatement);
+  line(`Telefon: ${COMPANY_PHONE}`);
+  line(`E-mail: ${SUPPORT_EMAIL}`);
 
   section("Client si livrare");
   line(order.contact_name, { bold: true });

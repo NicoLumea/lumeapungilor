@@ -1,4 +1,5 @@
 import { companyInfo, internationalTelephone } from "@/lib/company";
+import { COMPANY_LEGAL } from "@/lib/company-legal";
 import { useContent } from "@/lib/content";
 
 export function OrganizationStructuredData() {
@@ -15,15 +16,20 @@ export function OrganizationStructuredData() {
     legalName: company.legalName,
     address: {
       "@type": "PostalAddress",
-      streetAddress: company.address,
-      addressCountry: "RO",
+      streetAddress: COMPANY_LEGAL.streetAddress,
+      addressLocality: COMPANY_LEGAL.city,
+      addressRegion: COMPANY_LEGAL.county,
+      addressCountry: COMPANY_LEGAL.country,
     },
     telephone: primary,
-    contactPoint: secondary
-      ? [{ "@type": "ContactPoint", telephone: secondary }]
-      : undefined,
+    contactPoint: secondary ? [{ "@type": "ContactPoint", telephone: secondary }] : undefined,
     taxID: company.cui,
   };
 
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />;
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
 }

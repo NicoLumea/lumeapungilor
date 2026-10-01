@@ -52,8 +52,8 @@ export function PrivacyPolicy() {
 
       <Section id="operator" title="Operatorul de date">
         <p>
-          Lumea Pungilor prelucrează datele în calitate de operator. Datele juridice sunt preluate
-          din setările comune ale site-ului:
+          Lumea Pungilor prelucrează datele în calitate de operator. Datele juridice ale societății
+          sunt:
         </p>
         <div className="border-l-2 border-foreground pl-4 text-foreground">
           <CompanyIdentity />

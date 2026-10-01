@@ -3,6 +3,7 @@ import { ArrowUpRight, MapPin } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { COMPANY_PHONE, telephoneHref } from "@/lib/company";
+import { COMPANY_LEGAL } from "@/lib/company-legal";
 
 type AboutCategory = {
   title: string;
@@ -212,23 +213,25 @@ function AboutPage() {
 
         <AboutSection title="Datele companiei">
           <p className="mt-5 max-w-3xl text-sm leading-relaxed text-foreground/80 sm:text-base">
-            Magazinul online lumeapungilor.ro este operat de DEKORAMA IMPORT SRL, cu sediul în Str.
-            Agricultori nr. 88, Buftea, județul Ilfov, România.
+            Magazinul online lumeapungilor.ro este operat de {COMPANY_LEGAL.name}, cu sediul în{" "}
+            {COMPANY_LEGAL.registeredOffice}.
           </p>
           <dl className="mt-6 grid gap-px border border-border bg-border sm:grid-cols-2">
             <div className="min-w-0 bg-background p-5 sm:p-6">
               <dt className="micro-sm text-muted-foreground">CUI</dt>
-              <dd className="mt-2 text-sm font-medium">RO38393721</dd>
+              <dd className="mt-2 text-sm font-medium">{COMPANY_LEGAL.cui}</dd>
             </div>
             <div className="min-w-0 bg-background p-5 sm:p-6">
               <dt className="micro-sm text-muted-foreground">
                 Nr. înregistrare la Registrul Comerțului
               </dt>
-              <dd className="mt-2 break-words text-sm font-medium">J2017005349230</dd>
+              <dd className="mt-2 break-words text-sm font-medium">
+                {COMPANY_LEGAL.tradeRegisterNumber}
+              </dd>
             </div>
             <div className="min-w-0 bg-background p-5 sm:p-6">
               <dt className="micro-sm text-muted-foreground">TVA</dt>
-              <dd className="mt-2 text-sm font-medium">Societatea este plătitoare de TVA.</dd>
+              <dd className="mt-2 text-sm font-medium">{COMPANY_LEGAL.vatStatement}</dd>
             </div>
             <div className="min-w-0 bg-background p-5 sm:p-6">
               <dt className="micro-sm text-muted-foreground">Punct de lucru</dt>
