@@ -3,7 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { getStaffVerificationStatus } from "@/lib/staff-mfa.functions";
-import { effectiveRole, requiresStaffEmailVerification, type AppRole } from "@/lib/authorization";
+import { effectiveRole, type AppRole } from "@/lib/authorization";
 
 export type { AppRole } from "@/lib/authorization";
 
@@ -68,7 +68,10 @@ export function useAuth(): AuthState {
       }
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
       const roles = (data ?? []).map((r) => r.role as AppRole);
-      if (!requiresStaffEmailVerification(roles)) {
+      const privileged = roles.some((role) =>
+        (["employee", "admin", "owner"] as AppRole[]).includes(role),
+      );
+      if (!privileged) {
         if (active)
           setState({
             loading: false,
