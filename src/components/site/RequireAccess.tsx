@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { AccessDenied } from "@/components/site/AccessDenied";
-import { StaffVerification } from "@/components/site/StaffVerification";
 import { hasAccess, type AccessLevel } from "@/lib/authorization";
 import { useAuth, type AuthState } from "@/lib/use-auth";
 
@@ -30,20 +29,6 @@ export function RequireAccess({
         redirectTo={href}
       />
     );
-  }
-
-  if (
-    level !== "customer" &&
-    auth.isStaff &&
-    auth.staffVerificationRequired &&
-    !auth.staffVerified
-  ) {
-    if (auth.staffVerificationLoading) {
-      return (
-        <p className="py-32 text-center text-sm text-muted-foreground">Se verifică sesiunea…</p>
-      );
-    }
-    return <StaffVerification auth={auth} />;
   }
 
   if (!hasAccess(!!auth.user, auth.roles, level)) {

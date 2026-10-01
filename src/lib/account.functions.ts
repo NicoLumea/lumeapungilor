@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { AUTHORIZATION_DENIED, hasVerifiedPrivilegedAccess } from "@/lib/authorization.server";
+import { AUTHORIZATION_DENIED, hasPrivilegedAccess } from "@/lib/authorization.server";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -53,7 +53,7 @@ export const decideEmployeeRequest = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
-    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+    if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
       return { ok: false, error: DENIED };
     }
 
@@ -103,7 +103,7 @@ export const setEmployeeSuspension = createServerFn({ method: "POST" })
     z.object({ userId: z.string().uuid(), revoke: z.boolean() }).parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
-    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+    if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
       return { ok: false, error: DENIED };
     }
     if (data.userId === context.userId)
@@ -143,7 +143,7 @@ export const requestAdminPromotion = createServerFn({ method: "POST" })
     z.object({ candidateEmail: z.string().trim().email().max(200) }).parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
-    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "admin"))) {
+    if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
       return { ok: false, error: DENIED };
     }
 
@@ -197,7 +197,7 @@ export const decideAdminPromotion = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
     const roles = await rolesOf(context.userId);
-    if (!(await hasVerifiedPrivilegedAccess(context.userId, context.claims, "owner")))
+    if (!(await hasPrivilegedAccess(context.userId, "owner")))
       return { ok: false, error: "Doar proprietarul proiectului poate aproba această cerere." };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

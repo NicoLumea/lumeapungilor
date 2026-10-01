@@ -3,23 +3,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABEL } from "@/lib/authorization";
 import { useAuth } from "@/lib/use-auth";
-import { useServerFn } from "@tanstack/react-start";
-import { clearStaffVerification } from "@/lib/staff-mfa.functions";
 
 export function AccountNav() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const auth = useAuth();
-  const clearVerification = useServerFn(clearStaffVerification);
 
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
-    try {
-      await clearVerification({ data: {} });
-    } catch {
-      // Supabase sign-out still revokes the authentication session.
-    }
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
   }
