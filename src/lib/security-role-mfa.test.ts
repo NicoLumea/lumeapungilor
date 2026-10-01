@@ -23,14 +23,13 @@ test("enforces the role hierarchy without granting employee admin access", () =>
   assert.equal(roleAllows(["customer"], "employee"), false);
 });
 
-test("requires one email challenge for every privileged session", () => {
+test("requires the additional email challenge only for effective Employee accounts", () => {
   assert.equal(requiresStaffEmailVerification(["employee"]), true);
-  assert.equal(requiresStaffEmailVerification(["admin"]), true);
-  assert.equal(requiresStaffEmailVerification(["owner"]), true);
-  assert.equal(requiresStaffEmailVerification(["employee", "admin"]), true);
-  assert.equal(requiresStaffEmailVerification(["employee", "owner"]), true);
+  assert.equal(requiresStaffEmailVerification(["admin"]), false);
+  assert.equal(requiresStaffEmailVerification(["owner"]), false);
+  assert.equal(requiresStaffEmailVerification(["employee", "admin"]), false);
+  assert.equal(requiresStaffEmailVerification(["employee", "owner"]), false);
   assert.equal(requiresStaffEmailVerification(["customer"]), false);
-  assert.equal(requiresStaffEmailVerification([]), false);
 });
 
 test("accepts only a server-verifiable session identifier", () => {

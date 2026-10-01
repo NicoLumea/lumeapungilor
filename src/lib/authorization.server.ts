@@ -32,7 +32,9 @@ export async function hasVerifiedPrivilegedAccess(
   const roles = await rolesForUser(userId);
   if (!roleAllows(roles, required)) return false;
 
-  if (!requiresStaffEmailVerification(roles)) return false;
+  // Administrators still need a valid authenticated session and a trusted
+  // database role, but no longer need the additional email-code challenge.
+  if (!requiresStaffEmailVerification(roles)) return true;
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
@@ -40,6 +42,7 @@ export async function hasVerifiedPrivilegedAccess(
     .select("auth_session_id")
     .eq("auth_session_id", sessionId)
     .eq("user_id", userId)
+    .gt("expires_at", new Date().toISOString())
     .maybeSingle();
   return !!data;
 }

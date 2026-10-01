@@ -16,12 +16,13 @@ export function effectiveRole(roles: readonly AppRole[]): AppRole {
 }
 
 /**
- * Every privileged account completes the email challenge once for each new
- * Supabase session. The resulting verification stays bound to that session,
- * so navigating between staff actions never starts another challenge.
+ * Employee accounts keep the additional email challenge. Administrator and
+ * Owner accounts use the authenticated Supabase session plus their trusted
+ * database role instead, even when they also retain an Employee role row.
  */
 export function requiresStaffEmailVerification(roles: readonly string[]): boolean {
-  return roles.some((role) => role === "employee" || role === "admin" || role === "owner");
+  const hasAdministrativeRole = roles.includes("admin") || roles.includes("owner");
+  return roles.includes("employee") && !hasAdministrativeRole;
 }
 
 export function hasAccess(
