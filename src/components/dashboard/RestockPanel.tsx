@@ -50,8 +50,7 @@ export function RestockPanel() {
     const q = query.trim().toLowerCase();
     if (q)
       list = list.filter(
-        (r) =>
-          r.email.toLowerCase().includes(q) || (r.products?.name ?? "").toLowerCase().includes(q),
+        (r) => r.email.toLowerCase().includes(q) || (r.products?.name ?? "").toLowerCase().includes(q),
       );
     return list;
   }, [data, status, query]);
@@ -61,17 +60,14 @@ export function RestockPanel() {
       const { error: err } = await supabase
         .from("restock_requests")
         .update({ status: "anuntat", notified_at: new Date().toISOString(), notify_error: null })
-        .eq("id", id)
-        .select("id")
-        .single();
+        .eq("id", id);
       if (err) throw err;
     },
     onSuccess: () => {
       toast.success("Cererea a fost marcată ca anunțată.");
       void qc.invalidateQueries({ queryKey: ["admin", "restock"] });
     },
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : "Cererea nu a putut fi actualizată."),
+    onError: () => toast.error("Cererea nu a putut fi actualizată."),
   });
 
   function exportCsv() {
@@ -109,11 +105,7 @@ export function RestockPanel() {
             înregistrează doar după ce ai trimis mesajul.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={exportCsv}
-          className="micro min-h-11 border border-foreground px-5"
-        >
+        <button type="button" onClick={exportCsv} className="micro min-h-11 border border-foreground px-5">
           Exportă CSV
         </button>
       </div>
@@ -148,9 +140,7 @@ export function RestockPanel() {
       ) : error ? (
         <p className="mt-10 text-sm text-destructive">Cererile nu au putut fi încărcate.</p>
       ) : rows.length === 0 ? (
-        <p className="mt-10 text-sm text-muted-foreground">
-          Nu există cereri pentru filtrele alese.
-        </p>
+        <p className="mt-10 text-sm text-muted-foreground">Nu există cereri pentru filtrele alese.</p>
       ) : (
         <div className="mt-8 overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">

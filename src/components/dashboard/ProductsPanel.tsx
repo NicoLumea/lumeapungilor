@@ -1,26 +1,38 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  removeUnpersistedProductImages,
-  saveProductCatalogEntry,
-  uploadProductImage,
-  useAdminProducts,
-} from "@/lib/admin-data";
-import type {
-  AdminProductDraft,
-  AdminProductImageDraft,
-  AdminProductVariantDraft,
-} from "@/lib/admin-product";
+import { useAdminProducts, uploadProductImage } from "@/lib/admin-data";
 import { useCategories } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { formatRon, slugify } from "@/lib/format";
 import { primaryImage, sortedImages, type Product, type Spec } from "@/lib/shop-types";
 
-type ImageDraft = AdminProductImageDraft;
-type VariantDraft = AdminProductVariantDraft;
-type Draft = AdminProductDraft & { specs: Spec[] };
+type ImageDraft = { id?: string; url: string; alt: string; isPrimary: boolean };
+type VariantDraft = { id?: string; name: string; sku: string; price: string; stock: number };
+
+type Draft = {
+  id?: string;
+  name: string;
+  slug: string;
+  description: string;
+  category_id: string;
+  sku: string;
+  price: string;
+  selling_unit: string;
+  units_per_pack: string;
+  min_order_qty: number;
+  qty_increment: number;
+  stock: number;
+  track_stock: boolean;
+  status: "draft" | "published";
+  is_featured: boolean;
+  is_archived: boolean;
+  sort_order: number;
+  specs: Spec[];
+  images: ImageDraft[];
+  variants: VariantDraft[];
+};
 
 const blank: Draft = {
   name: "",
@@ -111,41 +123,30 @@ function Text({
 
 export function ProductsPanel() {
   const qc = useQueryClient();
-  const { data: products, isLoading, error: productsError } = useAdminProducts();
+  const { data: products, isLoading } = useAdminProducts();
   const { data: categories } = useCategories(true);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
   const draggedImageKey = useRef<string | null>(null);
   const dragStartImages = useRef<ImageDraft[] | null>(null);
-  const pendingImagePaths = useRef(new Set<string>());
-
-  useEffect(
-    () => () => {
-      const paths = [...pendingImagePaths.current];
-      pendingImagePaths.current.clear();
-      if (paths.length > 0) void removeUnpersistedProductImages(paths).catch(() => undefined);
-    },
-    [],
-  );
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["admin", "products"] });
     qc.invalidateQueries({ queryKey: ["products"] });
   }
 
-  async function persistGallery(productId: string, images: ImageDraft[]): Promise<boolean> {
+  async function persistGallery(productId: string, images: ImageDraft[]) {
     const imageIds = images.map((image) => image.id).filter((id): id is string => !!id);
-    if (imageIds.length !== images.length) return false;
+    if (imageIds.length !== images.length) return;
     const primaryId = images.find((image) => image.isPrimary)?.id ?? imageIds[0];
-    if (!primaryId) return false;
-    const { error } = await supabase.rpc("update_product_image_gallery", {
+    if (!primaryId) return;
+    const { error } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }> }).rpc("update_product_image_gallery", {
       p_product_id: productId,
       p_image_ids: imageIds,
       p_primary_image_id: primaryId,
     });
     if (error) throw error;
     invalidate();
-    return true;
   }
 
   async function moveImage(from: number, to: number) {
@@ -177,12 +178,8 @@ export function ProductsPanel() {
     setDraft({ ...draft, images });
     if (!draft.id) return;
     try {
-      const persisted = await persistGallery(draft.id, images);
-      toast.success(
-        persisted
-          ? "Fotografia principală a fost actualizată."
-          : "Fotografia principală va fi actualizată când salvezi produsul.",
-      );
+      await persistGallery(draft.id, images);
+      toast.success("Fotografia principală a fost actualizată.");
     } catch (error) {
       setDraft((current) => (current ? { ...current, images: previous } : current));
       toast.error(
@@ -198,26 +195,9 @@ export function ProductsPanel() {
     const remaining = draft.images.filter((_, current) => current !== index);
     if (removed.isPrimary && remaining[0]) remaining[0] = { ...remaining[0], isPrimary: true };
     setDraft({ ...draft, images: remaining });
-    if (!removed.id) {
-      try {
-        await removeUnpersistedProductImages([removed.url]);
-        pendingImagePaths.current.delete(removed.url);
-      } catch (error) {
-        setDraft({ ...draft, images: draft.images });
-        toast.error(
-          error instanceof Error ? error.message : "Fotografia încărcată nu a putut fi eliminată.",
-        );
-      }
-      return;
-    }
-    if (!draft.id) return;
+    if (!draft.id || !removed.id) return;
     try {
-      const { error } = await supabase
-        .from("product_images")
-        .delete()
-        .eq("id", removed.id)
-        .select("id")
-        .single();
+      const { error } = await supabase.from("product_images").delete().eq("id", removed.id);
       if (error) throw error;
       if (remaining.length > 0) await persistGallery(draft.id, remaining);
       else invalidate();
@@ -249,10 +229,94 @@ export function ProductsPanel() {
 
   async function save() {
     if (!draft) return;
+    if (!draft.name.trim()) {
+      toast.error("Numele produsului este obligatoriu.");
+      return;
+    }
+    const price = Number(draft.price.replace(",", "."));
+    if (!Number.isFinite(price) || price < 0) {
+      toast.error("Prețul trebuie să fie un număr.");
+      return;
+    }
     setBusy(true);
     try {
-      await saveProductCatalogEntry(draft);
-      pendingImagePaths.current.clear();
+      const payload = {
+        name: draft.name.trim(),
+        slug: (draft.slug.trim() || slugify(draft.name)).toLowerCase(),
+        description: draft.description.trim() || null,
+        category_id: draft.category_id || null,
+        sku: draft.sku.trim() || null,
+        price,
+        selling_unit: draft.selling_unit.trim() || "set",
+        units_per_pack: draft.units_per_pack ? Number(draft.units_per_pack) : null,
+        min_order_qty: Math.max(1, draft.min_order_qty),
+        qty_increment: Math.max(1, draft.qty_increment),
+        stock: draft.stock,
+        track_stock: draft.track_stock,
+        status: draft.status,
+        is_featured: draft.is_featured,
+        is_archived: draft.is_archived,
+        sort_order: draft.sort_order,
+        specs: draft.specs.filter((s) => s.label.trim() && s.value.trim()),
+      };
+
+      let productId = draft.id;
+      if (productId) {
+        const { error } = await supabase.from("products").update(payload).eq("id", productId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from("products")
+          .insert(payload)
+          .select("id")
+          .single();
+        if (error) throw error;
+        productId = data.id;
+      }
+
+      const savedImages: ImageDraft[] = [];
+      for (const [index, image] of draft.images.entries()) {
+        if (image.id) {
+          const { error } = await supabase
+            .from("product_images")
+            .update({ alt: image.alt.trim() || null })
+            .eq("id", image.id);
+          if (error) throw error;
+          savedImages.push(image);
+        } else {
+          const { data, error } = await supabase
+            .from("product_images")
+            .insert({
+              product_id: productId,
+              url: image.url,
+              alt: image.alt.trim() || null,
+              sort_order: index,
+              is_primary: false,
+            })
+            .select("id")
+            .single();
+          if (error) throw error;
+          savedImages.push({ ...image, id: data.id });
+        }
+      }
+      if (savedImages.length > 0) await persistGallery(productId, savedImages);
+
+      await supabase.from("product_variants").delete().eq("product_id", productId);
+      const variants = draft.variants.filter((v) => v.name.trim());
+      if (variants.length > 0) {
+        const { error } = await supabase.from("product_variants").insert(
+          variants.map((v, i) => ({
+            product_id: productId,
+            name: v.name.trim(),
+            sku: v.sku.trim() || null,
+            price: v.price.trim() === "" ? null : Number(v.price.replace(",", ".")),
+            stock: v.stock,
+            sort_order: i,
+          })),
+        );
+        if (error) throw error;
+      }
+
       toast.success("Produs salvat.");
       setDraft(null);
       invalidate();
@@ -265,7 +329,7 @@ export function ProductsPanel() {
 
   async function remove(p: Product) {
     if (!confirm(`Ștergi definitiv „${p.name}”?`)) return;
-    const { error } = await supabase.from("products").delete().eq("id", p.id).select("id").single();
+    const { error } = await supabase.from("products").delete().eq("id", p.id);
     if (error) {
       toast.error(error.message);
       return;
@@ -276,12 +340,7 @@ export function ProductsPanel() {
 
   async function togglePublish(p: Product) {
     const status = p.status === "published" ? "draft" : "published";
-    const { error } = await supabase
-      .from("products")
-      .update({ status })
-      .eq("id", p.id)
-      .select("id")
-      .single();
+    const { error } = await supabase.from("products").update({ status }).eq("id", p.id);
     if (error) {
       toast.error(error.message);
       return;
@@ -296,9 +355,8 @@ export function ProductsPanel() {
         <h1 className="display text-3xl">Produse</h1>
         <button
           type="button"
-          disabled={!!draft || busy}
           onClick={() => setDraft({ ...blank })}
-          className="micro border border-foreground bg-foreground px-6 py-3 text-background disabled:cursor-not-allowed disabled:opacity-40"
+          className="micro border border-foreground bg-foreground px-6 py-3 text-background"
         >
           Produs nou
         </button>
@@ -542,43 +600,41 @@ export function ProductsPanel() {
               multiple
               className="mt-4 text-sm"
               onChange={async (e) => {
-                const input = e.currentTarget;
                 const files = [...(e.target.files ?? [])];
                 if (files.length === 0) return;
-                const uploaded: ImageDraft[] = [];
-                setBusy(true);
                 try {
+                  const uploaded: ImageDraft[] = [];
                   for (const file of files) {
                     const url = await uploadProductImage(file);
-                    pendingImagePaths.current.add(url);
                     const isPrimary = draft.images.length === 0 && uploaded.length === 0;
-                    uploaded.push({ url, alt: "", isPrimary });
+                    if (draft.id) {
+                      const { data, error } = await supabase
+                        .from("product_images")
+                        .insert({
+                          product_id: draft.id,
+                          url,
+                          sort_order: draft.images.length + uploaded.length,
+                          is_primary: false,
+                        })
+                        .select("id")
+                        .single();
+                      if (error) throw error;
+                      uploaded.push({ id: data.id, url, alt: "", isPrimary });
+                    } else {
+                      uploaded.push({ url, alt: "", isPrimary });
+                    }
                   }
                   const images = [...draft.images, ...uploaded];
                   if (!images.some((image) => image.isPrimary) && images[0]) {
                     images[0] = { ...images[0], isPrimary: true };
                   }
                   setDraft({ ...draft, images });
-                  toast.success("Fotografii încărcate. Salvează produsul pentru confirmare.");
-                } catch (error) {
-                  const paths = uploaded.map((image) => image.url);
-                  if (paths.length > 0) {
-                    try {
-                      await removeUnpersistedProductImages(paths);
-                      for (const path of paths) pendingImagePaths.current.delete(path);
-                    } catch {
-                      // The original upload error is the useful message for the administrator.
-                    }
-                  }
-                  toast.error(
-                    error instanceof Error
-                      ? error.message
-                      : "Fotografiile nu au putut fi încărcate.",
-                  );
-                } finally {
-                  setBusy(false);
-                  input.value = "";
+                  if (draft.id) await persistGallery(draft.id, images);
+                  toast.success("Fotografii încărcate.");
+                } catch {
+                  toast.error("Fotografiile nu au putut fi încărcate.");
                 }
+                e.target.value = "";
               }}
             />
           </div>
@@ -704,27 +760,8 @@ export function ProductsPanel() {
             </button>
             <button
               type="button"
-              disabled={busy}
-              onClick={async () => {
-                const unpersisted = draft.images
-                  .filter((image) => !image.id)
-                  .map((image) => image.url);
-                setBusy(true);
-                try {
-                  await removeUnpersistedProductImages(unpersisted);
-                  pendingImagePaths.current.clear();
-                  setDraft(null);
-                } catch (error) {
-                  toast.error(
-                    error instanceof Error
-                      ? error.message
-                      : "Fotografiile nesalvate nu au putut fi curățate.",
-                  );
-                } finally {
-                  setBusy(false);
-                }
-              }}
-              className="micro border border-foreground px-6 py-3 disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={() => setDraft(null)}
+              className="micro border border-foreground px-6 py-3"
             >
               Renunță
             </button>
@@ -732,11 +769,7 @@ export function ProductsPanel() {
         </div>
       ) : null}
 
-      {productsError ? (
-        <p className="py-16 text-sm text-destructive">
-          Produsele nu au putut fi încărcate. Verifică sesiunea și încearcă din nou.
-        </p>
-      ) : isLoading ? (
+      {isLoading ? (
         <p className="py-16 text-sm text-muted-foreground">Se încarcă…</p>
       ) : (products ?? []).length === 0 ? (
         <p className="py-16 text-sm text-muted-foreground">
@@ -765,26 +798,19 @@ export function ProductsPanel() {
               </div>
               <button
                 type="button"
-                disabled={!!draft || busy}
-                className="micro-sm link-underline disabled:cursor-not-allowed disabled:opacity-40"
+                className="micro-sm link-underline"
                 onClick={() => togglePublish(p)}
               >
                 {p.status === "published" ? "Treci pe ciornă" : "Publică"}
               </button>
               <button
                 type="button"
-                disabled={!!draft || busy}
-                className="micro-sm link-underline disabled:cursor-not-allowed disabled:opacity-40"
+                className="micro-sm link-underline"
                 onClick={() => setDraft(toDraft(p))}
               >
                 Editează
               </button>
-              <button
-                type="button"
-                disabled={!!draft || busy}
-                className="micro-sm link-underline disabled:cursor-not-allowed disabled:opacity-40"
-                onClick={() => remove(p)}
-              >
+              <button type="button" className="micro-sm link-underline" onClick={() => remove(p)}>
                 Șterge
               </button>
             </li>

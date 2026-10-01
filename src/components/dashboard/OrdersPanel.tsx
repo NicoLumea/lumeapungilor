@@ -16,16 +16,11 @@ const STATUS_LABEL: Record<string, string> = {
 
 export function OrdersPanel() {
   const qc = useQueryClient();
-  const { data: orders, isLoading, error: ordersError } = useAdminOrders();
+  const { data: orders, isLoading } = useAdminOrders();
   const [open, setOpen] = useState<string | null>(null);
 
   async function setStatus(id: string, status: string) {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status })
-      .eq("id", id)
-      .select("id")
-      .single();
+    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
@@ -35,12 +30,7 @@ export function OrdersPanel() {
   }
 
   async function saveNote(id: string, internal_notes: string) {
-    const { error } = await supabase
-      .from("orders")
-      .update({ internal_notes })
-      .eq("id", id)
-      .select("id")
-      .single();
+    const { error } = await supabase.from("orders").update({ internal_notes }).eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
@@ -53,11 +43,7 @@ export function OrdersPanel() {
     <div className="mx-auto max-w-[1200px]">
       <h1 className="display text-3xl">Comenzi</h1>
 
-      {ordersError ? (
-        <p className="py-16 text-sm text-destructive">
-          Comenzile nu au putut fi încărcate. Verifică sesiunea și încearcă din nou.
-        </p>
-      ) : isLoading ? (
+      {isLoading ? (
         <p className="py-16 text-sm text-muted-foreground">Se încarcă…</p>
       ) : (orders ?? []).length === 0 ? (
         <p className="py-16 text-sm text-muted-foreground">Nu există comenzi încă.</p>
@@ -113,6 +99,7 @@ export function OrdersPanel() {
                           selling_unit: string | null;
                           line_total: number;
                         }) => (
+
                           <li key={it.id} className="flex justify-between gap-4">
                             <span>
                               {it.product_name}
