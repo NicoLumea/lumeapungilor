@@ -46,17 +46,6 @@ function AdministrationLayout() {
     return <p className="py-32 text-center text-sm text-muted-foreground">Se încarcă…</p>;
   }
 
-  if (auth.error) {
-    return (
-      <div className="mx-auto max-w-md py-24 text-center">
-        <p className="text-sm text-destructive">{auth.error}</p>
-        <button type="button" className="mt-5 underline" onClick={auth.refresh}>
-          Reîncearcă verificarea
-        </button>
-      </div>
-    );
-  }
-
   if (auth.user && !auth.isAdmin) {
     return <OwnerBootstrapGate email={auth.user.email ?? ""} onClaimed={auth.refresh} />;
   }

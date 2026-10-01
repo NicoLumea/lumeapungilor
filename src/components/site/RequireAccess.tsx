@@ -32,17 +32,6 @@ export function RequireAccess({
     );
   }
 
-  if (auth.error) {
-    return (
-      <div className="mx-auto max-w-md py-24 text-center">
-        <p className="text-sm text-destructive">{auth.error}</p>
-        <button type="button" className="mt-5 underline" onClick={auth.refresh}>
-          Reîncearcă verificarea
-        </button>
-      </div>
-    );
-  }
-
   if (
     level !== "customer" &&
     auth.isStaff &&
