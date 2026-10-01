@@ -58,13 +58,17 @@ export type Product = {
   product_variants?: ProductVariant[];
   categories?: { id: string; slug: string; name: string } | null;
   product_categories?: {
+    product_id: string;
     category_id: string;
     categories: { id: string; slug: string; name: string } | null;
   }[];
 };
 
-export const PRODUCT_SELECT =
-  "*, product_images(*), product_variants(*), categories(id,slug,name), product_categories(category_id,categories(id,slug,name))";
+export const PRODUCT_BASE_SELECT =
+  "*, product_images(*), product_variants(*), categories!products_category_id_fkey(id,slug,name)";
+
+// The explicit FK names matter: PostgREST also sees a many-to-many products/categories path.
+export const PRODUCT_SELECT = `${PRODUCT_BASE_SELECT}, product_categories(product_id,category_id,categories!product_categories_category_id_fkey(id,slug,name))`;
 
 /** Nested memberships keep one parent product row, so search and inventory stay unique. */
 export function assignedCategories(product: Product): NonNullable<Product["categories"]>[] {
