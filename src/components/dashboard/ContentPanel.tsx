@@ -49,7 +49,6 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
     title: "Livrare, TVA și plăți",
     note: "Aceste valori se folosesc la calculul comenzii.",
     fields: [
-      { name: "shipping_flat", label: "Cost livrare (RON)", kind: "number", hint: "Lasă gol dacă se stabilește manual." },
       { name: "free_shipping_over", label: "Livrare gratuită peste (RON)", kind: "number" },
       { name: "vat_rate", label: "Cotă TVA (%)", kind: "number", hint: "Lasă gol dacă prețurile includ deja TVA." },
       {

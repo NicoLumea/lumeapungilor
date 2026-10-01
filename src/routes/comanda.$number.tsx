@@ -134,7 +134,9 @@ function OrderConfirmation() {
             {order.billing_address || "Aceeași adresă ca livrarea"}
           </p>
           <p className="mt-4 text-sm">Metoda de livrare: de confirmat</p>
-          <p className="mt-1 text-sm">Metoda de plată: de confirmat</p>
+          <p className="mt-1 text-sm">
+            Metoda de plată: {order.payment_method === "cash" ? "Numerar" : "De confirmat"}
+          </p>
           <p className="mt-1 text-sm">Starea plății: {order.payment_status}</p>
           <p className="mt-1 text-sm">Starea comenzii: {order.status}</p>
         </section>

@@ -95,6 +95,7 @@ export async function renderOrderPdf(order: ConfirmationOrder): Promise<Uint8Arr
   line(`Numar comanda: ${order.order_number}`, { bold: true });
   line(`Data: ${new Date(order.created_at).toLocaleDateString("ro-RO")}`);
   line(`Stare comanda: ${order.status} | Stare plata: ${order.payment_status}`);
+  line(`Metoda de plata: ${order.payment_method === "cash" ? "Numerar" : "De confirmat"}`);
   line(deliveryEstimate(order.city));
 
   section("Vanzator");
@@ -116,10 +117,15 @@ export async function renderOrderPdf(order: ConfirmationOrder): Promise<Uint8Arr
   if (order.delivery_address) line(`Livrare: ${order.delivery_address}`);
   line([order.city, order.county, order.postal_code].filter(Boolean).join(", "));
   if (order.billing_address) line(`Facturare: ${order.billing_address}`);
-  line("Metoda de livrare si metoda de plata vor fi confirmate de echipa noastra.", {
-    size: 9,
-    color: MUTED,
-  });
+  line(
+    order.payment_method === "cash"
+      ? "Plata in numerar la livrare; metoda de livrare va fi confirmata de echipa noastra."
+      : "Metoda de livrare si metoda de plata vor fi confirmate de echipa noastra.",
+    {
+      size: 9,
+      color: MUTED,
+    },
+  );
 
   section("Produse");
   for (const item of order.order_items) {

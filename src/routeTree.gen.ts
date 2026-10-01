@@ -44,6 +44,7 @@ import { Route as N7q4V2m9ClientiRouteImport } from './routes/n7q4-v2m9.clienti'
 import { Route as N7q4V2m9ContentRouteImport } from './routes/n7q4-v2m9.content'
 import { Route as N7q4V2m9FeedbackRouteImport } from './routes/n7q4-v2m9.feedback'
 import { Route as N7q4V2m9GuideRouteImport } from './routes/n7q4-v2m9.guide'
+import { Route as N7q4V2m9LivrareRouteImport } from './routes/n7q4-v2m9.livrare'
 import { Route as N7q4V2m9MesajeRouteImport } from './routes/n7q4-v2m9.mesaje'
 import { Route as N7q4V2m9OrdersRouteImport } from './routes/n7q4-v2m9.orders'
 import { Route as N7q4V2m9ProductsRouteImport } from './routes/n7q4-v2m9.products'
@@ -55,8 +56,10 @@ import { Route as N7q4V2m9UtilizatoriRouteImport } from './routes/n7q4-v2m9.util
 import { Route as ProdusSlugRouteImport } from './routes/produs.$slug'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
 import { Route as StaffCategoriiRouteImport } from './routes/staff.categorii'
+import { Route as StaffClientiRouteImport } from './routes/staff.clienti'
 import { Route as StaffComenziRouteImport } from './routes/staff.comenzi'
 import { Route as StaffFeedbackRouteImport } from './routes/staff.feedback'
+import { Route as StaffLivrareRouteImport } from './routes/staff.livrare'
 import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
 import { Route as StaffProduseRouteImport } from './routes/staff.produse'
 import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
@@ -64,6 +67,8 @@ import { Route as StaffStocRouteImport } from './routes/staff.stoc'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiAuthLoginRouteImport } from './routes/api.auth.login'
 import { Route as ApiAuthPasswordResetRouteImport } from './routes/api.auth.password-reset'
+import { Route as N7q4V2m9OrdersOrderIdRouteImport } from './routes/n7q4-v2m9.orders.$orderId'
+import { Route as StaffComenziOrderIdRouteImport } from './routes/staff.comenzi.$orderId'
 import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -242,6 +247,11 @@ const N7q4V2m9GuideRoute = N7q4V2m9GuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => N7q4V2m9Route,
 } as any)
+const N7q4V2m9LivrareRoute = N7q4V2m9LivrareRouteImport.update({
+  id: '/livrare',
+  path: '/livrare',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
 const N7q4V2m9MesajeRoute = N7q4V2m9MesajeRouteImport.update({
   id: '/mesaje',
   path: '/mesaje',
@@ -297,6 +307,11 @@ const StaffCategoriiRoute = StaffCategoriiRouteImport.update({
   path: '/categorii',
   getParentRoute: () => StaffRoute,
 } as any)
+const StaffClientiRoute = StaffClientiRouteImport.update({
+  id: '/clienti',
+  path: '/clienti',
+  getParentRoute: () => StaffRoute,
+} as any)
 const StaffComenziRoute = StaffComenziRouteImport.update({
   id: '/comenzi',
   path: '/comenzi',
@@ -305,6 +320,11 @@ const StaffComenziRoute = StaffComenziRouteImport.update({
 const StaffFeedbackRoute = StaffFeedbackRouteImport.update({
   id: '/feedback',
   path: '/feedback',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffLivrareRoute = StaffLivrareRouteImport.update({
+  id: '/livrare',
+  path: '/livrare',
   getParentRoute: () => StaffRoute,
 } as any)
 const StaffMesajeRoute = StaffMesajeRouteImport.update({
@@ -341,6 +361,16 @@ const ApiAuthPasswordResetRoute = ApiAuthPasswordResetRouteImport.update({
   id: '/api/auth/password-reset',
   path: '/api/auth/password-reset',
   getParentRoute: () => rootRouteImport,
+} as any)
+const N7q4V2m9OrdersOrderIdRoute = N7q4V2m9OrdersOrderIdRouteImport.update({
+  id: '/$orderId',
+  path: '/$orderId',
+  getParentRoute: () => N7q4V2m9OrdersRoute,
+} as any)
+const StaffComenziOrderIdRoute = StaffComenziOrderIdRouteImport.update({
+  id: '/$orderId',
+  path: '/$orderId',
+  getParentRoute: () => StaffComenziRoute,
 } as any)
 const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
   id: '/api/public/img/$',
@@ -383,8 +413,9 @@ export interface FileRoutesByFullPath {
   '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
   '/n7q4-v2m9/feedback': typeof N7q4V2m9FeedbackRoute
   '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
+  '/n7q4-v2m9/livrare': typeof N7q4V2m9LivrareRoute
   '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
-  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
+  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRouteWithChildren
   '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
   '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
   '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
@@ -393,8 +424,10 @@ export interface FileRoutesByFullPath {
   '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
-  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/clienti': typeof StaffClientiRoute
+  '/staff/comenzi': typeof StaffComenziRouteWithChildren
   '/staff/feedback': typeof StaffFeedbackRoute
+  '/staff/livrare': typeof StaffLivrareRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
@@ -404,6 +437,8 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
+  '/n7q4-v2m9/orders/$orderId': typeof N7q4V2m9OrdersOrderIdRoute
+  '/staff/comenzi/$orderId': typeof StaffComenziOrderIdRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesByTo {
@@ -439,8 +474,9 @@ export interface FileRoutesByTo {
   '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
   '/n7q4-v2m9/feedback': typeof N7q4V2m9FeedbackRoute
   '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
+  '/n7q4-v2m9/livrare': typeof N7q4V2m9LivrareRoute
   '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
-  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
+  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRouteWithChildren
   '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
   '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
   '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
@@ -449,8 +485,10 @@ export interface FileRoutesByTo {
   '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
-  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/clienti': typeof StaffClientiRoute
+  '/staff/comenzi': typeof StaffComenziRouteWithChildren
   '/staff/feedback': typeof StaffFeedbackRoute
+  '/staff/livrare': typeof StaffLivrareRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
@@ -460,6 +498,8 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
+  '/n7q4-v2m9/orders/$orderId': typeof N7q4V2m9OrdersOrderIdRoute
+  '/staff/comenzi/$orderId': typeof StaffComenziOrderIdRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesById {
@@ -498,8 +538,9 @@ export interface FileRoutesById {
   '/n7q4-v2m9/content': typeof N7q4V2m9ContentRoute
   '/n7q4-v2m9/feedback': typeof N7q4V2m9FeedbackRoute
   '/n7q4-v2m9/guide': typeof N7q4V2m9GuideRoute
+  '/n7q4-v2m9/livrare': typeof N7q4V2m9LivrareRoute
   '/n7q4-v2m9/mesaje': typeof N7q4V2m9MesajeRoute
-  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRoute
+  '/n7q4-v2m9/orders': typeof N7q4V2m9OrdersRouteWithChildren
   '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
   '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
   '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
@@ -508,8 +549,10 @@ export interface FileRoutesById {
   '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
   '/produs/$slug': typeof ProdusSlugRoute
   '/staff/categorii': typeof StaffCategoriiRoute
-  '/staff/comenzi': typeof StaffComenziRoute
+  '/staff/clienti': typeof StaffClientiRoute
+  '/staff/comenzi': typeof StaffComenziRouteWithChildren
   '/staff/feedback': typeof StaffFeedbackRoute
+  '/staff/livrare': typeof StaffLivrareRoute
   '/staff/mesaje': typeof StaffMesajeRoute
   '/staff/produse': typeof StaffProduseRoute
   '/staff/retururi': typeof StaffRetururiRoute
@@ -519,6 +562,8 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
+  '/n7q4-v2m9/orders/$orderId': typeof N7q4V2m9OrdersOrderIdRoute
+  '/staff/comenzi/$orderId': typeof StaffComenziOrderIdRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRouteTypes {
@@ -558,6 +603,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/content'
     | '/n7q4-v2m9/feedback'
     | '/n7q4-v2m9/guide'
+    | '/n7q4-v2m9/livrare'
     | '/n7q4-v2m9/mesaje'
     | '/n7q4-v2m9/orders'
     | '/n7q4-v2m9/products'
@@ -568,8 +614,10 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/utilizatori'
     | '/produs/$slug'
     | '/staff/categorii'
+    | '/staff/clienti'
     | '/staff/comenzi'
     | '/staff/feedback'
+    | '/staff/livrare'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
@@ -579,6 +627,8 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/api/auth/login'
     | '/api/auth/password-reset'
+    | '/n7q4-v2m9/orders/$orderId'
+    | '/staff/comenzi/$orderId'
     | '/api/public/img/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -614,6 +664,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/content'
     | '/n7q4-v2m9/feedback'
     | '/n7q4-v2m9/guide'
+    | '/n7q4-v2m9/livrare'
     | '/n7q4-v2m9/mesaje'
     | '/n7q4-v2m9/orders'
     | '/n7q4-v2m9/products'
@@ -624,8 +675,10 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/utilizatori'
     | '/produs/$slug'
     | '/staff/categorii'
+    | '/staff/clienti'
     | '/staff/comenzi'
     | '/staff/feedback'
+    | '/staff/livrare'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
@@ -635,6 +688,8 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/api/auth/login'
     | '/api/auth/password-reset'
+    | '/n7q4-v2m9/orders/$orderId'
+    | '/staff/comenzi/$orderId'
     | '/api/public/img/$'
   id:
     | '__root__'
@@ -672,6 +727,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/content'
     | '/n7q4-v2m9/feedback'
     | '/n7q4-v2m9/guide'
+    | '/n7q4-v2m9/livrare'
     | '/n7q4-v2m9/mesaje'
     | '/n7q4-v2m9/orders'
     | '/n7q4-v2m9/products'
@@ -682,8 +738,10 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/utilizatori'
     | '/produs/$slug'
     | '/staff/categorii'
+    | '/staff/clienti'
     | '/staff/comenzi'
     | '/staff/feedback'
+    | '/staff/livrare'
     | '/staff/mesaje'
     | '/staff/produse'
     | '/staff/retururi'
@@ -693,6 +751,8 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/api/auth/login'
     | '/api/auth/password-reset'
+    | '/n7q4-v2m9/orders/$orderId'
+    | '/staff/comenzi/$orderId'
     | '/api/public/img/$'
   fileRoutesById: FileRoutesById
 }
@@ -979,6 +1039,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof N7q4V2m9GuideRouteImport
       parentRoute: typeof N7q4V2m9Route
     }
+    '/n7q4-v2m9/livrare': {
+      id: '/n7q4-v2m9/livrare'
+      path: '/livrare'
+      fullPath: '/n7q4-v2m9/livrare'
+      preLoaderRoute: typeof N7q4V2m9LivrareRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
     '/n7q4-v2m9/mesaje': {
       id: '/n7q4-v2m9/mesaje'
       path: '/mesaje'
@@ -1056,6 +1123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffCategoriiRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/staff/clienti': {
+      id: '/staff/clienti'
+      path: '/clienti'
+      fullPath: '/staff/clienti'
+      preLoaderRoute: typeof StaffClientiRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/staff/comenzi': {
       id: '/staff/comenzi'
       path: '/comenzi'
@@ -1068,6 +1142,13 @@ declare module '@tanstack/react-router' {
       path: '/feedback'
       fullPath: '/staff/feedback'
       preLoaderRoute: typeof StaffFeedbackRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/livrare': {
+      id: '/staff/livrare'
+      path: '/livrare'
+      fullPath: '/staff/livrare'
+      preLoaderRoute: typeof StaffLivrareRouteImport
       parentRoute: typeof StaffRoute
     }
     '/staff/mesaje': {
@@ -1119,6 +1200,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthPasswordResetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/n7q4-v2m9/orders/$orderId': {
+      id: '/n7q4-v2m9/orders/$orderId'
+      path: '/$orderId'
+      fullPath: '/n7q4-v2m9/orders/$orderId'
+      preLoaderRoute: typeof N7q4V2m9OrdersOrderIdRouteImport
+      parentRoute: typeof N7q4V2m9OrdersRoute
+    }
+    '/staff/comenzi/$orderId': {
+      id: '/staff/comenzi/$orderId'
+      path: '/$orderId'
+      fullPath: '/staff/comenzi/$orderId'
+      preLoaderRoute: typeof StaffComenziOrderIdRouteImport
+      parentRoute: typeof StaffComenziRoute
+    }
     '/api/public/img/$': {
       id: '/api/public/img/$'
       path: '/api/public/img/$'
@@ -1129,6 +1224,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface N7q4V2m9OrdersRouteChildren {
+  N7q4V2m9OrdersOrderIdRoute: typeof N7q4V2m9OrdersOrderIdRoute
+}
+
+const N7q4V2m9OrdersRouteChildren: N7q4V2m9OrdersRouteChildren = {
+  N7q4V2m9OrdersOrderIdRoute: N7q4V2m9OrdersOrderIdRoute,
+}
+
+const N7q4V2m9OrdersRouteWithChildren = N7q4V2m9OrdersRoute._addFileChildren(
+  N7q4V2m9OrdersRouteChildren,
+)
+
 interface N7q4V2m9RouteChildren {
   N7q4V2m9AuditRoute: typeof N7q4V2m9AuditRoute
   N7q4V2m9CategoriesRoute: typeof N7q4V2m9CategoriesRoute
@@ -1136,8 +1243,9 @@ interface N7q4V2m9RouteChildren {
   N7q4V2m9ContentRoute: typeof N7q4V2m9ContentRoute
   N7q4V2m9FeedbackRoute: typeof N7q4V2m9FeedbackRoute
   N7q4V2m9GuideRoute: typeof N7q4V2m9GuideRoute
+  N7q4V2m9LivrareRoute: typeof N7q4V2m9LivrareRoute
   N7q4V2m9MesajeRoute: typeof N7q4V2m9MesajeRoute
-  N7q4V2m9OrdersRoute: typeof N7q4V2m9OrdersRoute
+  N7q4V2m9OrdersRoute: typeof N7q4V2m9OrdersRouteWithChildren
   N7q4V2m9ProductsRoute: typeof N7q4V2m9ProductsRoute
   N7q4V2m9RetururiRoute: typeof N7q4V2m9RetururiRoute
   N7q4V2m9RoluriRoute: typeof N7q4V2m9RoluriRoute
@@ -1154,8 +1262,9 @@ const N7q4V2m9RouteChildren: N7q4V2m9RouteChildren = {
   N7q4V2m9ContentRoute: N7q4V2m9ContentRoute,
   N7q4V2m9FeedbackRoute: N7q4V2m9FeedbackRoute,
   N7q4V2m9GuideRoute: N7q4V2m9GuideRoute,
+  N7q4V2m9LivrareRoute: N7q4V2m9LivrareRoute,
   N7q4V2m9MesajeRoute: N7q4V2m9MesajeRoute,
-  N7q4V2m9OrdersRoute: N7q4V2m9OrdersRoute,
+  N7q4V2m9OrdersRoute: N7q4V2m9OrdersRouteWithChildren,
   N7q4V2m9ProductsRoute: N7q4V2m9ProductsRoute,
   N7q4V2m9RetururiRoute: N7q4V2m9RetururiRoute,
   N7q4V2m9RoluriRoute: N7q4V2m9RoluriRoute,
@@ -1169,10 +1278,24 @@ const N7q4V2m9RouteWithChildren = N7q4V2m9Route._addFileChildren(
   N7q4V2m9RouteChildren,
 )
 
+interface StaffComenziRouteChildren {
+  StaffComenziOrderIdRoute: typeof StaffComenziOrderIdRoute
+}
+
+const StaffComenziRouteChildren: StaffComenziRouteChildren = {
+  StaffComenziOrderIdRoute: StaffComenziOrderIdRoute,
+}
+
+const StaffComenziRouteWithChildren = StaffComenziRoute._addFileChildren(
+  StaffComenziRouteChildren,
+)
+
 interface StaffRouteChildren {
   StaffCategoriiRoute: typeof StaffCategoriiRoute
-  StaffComenziRoute: typeof StaffComenziRoute
+  StaffClientiRoute: typeof StaffClientiRoute
+  StaffComenziRoute: typeof StaffComenziRouteWithChildren
   StaffFeedbackRoute: typeof StaffFeedbackRoute
+  StaffLivrareRoute: typeof StaffLivrareRoute
   StaffMesajeRoute: typeof StaffMesajeRoute
   StaffProduseRoute: typeof StaffProduseRoute
   StaffRetururiRoute: typeof StaffRetururiRoute
@@ -1182,8 +1305,10 @@ interface StaffRouteChildren {
 
 const StaffRouteChildren: StaffRouteChildren = {
   StaffCategoriiRoute: StaffCategoriiRoute,
-  StaffComenziRoute: StaffComenziRoute,
+  StaffClientiRoute: StaffClientiRoute,
+  StaffComenziRoute: StaffComenziRouteWithChildren,
   StaffFeedbackRoute: StaffFeedbackRoute,
+  StaffLivrareRoute: StaffLivrareRoute,
   StaffMesajeRoute: StaffMesajeRoute,
   StaffProduseRoute: StaffProduseRoute,
   StaffRetururiRoute: StaffRetururiRoute,

@@ -28,6 +28,7 @@ const NAV = [
   { to: "/n7q4-v2m9/orders", label: "Comenzi", exact: false },
   { to: "/n7q4-v2m9/utilizatori", label: "Utilizatori și interes", exact: false },
   { to: "/n7q4-v2m9/clienti", label: "Clienți", exact: false },
+  { to: "/n7q4-v2m9/livrare", label: "Livrare", exact: false },
   { to: "/n7q4-v2m9/roluri", label: "Angajați și accese", exact: false },
   { to: "/n7q4-v2m9/retururi", label: "Retururi", exact: false },
   { to: "/n7q4-v2m9/stoc", label: "Cereri revenire stoc", exact: false },

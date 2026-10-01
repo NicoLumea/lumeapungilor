@@ -28,6 +28,7 @@ export type ConfirmationOrder = {
   postal_code: string | null;
   status: string;
   payment_status: string;
+  payment_method: string;
   subtotal: number;
   shipping_total: number;
   tax_total: number;
@@ -49,7 +50,7 @@ export async function readAuthorizedOrder(
   const { data: order, error } = await supabaseAdmin
     .from("orders")
     .select(
-      "id,user_id,order_number,created_at,contact_name,email,phone,company_name,cui,reg_com,billing_address,delivery_address,city,county,postal_code,status,payment_status,subtotal,shipping_total,tax_total,total,currency,order_items(id,product_name,variant_name,sku,product_image_url,quantity,unit_price,line_total)",
+      "id,user_id,order_number,created_at,contact_name,email,phone,company_name,cui,reg_com,billing_address,delivery_address,city,county,postal_code,status,payment_status,payment_method,subtotal,shipping_total,tax_total,total,currency,order_items(id,product_name,variant_name,sku,product_image_url,quantity,unit_price,line_total)",
     )
     .eq("order_number", number)
     .maybeSingle();

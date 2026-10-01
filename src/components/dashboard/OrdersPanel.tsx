@@ -1,152 +1,231 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdminOrders } from "@/lib/admin-data";
 import { formatRon } from "@/lib/format";
 
-const STATUSES = ["nou", "confirmat", "in_livrare", "finalizat", "anulat"] as const;
-const STATUS_LABEL: Record<string, string> = {
-  nou: "Nou",
-  confirmat: "Confirmat",
-  in_livrare: "În livrare",
-  finalizat: "Finalizat",
-  anulat: "Anulat",
-};
+const PAGE_SIZE = 25;
+const statuses = ["nou", "confirmat", "in_livrare", "finalizat", "anulat"];
+const payments = ["in_asteptare", "platit", "rambursat", "anulat", "neplatit"];
 
-export function OrdersPanel() {
-  const qc = useQueryClient();
-  const { data: orders, isLoading } = useAdminOrders();
-  const [open, setOpen] = useState<string | null>(null);
-
-  async function setStatus(id: string, status: string) {
-    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Status actualizat.");
-    qc.invalidateQueries({ queryKey: ["admin", "orders"] });
-  }
-
-  async function saveNote(id: string, internal_notes: string) {
-    const { error } = await supabase.from("orders").update({ internal_notes }).eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Notiță salvată.");
-    qc.invalidateQueries({ queryKey: ["admin", "orders"] });
-  }
-
+export function OrdersPanel({ base }: { base: "/staff/comenzi" | "/n7q4-v2m9/orders" }) {
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [payment, setPayment] = useState("");
+  const [method, setMethod] = useState("");
+  const [customerType, setCustomerType] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [page, setPage] = useState(0);
+  const orders = useQuery({
+    queryKey: ["staff", "orders", search, status, payment, method, customerType, from, to, page],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("staff_order_catalog", {
+        p_search: search || null,
+        p_status: status || null,
+        p_payment_status: payment || null,
+        p_payment_method: method || null,
+        p_customer_type: customerType || null,
+        p_from: from || null,
+        p_to: to || null,
+        p_limit: PAGE_SIZE + 1,
+        p_offset: page * PAGE_SIZE,
+      });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const rows = orders.data?.slice(0, PAGE_SIZE) ?? [];
+  const resetPage = () => setPage(0);
   return (
     <div className="mx-auto max-w-[1200px]">
       <h1 className="display text-3xl">Comenzi</h1>
-
-      {isLoading ? (
-        <p className="py-16 text-sm text-muted-foreground">Se încarcă…</p>
-      ) : (orders ?? []).length === 0 ? (
-        <p className="py-16 text-sm text-muted-foreground">Nu există comenzi încă.</p>
-      ) : (
-        <ul className="mt-10 divide-y divide-border border-y border-border">
-          {(orders ?? []).map((o) => (
-            <li key={o.id} className="py-5">
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex-1">
-                  <p className="text-sm">
-                    {o.order_number} · {o.contact_name}
+      <p className="mt-3 text-sm text-muted-foreground">
+        Comenzi înregistrate, inclusiv cele fără cont.
+      </p>
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="text-sm lg:col-span-2">
+          Caută
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              resetPage();
+            }}
+            placeholder="Număr, client, e-mail, firmă, produs sau ID"
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          />
+        </label>
+        <label className="text-sm">
+          Status comandă
+          <select
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              resetPage();
+            }}
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          >
+            <option value="">Toate</option>
+            {statuses.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm">
+          Status plată
+          <select
+            value={payment}
+            onChange={(e) => {
+              setPayment(e.target.value);
+              resetPage();
+            }}
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          >
+            <option value="">Toate</option>
+            {payments.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm">
+          Metodă plată
+          <select
+            value={method}
+            onChange={(e) => {
+              setMethod(e.target.value);
+              resetPage();
+            }}
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          >
+            <option value="">Toate</option>
+            <option value="cash">Numerar</option>
+            <option value="de_confirmat">De confirmat</option>
+          </select>
+        </label>
+        <label className="text-sm">
+          Tip client
+          <select
+            value={customerType}
+            onChange={(e) => {
+              setCustomerType(e.target.value);
+              resetPage();
+            }}
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          >
+            <option value="">Toate</option>
+            <option value="registered">Înregistrat</option>
+            <option value="guest">Fără cont</option>
+          </select>
+        </label>
+        <label className="text-sm">
+          De la
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => {
+              setFrom(e.target.value);
+              resetPage();
+            }}
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          />
+        </label>
+        <label className="text-sm">
+          Până la
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => {
+              setTo(e.target.value);
+              resetPage();
+            }}
+            className="mt-1 w-full border border-input bg-background px-3 py-2"
+          />
+        </label>
+      </div>
+      {orders.isLoading ? <p className="mt-8 text-sm">Se încarcă…</p> : null}
+      {orders.error ? (
+        <p className="mt-8 text-sm text-destructive">Comenzile nu au putut fi încărcate.</p>
+      ) : null}
+      <div className="mt-6 overflow-x-auto border border-border">
+        <table className="w-full min-w-[760px] text-left text-sm">
+          <thead className="border-b border-border bg-field text-muted-foreground">
+            <tr>
+              <th className="p-3 font-normal">Comandă / dată</th>
+              <th className="p-3 font-normal">Client</th>
+              <th className="p-3 font-normal">Plată</th>
+              <th className="p-3 font-normal">Status</th>
+              <th className="p-3 font-normal">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((o) => (
+              <tr key={o.id} className="border-b border-border/60 align-top">
+                <td className="p-3">
+                  <Link
+                    to={
+                      base === "/staff/comenzi"
+                        ? "/staff/comenzi/$orderId"
+                        : "/n7q4-v2m9/orders/$orderId"
+                    }
+                    params={{ orderId: o.id }}
+                    className="underline underline-offset-4"
+                  >
+                    {o.order_number}
+                  </Link>
+                  <br />
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(o.created_at).toLocaleString("ro-RO")}
+                  </span>
+                </td>
+                <td className="p-3">
+                  {o.contact_name}
+                  <br />
+                  {o.email}
+                  <br />
+                  <span className="text-xs text-muted-foreground">
+                    {o.user_id ? "Înregistrat" : "Fără cont"}
                     {o.company_name ? ` · ${o.company_name}` : ""}
-                    {o.is_test ? " · TEST" : ""}
-                  </p>
-                  <p className="micro-sm text-muted-foreground">
-                    {new Date(o.created_at).toLocaleString("ro-RO")} · {o.email}
-                    {o.phone ? ` · ${o.phone}` : ""}
-                  </p>
-                </div>
-                <p className="text-sm">{formatRon(Number(o.total))}</p>
-                <select
-                  value={o.status}
-                  onChange={(e) => setStatus(o.id, e.target.value)}
-                  aria-label="Status comandă"
-                  className="border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-                >
-                  {STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {STATUS_LABEL[s]}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="micro-sm link-underline"
-                  onClick={() => setOpen(open === o.id ? null : o.id)}
-                >
-                  {open === o.id ? "Ascunde" : "Detalii"}
-                </button>
-              </div>
-
-              {open === o.id ? (
-                <div className="mt-5 grid gap-6 border-t border-border pt-5 md:grid-cols-2">
-                  <div>
-                    <p className="micro-sm text-muted-foreground">Produse</p>
-                    <ul className="mt-3 space-y-2 text-sm">
-                      {(o.order_items ?? []).map(
-                        (it: {
-                          id: string;
-                          product_name: string;
-                          variant_name: string | null;
-                          quantity: number;
-                          selling_unit: string | null;
-                          line_total: number;
-                        }) => (
-
-                          <li key={it.id} className="flex justify-between gap-4">
-                            <span>
-                              {it.product_name}
-                              {it.variant_name ? ` — ${it.variant_name}` : ""} × {it.quantity}{" "}
-                              {it.selling_unit}
-                            </span>
-                            <span>{formatRon(Number(it.line_total))}</span>
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                  </div>
-                  <div className="space-y-3 text-sm">
-                    <p className="micro-sm text-muted-foreground">Date client</p>
-                    <p className="whitespace-pre-line text-muted-foreground">
-                      {[
-                        o.company_name,
-                        o.cui ? `CUI ${o.cui}` : null,
-                        o.reg_com,
-                        o.billing_address,
-                        o.delivery_address,
-                        [o.city, o.county, o.postal_code].filter(Boolean).join(", "),
-                        o.notes ? `Observații: ${o.notes}` : null,
-                      ]
-                        .filter(Boolean)
-                        .join("\n") || "Fără detalii suplimentare."}
-                    </p>
-                    <label className="block">
-                      <span className="micro-sm text-muted-foreground">Notiță internă</span>
-                      <textarea
-                        rows={3}
-                        defaultValue={o.internal_notes ?? ""}
-                        onBlur={(e) => {
-                          if (e.target.value !== (o.internal_notes ?? "")) {
-                            saveNote(o.id, e.target.value);
-                          }
-                        }}
-                        className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-                      />
-                    </label>
-                  </div>
-                </div>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      )}
+                  </span>
+                </td>
+                <td className="p-3">
+                  {o.payment_method === "cash" ? "Numerar" : "De confirmat"}
+                  <br />
+                  {o.payment_status}
+                </td>
+                <td className="p-3">{o.status}</td>
+                <td className="p-3">{formatRon(o.total)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {!orders.isLoading && rows.length === 0 ? (
+        <p className="mt-5 text-sm">Nu există comenzi pentru filtrele alese.</p>
+      ) : null}
+      <div className="mt-5 flex gap-3">
+        <button
+          type="button"
+          disabled={page === 0}
+          onClick={() => setPage(page - 1)}
+          className="border border-border px-4 py-2 disabled:opacity-40"
+        >
+          Anterior
+        </button>
+        <span className="py-2 text-sm">Pagina {page + 1}</span>
+        <button
+          type="button"
+          disabled={(orders.data?.length ?? 0) <= PAGE_SIZE}
+          onClick={() => setPage(page + 1)}
+          className="border border-border px-4 py-2 disabled:opacity-40"
+        >
+          Următor
+        </button>
+      </div>
     </div>
   );
 }

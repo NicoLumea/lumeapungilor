@@ -140,7 +140,11 @@ export function ProductsPanel() {
     if (imageIds.length !== images.length) return;
     const primaryId = images.find((image) => image.isPrimary)?.id ?? imageIds[0];
     if (!primaryId) return;
-    const { error } = await (supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }> }).rpc("update_product_image_gallery", {
+    const { error } = await (
+      supabase as unknown as {
+        rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }>;
+      }
+    ).rpc("update_product_image_gallery", {
       p_product_id: productId,
       p_image_ids: imageIds,
       p_primary_image_id: primaryId,
@@ -301,20 +305,39 @@ export function ProductsPanel() {
       }
       if (savedImages.length > 0) await persistGallery(productId, savedImages);
 
-      await supabase.from("product_variants").delete().eq("product_id", productId);
       const variants = draft.variants.filter((v) => v.name.trim());
-      if (variants.length > 0) {
-        const { error } = await supabase.from("product_variants").insert(
-          variants.map((v, i) => ({
-            product_id: productId,
-            name: v.name.trim(),
-            sku: v.sku.trim() || null,
-            price: v.price.trim() === "" ? null : Number(v.price.replace(",", ".")),
-            stock: v.stock,
-            sort_order: i,
-          })),
-        );
+      const { data: currentVariants, error: variantsReadError } = await supabase
+        .from("product_variants")
+        .select("id")
+        .eq("product_id", productId);
+      if (variantsReadError) throw variantsReadError;
+      const keptIds = new Set(variants.flatMap((v) => (v.id ? [v.id] : [])));
+      const removedIds = (currentVariants ?? []).map((v) => v.id).filter((id) => !keptIds.has(id));
+      if (removedIds.length > 0) {
+        const { error } = await supabase.from("product_variants").delete().in("id", removedIds);
         if (error) throw error;
+      }
+      for (const [i, variant] of variants.entries()) {
+        const payload = {
+          name: variant.name.trim(),
+          sku: variant.sku.trim() || null,
+          price: variant.price.trim() === "" ? null : Number(variant.price.replace(",", ".")),
+          stock: variant.stock,
+          sort_order: i,
+        };
+        if (variant.id) {
+          const { error } = await supabase
+            .from("product_variants")
+            .update(payload)
+            .eq("id", variant.id)
+            .eq("product_id", productId);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from("product_variants")
+            .insert({ ...payload, product_id: productId });
+          if (error) throw error;
+        }
       }
 
       toast.success("Produs salvat.");

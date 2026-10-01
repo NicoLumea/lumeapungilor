@@ -300,8 +300,8 @@ function CheckoutPage() {
       ) : null}
 
       <p className="mt-6 border border-border bg-field p-4 text-sm">
-        Comanda este trimisă spre confirmare. Echipa Lumea Pungilor te va contacta pentru
-        confirmarea disponibilității, livrării și modalității de plată.
+        Plata se face în numerar la livrare. Comanda este înregistrată cu plata în așteptare; echipa
+        te va contacta pentru detaliile livrării.
       </p>
 
       <ConfirmedMethods />
@@ -504,6 +504,9 @@ function CheckoutPage() {
               <dd>{formatRon(total)}</dd>
             </div>
           </dl>
+          <p className="mt-5 text-sm">
+            Metoda de plată: <strong>Numerar la livrare</strong>
+          </p>
 
           <label className="mt-6 flex items-start gap-3 text-sm">
             <input
@@ -551,10 +554,10 @@ function CheckoutPage() {
 
           <button
             type="submit"
-            disabled={busy || overGuestLimit}
+            disabled={busy || overGuestLimit || !shippingConfigured}
             className="micro mt-6 w-full border border-foreground bg-foreground px-8 py-4 text-background transition-opacity hover:opacity-85 disabled:opacity-40"
           >
-            {busy ? "Se trimite…" : "Trimite cererea de comandă"}
+            {busy ? "Se trimite…" : "Confirmă comanda cu plata în numerar"}
           </button>
           <div className="mt-6 border-t border-border pt-5">
             <p className="micro-sm mb-3 text-muted-foreground">Datele vânzătorului</p>
@@ -593,12 +596,10 @@ function MethodList({
 
 /** Shows only the payment and delivery methods an administrator has confirmed. */
 function ConfirmedMethods() {
-  const { data: payments } = useEnabledMethods("payment_methods");
   const { data: deliveries } = useEnabledMethods("delivery_methods");
-  if (payments.length === 0 && deliveries.length === 0) return null;
+  if (deliveries.length === 0) return null;
   return (
-    <div className="mt-4 grid gap-6 border border-border p-4 sm:grid-cols-2">
-      <MethodList title="Modalități de plată" items={payments} />
+    <div className="mt-4 border border-border p-4">
       <MethodList title="Modalități de livrare" items={deliveries} />
     </div>
   );

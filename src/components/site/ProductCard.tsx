@@ -2,15 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
-import { primaryImage, sortedImages, type Product } from "@/lib/shop-types";
+import { primaryImage, productAvailableStock, sortedImages, type Product } from "@/lib/shop-types";
 import { cn } from "@/lib/utils";
 
 type StockState = "available" | "low" | "unavailable";
 
 function stockState(product: Product): StockState {
   if (!product.track_stock) return "available";
-  if (product.stock <= 0) return "unavailable";
-  return product.stock <= 5 ? "low" : "available";
+  const stock = productAvailableStock(product);
+  if (stock <= 0) return "unavailable";
+  return stock <= 5 ? "low" : "available";
 }
 
 function cataloguePrice(value: number): string {

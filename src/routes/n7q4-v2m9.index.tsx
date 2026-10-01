@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAdminProducts, useAdminOrders } from "@/lib/admin-data";
+import { useAdminProducts, useNewOrderCount } from "@/lib/admin-data";
 import { useCategories } from "@/lib/content";
 
 export const Route = createFileRoute("/n7q4-v2m9/")({
@@ -17,14 +17,13 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 
 function AdminHome() {
   const { data: products } = useAdminProducts();
-  const { data: orders } = useAdminOrders();
+  const { data: newOrders = 0 } = useNewOrderCount();
   const { data: categories } = useCategories(true);
 
   const published = (products ?? []).filter(
     (p) => p.status === "published" && !p.is_archived,
   ).length;
   const drafts = (products ?? []).filter((p) => p.status === "draft").length;
-  const newOrders = (orders ?? []).filter((o) => o.status === "nou").length;
 
   return (
     <div className="mx-auto max-w-[1200px]">

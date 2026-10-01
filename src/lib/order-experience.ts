@@ -31,8 +31,7 @@ export function repeatPurchaseLine(
   const variant = variantId ? variants.find((item) => item.id === variantId) : null;
   if ((variantId && !variant) || (!variantId && variants.length > 0)) return null;
   const qty = normalizeQty(product, 1);
-  const variantsStocked = variants.some((item) => item.stock > 0);
-  const stock = variant && variantsStocked ? variant.stock : product.stock;
+  const stock = variant && product.variant_stock_tracked ? variant.stock : product.stock;
   if (product.track_stock && stock < qty) return null;
   return { productId: product.id, variantId, qty };
 }

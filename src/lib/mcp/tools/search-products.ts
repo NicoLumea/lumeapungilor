@@ -12,10 +12,13 @@ export default defineTool({
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ query, limit }, ctx) => {
-    if (!ctx.isAuthenticated()) return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
+    if (!ctx.isAuthenticated())
+      return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     let q = supabaseForUser(ctx)
       .from("products")
-      .select("name, slug, price, currency, selling_unit, stock, sku")
+      .select(
+        "name, slug, price, currency, selling_unit, stock, sku, variant_stock_tracked, product_variants(stock)",
+      )
       .eq("status", "published")
       .eq("is_archived", false)
       .order("sort_order")
@@ -24,9 +27,19 @@ export default defineTool({
     const { data, error } = await q;
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     const products = (data ?? []).map((p) => ({
-      name: p.name, slug: p.slug, price: p.price, currency: p.currency,
-      unit: p.selling_unit, stock: p.stock, sku: p.sku,
+      name: p.name,
+      slug: p.slug,
+      price: p.price,
+      currency: p.currency,
+      unit: p.selling_unit,
+      stock: p.variant_stock_tracked
+        ? p.product_variants.reduce((sum, variant) => sum + variant.stock, 0)
+        : p.stock,
+      sku: p.sku,
     }));
-    return { content: [{ type: "text", text: JSON.stringify(products) }], structuredContent: { products } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(products) }],
+      structuredContent: { products },
+    };
   },
 });

@@ -21,6 +21,7 @@ test("order confirmation is a readable, non-invoice PDF with the recorded totals
     postal_code: "010101",
     status: "nou",
     payment_status: "neplatit",
+    payment_method: "cash",
     subtotal: 100,
     shipping_total: 10,
     tax_total: 19,

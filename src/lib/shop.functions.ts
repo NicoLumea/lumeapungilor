@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { calculateOrderTotals } from "@/lib/order-totals";
 
 const lineSchema = z.object({
   productId: z.string().uuid(),
@@ -221,10 +222,8 @@ export const placeOrder = createServerFn({ method: "POST" })
         };
       }
 
-      // Variants only carry their own inventory when at least one of them is stocked;
-      // otherwise they are plain options and the product stock applies.
-      const variantsStocked = variants.some((v) => v.stock > 0);
-      const stock = variant && variantsStocked ? variant.stock : product.stock;
+      // The database keeps this source stable even after the last variant sells out.
+      const stock = variant && product.variant_stock_tracked ? variant.stock : product.stock;
       if (product.track_stock && line.qty > stock) {
         return { ok: false, error: `Stoc insuficient pentru „${product.name}”.` };
       }
@@ -265,11 +264,14 @@ export const placeOrder = createServerFn({ method: "POST" })
     const flat = toNum(settings["shipping_flat"]);
     const freeOver = toNum(settings["free_shipping_over"]);
     const vatRate = toNum(settings["vat_rate"]);
-    const paymentsConfigured = settings["payments_configured"] === true;
 
-    const shipping = flat === null ? 0 : freeOver !== null && subtotal >= freeOver ? 0 : flat;
-    const tax = vatRate === null ? 0 : Math.round(subtotal * (vatRate / 100) * 100) / 100;
-    const total = Math.round((subtotal + shipping + tax) * 100) / 100;
+    if (flat === null || flat < 0) {
+      return {
+        ok: false,
+        error: "Costul de livrare nu este configurat. Te rugăm să revii mai târziu.",
+      };
+    }
+    const { shipping, tax, total } = calculateOrderTotals(subtotal, flat, freeOver, vatRate);
 
     if (data.expectedTotal !== undefined && Math.abs(data.expectedTotal - total) > 0.01) {
       return {
@@ -301,9 +303,10 @@ export const placeOrder = createServerFn({ method: "POST" })
         shipping_total: shipping,
         tax_total: tax,
         total,
-        is_test: !paymentsConfigured,
+        is_test: false,
         status: "nou",
-        payment_status: paymentsConfigured ? "in_asteptare" : "neplatit",
+        payment_status: "in_asteptare",
+        payment_method: "cash",
       },
       p_items: items,
     });

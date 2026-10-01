@@ -55,6 +55,7 @@ test("repeat purchases use current minimum, stock and active variant state", () 
     repeatPurchaseLine(
       {
         ...product,
+        variant_stock_tracked: true,
         product_variants: [
           {
             id: "v1",
@@ -63,6 +64,27 @@ test("repeat purchases use current minimum, stock and active variant state", () 
             sku: null,
             price: 14,
             stock: 1,
+            sort_order: 0,
+          },
+        ],
+      },
+      "v1",
+    ),
+    null,
+  );
+  assert.equal(
+    repeatPurchaseLine(
+      {
+        ...product,
+        variant_stock_tracked: true,
+        product_variants: [
+          {
+            id: "v1",
+            product_id: "p1",
+            name: "Mic",
+            sku: null,
+            price: 14,
+            stock: 0,
             sort_order: 0,
           },
         ],

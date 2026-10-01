@@ -18,16 +18,16 @@ export function useAdminProducts() {
   });
 }
 
-export function useAdminOrders() {
+export function useNewOrderCount() {
   return useQuery({
-    queryKey: ["admin", "orders"],
+    queryKey: ["admin", "new-order-count"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from("orders")
-        .select("*, order_items(*)")
-        .order("created_at", { ascending: false });
+        .select("id", { count: "exact", head: true })
+        .eq("status", "nou");
       if (error) throw error;
-      return data ?? [];
+      return count ?? 0;
     },
   });
 }
