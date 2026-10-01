@@ -1,224 +1,286 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight, MapPin } from "lucide-react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { companyInfo, telephoneHref } from "@/lib/company";
-import { useContent } from "@/lib/content";
+import { telephoneHref } from "@/lib/company";
 
-const faqItems = [
+type AboutCategory = {
+  title: string;
+  description: string;
+  slug?: string;
+};
+
+const categories: AboutCategory[] = [
   {
-    question: "Ce este Lumea Pungilor?",
-    answer:
-      "Lumea Pungilor este un magazin online operat de S.C. ZEBE MARKET S.R.L., specializat în produse precum pungi, fețe de masă și folie cu bule.",
+    title: "Pungi plastic",
+    description:
+      "Pungi cu imprimeu și pungi simple, în mai multe dimensiuni, pentru magazine și standuri comerciale.",
+    slug: "pungi-plastic",
   },
   {
-    question: "Ce tipuri de produse sunt disponibile?",
-    answer:
-      "Catalogul este organizat în jurul categoriilor pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule. Produsele disponibile și situația stocului pot fi consultate în catalog.",
+    title: "Pungi curierat",
+    description:
+      "Pungi și plicuri autoadezive pentru expedieri, de la 16 × 24 cm până la 80 × 100 cm.",
   },
   {
-    question: "Cui i se adresează magazinul?",
-    answer:
-      "Magazinul se adresează magazinelor, revânzătorilor, restaurantelor, firmelor de catering, organizatorilor de evenimente, atelierelor, magazinelor online și altor clienți care utilizează produse pentru ambalare, servire sau protecție.",
+    title: "Punguțe mici",
+    description: "Pungi pentru produse mărunte, bijuterii și accesorii.",
   },
   {
-    question: "Produsele se comercializează individual?",
-    answer:
-      "Produsele sunt comercializate în seturi. Cantitatea de bucăți inclusă într-un set este afișată în pagina fiecărui produs.",
+    title: "Fețe de masă",
+    description: "Fețe de masă și mușama la rolă pentru restaurante, catering și evenimente.",
+    slug: "fete-de-masa",
   },
   {
-    question: "Se poate comanda fără cont?",
-    answer:
-      "Da. Website-ul permite plasarea unei comenzi ca vizitator, în limitele și condițiile afișate în procesul de comandă.",
-  },
-  {
-    question: "Unde pot vedea produsele disponibile?",
-    answer:
-      "Produsele pot fi consultate în catalogul Lumea Pungilor și în paginile dedicate fiecărei categorii.",
-  },
-  {
-    question: "Cum pot contacta Lumea Pungilor?",
-    answer:
-      "Lumea Pungilor poate fi contactat la numerele 0765 514 422 și 0371 900 033, de luni până vineri, între orele 09:00 și 17:00.",
+    title: "Folie cu bule",
+    description: "Folie pentru protejarea produselor fragile la depozitare și transport.",
+    slug: "folie-cu-bule",
   },
 ];
+
+const phones = ["0765 514 422", "0371 900 033"];
 
 export const Route = createFileRoute("/despre")({
   head: () => ({
     meta: [
-      { title: "Despre Lumea Pungilor — Pungi, fețe de masă și folie cu bule" },
+      { title: "Despre Lumea Pungilor" },
       {
         name: "description",
         content:
-          "Descoperă Lumea Pungilor, furnizor de pungi, fețe de masă și folie cu bule pentru magazine, revânzători și alte activități profesionale din România.",
+          "Descoperă produsele Lumea Pungilor, punctul de lucru din Dragonul Roșu și informațiile pentru comenzi și livrare în România.",
       },
-      { property: "og:title", content: "Despre Lumea Pungilor — Pungi, fețe de masă și folie cu bule" },
+      { property: "og:title", content: "Despre Lumea Pungilor" },
       {
         property: "og:description",
         content:
-          "Descoperă Lumea Pungilor, furnizor de pungi, fețe de masă și folie cu bule pentru magazine, revânzători și alte activități profesionale din România.",
+          "Pungi, fețe de masă, mușama și folie cu bule. Ne găsiți în Dragonul Roșu 7, la standurile 388–442.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://lumeapungilor.lovable.app/despre" },
       { name: "twitter:card", content: "summary" },
-    ],
-    links: [{ rel: "canonical", href: "https://lumeapungilor.lovable.app/despre" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: faqItems.map((item) => ({
-            "@type": "Question",
-            name: item.question,
-            acceptedAnswer: { "@type": "Answer", text: item.answer },
-          })),
-        }),
-      },
     ],
   }),
   component: AboutPage,
 });
 
-function AboutPage() {
-  const { data } = useContent();
-  const company = companyInfo(data);
-
+function AboutSection({
+  title,
+  children,
+  className = "",
+}: {
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <article className="site-container max-w-[1000px] py-14 md:py-20">
-      <header className="max-w-[900px]">
-        <h1 className="display text-4xl leading-tight md:text-5xl">
-          Lumea Pungilor, partener pentru aprovizionarea cu pungi și fețe de masă
-        </h1>
-        <div className="mt-8 space-y-5 text-base leading-relaxed text-foreground/85">
-          <p>
-            Lumea Pungilor este un furnizor de produse practice pentru ambalare, transport, servire și protejarea mărfurilor. Oferta noastră se adresează magazinelor, revânzătorilor, restaurantelor, atelierelor, organizatorilor de evenimente și altor activități care utilizează în mod constant astfel de consumabile.
-          </p>
-          <p>
-            Prin intermediul magazinului online, clienții pot consulta într-un singur loc diferite modele de pungi, fețe de masă și folie cu bule. Informațiile despre dimensiuni, cantitatea inclusă într-un set, variante și disponibilitate sunt prezentate în paginile produselor, astfel încât alegerea să fie cât mai clară.
-          </p>
-          <p>Obiectivul Lumea Pungilor este să simplifice identificarea și comandarea produselor necesare activităților comerciale de zi cu zi.</p>
-        </div>
+    <section className={`border-t border-border pt-9 md:pt-11 ${className}`}>
+      <h2 className="display text-2xl leading-tight sm:text-3xl">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function AboutPage() {
+  return (
+    <article className="site-container max-w-[1120px] py-10 sm:py-14 md:py-16">
+      <header className="max-w-4xl">
+        <p className="micro-sm text-brand">Despre noi</p>
+        <h1 className="display mt-4 text-4xl leading-tight sm:text-5xl">Despre Lumea Pungilor</h1>
+        <p className="mt-5 max-w-3xl text-base leading-relaxed text-foreground/85 sm:text-lg">
+          Lumea Pungilor este furnizor de produse pentru ambalare, transport și servire: pungi,
+          pungi de curierat, fețe de masă, mușama la rolă și folie cu bule.
+        </p>
       </header>
 
-      <AboutSection title="Produse pentru ambalare, servire și protecție">
-        <p>
-          Produsele pentru ambalare și servire sunt consumabile folosite în numeroase domenii. Magazinele au nevoie de pungi pentru predarea și transportarea produselor, restaurantele și organizatorii de evenimente utilizează fețe de masă, iar folia cu bule contribuie la protejarea obiectelor în timpul manipulării, depozitării sau transportului.
-        </p>
-        <p>
-          Lumea Pungilor reunește aceste categorii într-un <Link to="/produse" className="link-underline font-medium">catalog</Link> organizat și ușor de consultat. Fiecare categorie poate fi accesată separat, iar produsele sunt prezentate individual, împreună cu informațiile comerciale relevante.
-        </p>
-      </AboutSection>
-
-      <AboutSection title="Categoriile principale">
-        <CategoryText title="Pungi cu mâner">
-          <p>
-            <Link to="/categorie/$slug" params={{ slug: "pungi-plastic" }} className="link-underline font-medium">Pungile cu mâner</Link> sunt potrivite pentru magazine, standuri comerciale, saloane, magazine de îmbrăcăminte, magazine de cadouri și alte activități în care produsele trebuie oferite clienților într-un ambalaj practic.
-          </p>
-          <p>Catalogul include modele cu diferite dimensiuni, culori și imprimeuri. Disponibilitatea fiecărui produs este afișată în pagina sa dedicată.</p>
-        </CategoryText>
-        <CategoryText title="Pungi fără mâner">
-          <p>Pungile fără mâner pot fi folosite pentru ambalarea, separarea sau organizarea produselor în funcție de necesitățile fiecărei activități comerciale.</p>
-          <p>Dimensiunile, designul, cantitatea inclusă în set și prețul sunt prezentate separat pentru fiecare produs.</p>
-        </CategoryText>
-        <CategoryText title="Fețe de masă">
-          <p>
-            <Link to="/categorie/$slug" params={{ slug: "fete-de-masa" }} className="link-underline font-medium">Fețele de masă</Link> sunt destinate spațiilor comerciale, restaurantelor, activităților de catering și organizării de evenimente. Acestea oferă o soluție practică pentru pregătirea și prezentarea meselor în diferite contexte.
-          </p>
-          <p>Modelele și variantele disponibile pot fi consultate în categoria dedicată.</p>
-        </CategoryText>
-        <CategoryText title="Folie cu bule">
-          <p>
-            <Link to="/categorie/$slug" params={{ slug: "folie-cu-bule" }} className="link-underline font-medium">Folia cu bule</Link> este utilizată pentru protejarea produselor fragile sau sensibile în timpul depozitării, manipulării și transportului.
-          </p>
-          <p>Este o categorie utilă pentru magazine online, depozite, ateliere, revânzători și alte afaceri care pregătesc produse pentru expediere.</p>
-        </CategoryText>
-      </AboutSection>
-
-      <AboutSection title="Cui se adresează Lumea Pungilor">
-        <p>Oferta Lumea Pungilor poate fi relevantă pentru:</p>
-        <ul className="list-disc space-y-2 pl-5 marker:text-muted-foreground">
-          <li>magazine și spații comerciale;</li>
-          <li>revânzători;</li>
-          <li>magazine de îmbrăcăminte și cadouri;</li>
-          <li>restaurante și firme de catering;</li>
-          <li>organizatori de evenimente;</li>
-          <li>saloane și ateliere;</li>
-          <li>magazine online;</li>
-          <li>firme care ambalează, depozitează sau expediază produse;</li>
-          <li>persoane care caută aceste produse pentru utilizări specifice.</li>
-        </ul>
-        <p>Produsele sunt comercializate în seturi, iar cantitatea inclusă și prețul sunt afișate în pagina fiecărui produs.</p>
-      </AboutSection>
-
-      <AboutSection title="Un catalog organizat pentru alegeri mai simple">
-        <p>Pagina Despre prezintă compania și domeniul său de activitate, în timp ce catalogul este destinat produselor disponibile.</p>
-        <p>
-          În <Link to="/produse" className="link-underline font-medium">catalog</Link>, vizitatorii pot consulta categoriile, imaginile, dimensiunile, variantele, cantitățile per set, prețurile și situația stocului. Separarea informațiilor despre companie de informațiile comerciale ajută clienții să găsească mai repede ceea ce caută.
-        </p>
-        <p>Disponibilitatea produselor se poate modifica, motiv pentru care informația actuală despre stoc trebuie consultată direct în catalog.</p>
-      </AboutSection>
-
-      <AboutSection title="Comenzi și livrare">
-        <p>Produsele pot fi adăugate în coș și comandate prin intermediul magazinului online. Clienții pot continua ca vizitatori sau pot utiliza un cont de client, în funcție de opțiunile disponibile pe website.</p>
-        <p>
-          Contul de client permite păstrarea informațiilor relevante și consultarea comenzilor într-un singur loc. Pentru comenzile fără cont, website-ul pune la dispoziție o <Link to="/ajutor-comanda" className="link-underline font-medium">pagină separată de ajutor</Link>.
-        </p>
-        <p>
-          Livrarea este disponibilă în România. Informațiile aplicabile despre livrare, confirmarea comenzii și costuri trebuie consultate în <Link to="/livrare" className="link-underline font-medium">pagina de livrare</Link> și în procesul de finalizare a comenzii.
-        </p>
-      </AboutSection>
-
-      <AboutSection title="Datele companiei">
-        <p>Lumea Pungilor este operat de:</p>
-        <CompanyIdentity />
-        <p>Pentru informații despre produse, disponibilitate, comenzi sau colaborări, clienții ne pot contacta telefonic de luni până vineri, între orele 09:00 și 17:00.</p>
-        <div className="flex flex-col items-start gap-1">
-          {company.phonePrimary ? <a href={telephoneHref(company.phonePrimary)} className="inline-flex min-h-11 items-center link-underline">Telefon: {company.phonePrimary}</a> : null}
-          {company.phoneSecondary ? <a href={telephoneHref(company.phoneSecondary)} className="inline-flex min-h-11 items-center link-underline">Telefon: {company.phoneSecondary} — apel cu tarif normal</a> : null}
+      <section
+        aria-labelledby="about-location"
+        className="mt-9 border border-border bg-hero p-5 sm:p-7 md:mt-11 md:p-9"
+      >
+        <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] md:gap-10">
+          <div className="flex min-w-0 items-start gap-4">
+            <MapPin
+              aria-hidden="true"
+              className="mt-1 size-6 shrink-0 text-brand"
+              strokeWidth={1.5}
+            />
+            <div className="min-w-0">
+              <p className="micro-sm text-brand">Punct de lucru</p>
+              <h2 id="about-location" className="display mt-2 text-2xl leading-tight sm:text-3xl">
+                Ne găsiți în Dragonul Roșu
+              </h2>
+            </div>
+          </div>
+          <div className="min-w-0 md:border-l md:border-foreground/15 md:pl-8">
+            <address className="not-italic text-base font-medium leading-relaxed">
+              Complexul Comercial Dragonul Roșu 7, standurile 388–442
+              <br />
+              Str. Drumul Gării 1–10
+            </address>
+            <p className="mt-4 text-sm leading-relaxed text-foreground/75">
+              Clienții care preferă să vadă produsele înainte de comandă ne pot vizita direct.
+              Pentru comenzi mai mari sau produse care nu apar în magazinul online, ne puteți suna
+              înainte de vizită.
+            </p>
+          </div>
         </div>
-      </AboutSection>
+      </section>
 
-      <AboutSection title="Întrebări frecvente despre Lumea Pungilor">
-        <div className="divide-y divide-border border-y border-border">
-          {faqItems.map((item) => (
-            <section key={item.question} className="py-6">
-              <h3 className="text-lg font-semibold">{item.question}</h3>
-              {item.question === "Unde pot vedea produsele disponibile?" ? (
-                <p className="mt-3">
-                  Produsele pot fi consultate în <Link to="/produse" className="link-underline font-medium">catalogul Lumea Pungilor</Link> și în paginile dedicate fiecărei categorii.
-                </p>
+      <div className="mt-10 space-y-10 md:mt-14 md:space-y-14">
+        <AboutSection title="Despre noi">
+          <div className="mt-5 grid gap-5 text-sm leading-relaxed text-foreground/80 sm:text-base md:grid-cols-2 md:gap-10">
+            <p>
+              Ne desfășurăm activitatea în Complexul Comercial Dragonul Roșu 7, la standurile
+              388–442. De aici livrăm în toată România și primim clienți direct la stand.
+            </p>
+            <p>
+              Toate produsele se vând la set. Cantitatea inclusă și prețul pe bucată sunt afișate pe
+              pagina fiecărui produs.
+            </p>
+          </div>
+        </AboutSection>
+
+        <AboutSection title="Ce găsiți în catalog">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {categories.map((category) => {
+              const content = (
+                <>
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="text-lg font-medium leading-snug">{category.title}</span>
+                    {category.slug ? (
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="mt-0.5 size-4 shrink-0 text-brand"
+                      />
+                    ) : null}
+                  </span>
+                  <span className="mt-3 block text-sm leading-relaxed text-muted-foreground">
+                    {category.description}
+                  </span>
+                </>
+              );
+
+              return category.slug ? (
+                <Link
+                  key={category.title}
+                  to="/categorie/$slug"
+                  params={{ slug: category.slug }}
+                  className="group min-w-0 border border-border bg-background p-5 transition-colors hover:border-foreground/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground sm:p-6"
+                  aria-label={`Vezi categoria ${category.title}`}
+                >
+                  {content}
+                </Link>
               ) : (
-                <p className="mt-3">{item.answer}</p>
-              )}
-            </section>
-          ))}
-        </div>
-      </AboutSection>
+                <div
+                  key={category.title}
+                  className="min-w-0 border border-border bg-field p-5 sm:p-6"
+                >
+                  {content}
+                </div>
+              );
+            })}
+          </div>
+        </AboutSection>
 
-      <div className="border-t border-border pt-10">
-        <Button asChild className="micro min-h-11 rounded-none px-6 shadow-none">
-          <Link to="/produse">Vezi catalogul</Link>
-        </Button>
+        <AboutSection title="Cui ne adresăm">
+          <div className="mt-5 grid gap-4 text-sm leading-relaxed text-foreground/80 sm:text-base md:grid-cols-2 md:gap-10">
+            <p>
+              Lucrăm cu magazine și standuri comerciale, revânzători, magazine de haine și cadouri,
+              restaurante, firme de catering, organizatori de evenimente, ateliere, saloane și
+              magazine online care expediază produse.
+            </p>
+            <p>Primim atât comenzi online, cât și clienți care cumpără direct din complex.</p>
+          </div>
+        </AboutSection>
+
+        <AboutSection title="Comenzi și livrare">
+          <div className="mt-5 grid gap-4 text-sm leading-relaxed text-foreground/80 sm:text-base md:grid-cols-2 md:gap-10">
+            <p>
+              Comenzile se plasează direct în magazinul online, cu sau fără cont de client. Livrăm
+              în toată România.
+            </p>
+            <p>
+              Pentru întrebări despre produse, stoc sau comenzi mai mari, ne puteți contacta
+              telefonic de luni până vineri, între 09:00 și 17:00.
+            </p>
+          </div>
+          <Link
+            to="/produse"
+            className="micro mt-5 inline-flex min-h-11 items-center link-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+          >
+            Explorează catalogul
+          </Link>
+        </AboutSection>
+
+        <AboutSection title="Datele companiei">
+          <p className="mt-5 max-w-3xl text-sm leading-relaxed text-foreground/80 sm:text-base">
+            Magazinul online lumeapungilor.ro este operat de DEKORAMA IMPORT SRL, cu sediul în Str.
+            Agricultori nr. 88, Buftea, județul Ilfov, România.
+          </p>
+          <dl className="mt-6 grid gap-px border border-border bg-border sm:grid-cols-2">
+            <div className="min-w-0 bg-background p-5 sm:p-6">
+              <dt className="micro-sm text-muted-foreground">CUI</dt>
+              <dd className="mt-2 text-sm font-medium">RO38393721</dd>
+            </div>
+            <div className="min-w-0 bg-background p-5 sm:p-6">
+              <dt className="micro-sm text-muted-foreground">
+                Nr. înregistrare la Registrul Comerțului
+              </dt>
+              <dd className="mt-2 break-words text-sm font-medium">J2017005349230</dd>
+            </div>
+            <div className="min-w-0 bg-background p-5 sm:p-6">
+              <dt className="micro-sm text-muted-foreground">TVA</dt>
+              <dd className="mt-2 text-sm font-medium">Societatea este plătitoare de TVA.</dd>
+            </div>
+            <div className="min-w-0 bg-background p-5 sm:p-6">
+              <dt className="micro-sm text-muted-foreground">Punct de lucru</dt>
+              <dd className="mt-2 text-sm leading-relaxed">
+                Complexul Comercial Dragonul Roșu 7, standurile 388–442, Str. Drumul Gării 1–10
+              </dd>
+            </div>
+            <div className="min-w-0 bg-background p-5 sm:p-6">
+              <dt className="micro-sm text-muted-foreground">Telefon</dt>
+              <dd className="mt-2 flex flex-col items-start gap-1 text-sm">
+                {phones.map((phone) => (
+                  <a
+                    key={phone}
+                    href={telephoneHref(phone)}
+                    className="inline-flex min-h-11 items-center link-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  >
+                    {phone}
+                  </a>
+                ))}
+              </dd>
+            </div>
+            <div className="min-w-0 bg-background p-5 sm:p-6">
+              <dt className="micro-sm text-muted-foreground">Program</dt>
+              <dd className="mt-2 text-sm font-medium">luni–vineri, 09:00–17:00</dd>
+            </div>
+          </dl>
+        </AboutSection>
+
+        <section className="border-t border-border bg-hero px-5 py-8 sm:px-8 md:flex md:items-center md:justify-between md:gap-8 md:py-10">
+          <div className="min-w-0">
+            <h2 className="display text-2xl sm:text-3xl">Vă așteptăm online sau la stand</h2>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/75">
+              Alegeți produsele din catalog sau contactați-ne pentru mai multe informații.
+            </p>
+          </div>
+          <div className="mt-6 flex min-w-0 flex-col gap-3 sm:flex-row md:mt-0 md:shrink-0">
+            <Button
+              asChild
+              className="micro min-h-11 w-full rounded-none px-6 shadow-none sm:w-auto"
+            >
+              <Link to="/produse">Vezi produsele</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="micro min-h-11 w-full rounded-none border-foreground bg-transparent px-6 shadow-none sm:w-auto"
+            >
+              <Link to="/contact">Contactează-ne</Link>
+            </Button>
+          </div>
+        </section>
       </div>
     </article>
-  );
-}
-
-function AboutSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="mt-12 border-t border-border pt-10 md:mt-16 md:pt-12">
-      <h2 className="display text-3xl md:text-4xl">{title}</h2>
-      <div className="mt-6 space-y-5 text-base leading-relaxed text-foreground/85">{children}</div>
-    </section>
-  );
-}
-
-function CategoryText({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="py-2">
-      <h3 className="text-xl font-semibold">{title}</h3>
-      <div className="mt-3 space-y-4">{children}</div>
-    </section>
   );
 }
