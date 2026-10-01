@@ -31,11 +31,20 @@ export function OrdersPanel({ base }: { base: "/staff/comenzi" | "/n7q4-v2m9/ord
         p_limit: PAGE_SIZE + 1,
         p_offset: page * PAGE_SIZE,
       });
-      if (error) throw error;
+      if (error) {
+        console.error("[orders] staff_order_catalog failed", {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw error;
+      }
       return data ?? [];
     },
   });
   const rows = orders.data?.slice(0, PAGE_SIZE) ?? [];
+  const hasFilters = Boolean(search || status || payment || method || customerType || from || to);
   const resetPage = () => setPage(0);
   return (
     <div className="mx-auto max-w-[1200px]">
@@ -151,81 +160,87 @@ export function OrdersPanel({ base }: { base: "/staff/comenzi" | "/n7q4-v2m9/ord
       {orders.error ? (
         <p className="mt-8 text-sm text-destructive">Comenzile nu au putut fi încărcate.</p>
       ) : null}
-      <div className="mt-6 overflow-x-auto border border-border">
-        <table className="w-full min-w-[760px] text-left text-sm">
-          <thead className="border-b border-border bg-field text-muted-foreground">
-            <tr>
-              <th className="p-3 font-normal">Comandă / dată</th>
-              <th className="p-3 font-normal">Client</th>
-              <th className="p-3 font-normal">Plată</th>
-              <th className="p-3 font-normal">Status</th>
-              <th className="p-3 font-normal">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((o) => (
-              <tr key={o.id} className="border-b border-border/60 align-top">
-                <td className="p-3">
-                  <Link
-                    to={
-                      base === "/staff/comenzi"
-                        ? "/staff/comenzi/$orderId"
-                        : "/n7q4-v2m9/orders/$orderId"
-                    }
-                    params={{ orderId: o.id }}
-                    className="underline underline-offset-4"
-                  >
-                    {o.order_number}
-                  </Link>
-                  <br />
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(o.created_at).toLocaleString("ro-RO")}
-                  </span>
-                </td>
-                <td className="p-3">
-                  {o.contact_name}
-                  <br />
-                  {o.email}
-                  <br />
-                  <span className="text-xs text-muted-foreground">
-                    {o.user_id ? "Înregistrat" : "Fără cont"}
-                    {o.company_name ? ` · ${o.company_name}` : ""}
-                  </span>
-                </td>
-                <td className="p-3">
-                  {o.payment_method === "cash" ? "Numerar" : "De confirmat"}
-                  <br />
-                  {o.payment_status}
-                </td>
-                <td className="p-3">{o.status}</td>
-                <td className="p-3">{formatRon(o.total)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {!orders.isLoading && rows.length === 0 ? (
-        <p className="mt-5 text-sm">Nu există comenzi pentru filtrele alese.</p>
+      {orders.isSuccess ? (
+        <>
+          <div className="mt-6 overflow-x-auto border border-border">
+            <table className="w-full min-w-[760px] text-left text-sm">
+              <thead className="border-b border-border bg-field text-muted-foreground">
+                <tr>
+                  <th className="p-3 font-normal">Comandă / dată</th>
+                  <th className="p-3 font-normal">Client</th>
+                  <th className="p-3 font-normal">Plată</th>
+                  <th className="p-3 font-normal">Status</th>
+                  <th className="p-3 font-normal">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((o) => (
+                  <tr key={o.id} className="border-b border-border/60 align-top">
+                    <td className="p-3">
+                      <Link
+                        to={
+                          base === "/staff/comenzi"
+                            ? "/staff/comenzi/$orderId"
+                            : "/n7q4-v2m9/orders/$orderId"
+                        }
+                        params={{ orderId: o.id }}
+                        className="underline underline-offset-4"
+                      >
+                        {o.order_number}
+                      </Link>
+                      <br />
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(o.created_at).toLocaleString("ro-RO")}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      {o.contact_name}
+                      <br />
+                      {o.email}
+                      <br />
+                      <span className="text-xs text-muted-foreground">
+                        {o.user_id ? "Înregistrat" : "Fără cont"}
+                        {o.company_name ? ` · ${o.company_name}` : ""}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      {o.payment_method === "cash" ? "Numerar" : "De confirmat"}
+                      <br />
+                      {o.payment_status}
+                    </td>
+                    <td className="p-3">{o.status}</td>
+                    <td className="p-3">{formatRon(o.total)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {rows.length === 0 ? (
+            <p className="mt-5 text-sm">
+              {hasFilters ? "Nu există comenzi pentru filtrele alese." : "Nu există comenzi."}
+            </p>
+          ) : null}
+          <div className="mt-5 flex gap-3">
+            <button
+              type="button"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+              className="border border-border px-4 py-2 disabled:opacity-40"
+            >
+              Anterior
+            </button>
+            <span className="py-2 text-sm">Pagina {page + 1}</span>
+            <button
+              type="button"
+              disabled={(orders.data?.length ?? 0) <= PAGE_SIZE}
+              onClick={() => setPage(page + 1)}
+              className="border border-border px-4 py-2 disabled:opacity-40"
+            >
+              Următor
+            </button>
+          </div>
+        </>
       ) : null}
-      <div className="mt-5 flex gap-3">
-        <button
-          type="button"
-          disabled={page === 0}
-          onClick={() => setPage(page - 1)}
-          className="border border-border px-4 py-2 disabled:opacity-40"
-        >
-          Anterior
-        </button>
-        <span className="py-2 text-sm">Pagina {page + 1}</span>
-        <button
-          type="button"
-          disabled={(orders.data?.length ?? 0) <= PAGE_SIZE}
-          onClick={() => setPage(page + 1)}
-          className="border border-border px-4 py-2 disabled:opacity-40"
-        >
-          Următor
-        </button>
-      </div>
     </div>
   );
 }

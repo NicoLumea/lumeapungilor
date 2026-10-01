@@ -21,6 +21,8 @@ dist-ssr
 # built from Git, and without it the browser has no database connection (blank screen).
 .env.*
 !.env.example
+**/.env
+!/.env
 .dev.vars*
 .npmrc
 
