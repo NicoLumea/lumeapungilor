@@ -14,14 +14,9 @@ export function ReturnsPanel() {
   const { data, isLoading, error } = useReturnRequests();
 
   async function setStatus(id: string, status: string) {
-    const { error: err } = await supabase
-      .from("return_requests")
-      .update({ status })
-      .eq("id", id)
-      .select("id")
-      .single();
+    const { error: err } = await supabase.from("return_requests").update({ status }).eq("id", id);
     if (err) {
-      toast.error(err.message || "Nu am putut actualiza cererea.");
+      toast.error("Nu am putut actualiza cererea.");
       return;
     }
     toast.success("Cerere actualizată.");
