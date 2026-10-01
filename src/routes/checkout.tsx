@@ -9,10 +9,8 @@ import { placeOrder } from "@/lib/shop.functions";
 import { useAuth } from "@/lib/use-auth";
 import { useGuestCartLimit } from "@/lib/dashboard-data";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
-import { SUPPORT_EMAIL, telephoneHref } from "@/lib/company";
+import { COMPANY_PHONE, SUPPORT_EMAIL, telephoneHref } from "@/lib/company";
 import { useEnabledMethods } from "@/lib/methods";
-
-const SUPPORT_PHONE = "0765 514 422";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -268,8 +266,8 @@ function CheckoutPage() {
       <h1 className="display mt-3 text-3xl md:text-4xl">Finalizare comandă</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         Ajutor pentru comandă:{" "}
-        <a href={telephoneHref(SUPPORT_PHONE)} className="link-underline text-foreground">
-          {SUPPORT_PHONE}
+        <a href={telephoneHref(COMPANY_PHONE)} className="link-underline text-foreground">
+          {COMPANY_PHONE}
         </a>{" "}
         /{" "}
         <a href={`mailto:${SUPPORT_EMAIL}`} className="link-underline text-foreground">

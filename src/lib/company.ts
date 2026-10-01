@@ -3,6 +3,9 @@ import { text, type ContentMap } from "@/lib/content";
 /** Official customer-service address, used everywhere the shop offers help. */
 export const SUPPORT_EMAIL = "contact@lumeapungilor.ro";
 
+/** Current public company contact number; hosted content may still contain retired numbers. */
+export const COMPANY_PHONE = "+40 54039462";
+
 /** Official Romanian consumer-protection references (ANPC / SAL). */
 export const CONSUMER_LINKS = {
   anpc: "https://anpc.ro/",
@@ -32,9 +35,9 @@ export function companyInfo(content: ContentMap | undefined): CompanyInfo {
     address: text(company, "registered_address") ?? text(company, "address"),
     cui: text(company, "cui"),
     tradeRegisterNumber: text(company, "trade_register_number") ?? text(company, "reg_com"),
-    phonePrimary: text(company, "phone_primary"),
-    phoneSecondary: text(company, "phone_secondary"),
-    secondaryPhoneNote: text(company, "secondary_phone_note"),
+    phonePrimary: COMPANY_PHONE,
+    phoneSecondary: null,
+    secondaryPhoneNote: null,
     operatingDays: text(company, "operating_days"),
     operatingHours: text(company, "operating_hours"),
     sellerEnquiryHeading: text(company, "seller_enquiry_heading"),
