@@ -551,6 +551,39 @@ export type Database = {
         }
         Relationships: []
       }
+      product_categories: {
+        Row: {
+          product_id: string
+          category_id: string
+          created_at: string
+        }
+        Insert: {
+          product_id: string
+          category_id: string
+          created_at?: string
+        }
+        Update: {
+          product_id?: string
+          category_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_categories_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_images: {
         Row: {
           alt: string | null
@@ -1295,6 +1328,14 @@ export type Database = {
           product_id: string
           sold: number
         }[]
+      }
+      set_product_categories: {
+        Args: {
+          p_product_id: string
+          p_category_ids: string[]
+          p_primary_category_id: string | null
+        }
+        Returns: undefined
       }
       update_product_image_gallery: {
         Args: {

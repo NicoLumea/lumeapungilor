@@ -56,10 +56,43 @@ export type Product = {
   updated_at: string;
   product_images?: ProductImage[];
   product_variants?: ProductVariant[];
-  categories?: { slug: string; name: string } | null;
+  categories?: { id: string; slug: string; name: string } | null;
+  product_categories?: {
+    category_id: string;
+    categories: { id: string; slug: string; name: string } | null;
+  }[];
 };
 
-export const PRODUCT_SELECT = "*, product_images(*), product_variants(*), categories(slug,name)";
+export const PRODUCT_SELECT =
+  "*, product_images(*), product_variants(*), categories(id,slug,name), product_categories(category_id,categories(id,slug,name))";
+
+/** Nested memberships keep one parent product row, so search and inventory stay unique. */
+export function assignedCategories(product: Product): NonNullable<Product["categories"]>[] {
+  const linked = (product.product_categories ?? [])
+    .map((link) => link.categories)
+    .filter((category): category is NonNullable<Product["categories"]> => category !== null);
+  if (linked.length > 0) return linked;
+  return product.categories ? [product.categories] : [];
+}
+
+export function belongsToCategory(product: Product, slug: string): boolean {
+  return assignedCategories(product).some((category) => category.slug === slug);
+}
+
+export function toggleCategorySelection(
+  selected: string[],
+  primary: string,
+  categoryId: string,
+  checked: boolean,
+): { categoryIds: string[]; primaryId: string } {
+  const categoryIds = checked
+    ? [...new Set([...selected, categoryId])]
+    : selected.filter((id) => id !== categoryId);
+  return {
+    categoryIds,
+    primaryId: categoryIds.includes(primary) ? primary : (categoryIds[0] ?? ""),
+  };
+}
 
 export function productAvailableStock(product: Product): number {
   return product.variant_stock_tracked
