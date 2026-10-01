@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { telephoneHref } from "@/lib/company";
+import { COMPANY_PHONE, telephoneHref } from "@/lib/company";
 
 type AboutCategory = {
   title: string;
@@ -15,21 +15,23 @@ const categories: AboutCategory[] = [
     title: "Pungi plastic",
     description:
       "Pungi cu imprimeu și pungi simple, în mai multe dimensiuni, pentru magazine și standuri comerciale.",
-    slug: "pungi-plastic",
+    slug: "pungute-mici",
   },
   {
     title: "Pungi curierat",
     description:
       "Pungi și plicuri autoadezive pentru expedieri, de la 16 × 24 cm până la 80 × 100 cm.",
+    slug: "pungi-curierat",
   },
   {
     title: "Punguțe mici",
     description: "Pungi pentru produse mărunte, bijuterii și accesorii.",
+    slug: "pungi-plastic",
   },
   {
-    title: "Fețe de masă",
-    description: "Fețe de masă și mușama la rolă pentru restaurante, catering și evenimente.",
-    slug: "fete-de-masa",
+    title: "Mușama",
+    description: "Mușama la rolă și fețe de masă pentru restaurante, catering și evenimente.",
+    slug: "musama",
   },
   {
     title: "Folie cu bule",
@@ -37,8 +39,6 @@ const categories: AboutCategory[] = [
     slug: "folie-cu-bule",
   },
 ];
-
-const phones = ["0765 514 422", "0371 900 033"];
 
 export const Route = createFileRoute("/despre")({
   head: () => ({
@@ -239,15 +239,12 @@ function AboutPage() {
             <div className="min-w-0 bg-background p-5 sm:p-6">
               <dt className="micro-sm text-muted-foreground">Telefon</dt>
               <dd className="mt-2 flex flex-col items-start gap-1 text-sm">
-                {phones.map((phone) => (
-                  <a
-                    key={phone}
-                    href={telephoneHref(phone)}
-                    className="inline-flex min-h-11 items-center link-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-                  >
-                    {phone}
-                  </a>
-                ))}
+                <a
+                  href={telephoneHref(COMPANY_PHONE)}
+                  className="inline-flex min-h-11 items-center link-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                >
+                  {COMPANY_PHONE}
+                </a>
               </dd>
             </div>
             <div className="min-w-0 bg-background p-5 sm:p-6">
