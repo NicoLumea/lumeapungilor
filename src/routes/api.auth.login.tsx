@@ -4,7 +4,6 @@ import { z } from "zod";
 const inputSchema = z.object({
   email: z.string().trim().email().max(320),
   password: z.string().min(1).max(1000),
-  destination: z.string().max(1000).optional(),
 });
 
 const headers = { "Cache-Control": "no-store", "Content-Type": "application/json" };
@@ -72,19 +71,12 @@ export const Route = createFileRoute("/api/auth/login")({
               { status: 503, headers },
             );
           }
-          const [{ rolesForUser }, { resolvePostAuthDestination }] = await Promise.all([
-            import("@/lib/authorization.server"),
-            import("@/lib/staff-auth-flow"),
-          ]);
-          const roles = await rolesForUser(result.session.user.id);
-          const nextDestination = resolvePostAuthDestination(input.data.destination, roles);
           return Response.json(
             {
               ok: true,
               accessToken: result.session.access_token,
               refreshToken: result.session.refresh_token,
               requiresStaffVerification: staffChallenge.required,
-              nextDestination,
             },
             { status: 200, headers },
           );

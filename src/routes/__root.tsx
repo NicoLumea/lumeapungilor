@@ -7,7 +7,6 @@ import {
   useRouterState,
   HeadContent,
   Scripts,
-  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -50,9 +49,8 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: ErrorComponentProps) {
-  const normalizedError = error instanceof Error ? error : new Error("Unknown application error");
-  console.error("[client] Application error:", normalizedError.name, normalizedError.message);
+function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  console.error("[client] Application error:", error?.name, error?.message);
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
