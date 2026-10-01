@@ -127,7 +127,7 @@ export async function staffVerificationStatus(userId: string, sessionId: string)
     return { roles, required: false, verified: true as const };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const now = new Date().toISOString();
-  const [{ data: verified }, { data: user }, { data: challenge }] = await Promise.all([
+  const [verifiedResult, userResult, challengeResult] = await Promise.all([
     supabaseAdmin
       .from("staff_verified_sessions")
       .select("expires_at")
@@ -147,6 +147,12 @@ export async function staffVerificationStatus(userId: string, sessionId: string)
       .limit(1)
       .maybeSingle(),
   ]);
+  if (verifiedResult.error) throw verifiedResult.error;
+  if (userResult.error) throw userResult.error;
+  if (challengeResult.error) throw challengeResult.error;
+  const verified = verifiedResult.data;
+  const user = userResult.data;
+  const challenge = challengeResult.data;
   return {
     roles,
     required: true,
