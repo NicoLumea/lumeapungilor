@@ -1,9 +1,5 @@
 # Administrator access and persistence audit
 
-> Historical record of the earlier implementation. For the current admin-only
-> catalogue policies and once-per-login MFA flow, see
-> [Administrator authorization and persistence](admin-authorization-repair.md).
-
 ## Authentication and route boundary
 
 - The administration tree remains protected by `RequireAccess` at the `/n7q4-v2m9` parent route.

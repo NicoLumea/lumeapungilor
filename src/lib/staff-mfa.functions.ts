@@ -10,7 +10,7 @@ export const getStaffVerificationStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const sessionId = sessionIdFromClaims(context.claims);
-    if (!sessionId) return { roles: [], required: true, verified: false, error: SESSION_ERROR };
+    if (!sessionId) return { required: true, verified: false, error: SESSION_ERROR };
     const { staffVerificationStatus } = await import("./staff-mfa.server");
     return staffVerificationStatus(context.userId, sessionId);
   });

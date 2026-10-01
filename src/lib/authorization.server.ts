@@ -12,8 +12,7 @@ export function sessionIdFromClaims(claims: JwtPayload | Record<string, unknown>
 
 export async function rolesForUser(userId: string): Promise<string[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
-  if (error) throw error;
+  const { data } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
   return (data ?? []).map((entry) => entry.role as string);
 }
 
