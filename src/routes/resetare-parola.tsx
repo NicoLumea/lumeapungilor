@@ -42,8 +42,8 @@ function RequestPasswordReset() {
     <main className="site-container max-w-[480px] py-20 sm:py-28">
       <h1 className="display text-3xl">Resetare parolă</h1>
       <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-        Introdu adresa de email asociată contului tău și îți vom trimite instrucțiuni pentru
-        resetarea parolei.
+        Introdu adresa de email asociată contului tău și îți vom trimite un link pentru resetarea
+        parolei.
       </p>
       {message ? (
         <p className="mt-6 border border-border bg-field p-4 text-sm leading-relaxed" role="status">

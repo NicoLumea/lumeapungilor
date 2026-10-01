@@ -1,12 +1,22 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  hasRecoveryError,
-  hasRecoveryMarker,
   MIN_PASSWORD_LENGTH,
   passwordValidationError,
+  readRecoveryCallback,
+  recoveryCallbackConsumed,
+  recoveryErrorMessage,
+  type RecoveryCallback,
 } from "@/lib/password-recovery";
+
+// Route modules load before the site header initializes the shared auth client.
+// Preserve only the callback type/error metadata; Supabase removes successful
+// tokens/code from the URL while establishing the recovery session.
+const initialCallback: RecoveryCallback =
+  typeof window !== "undefined" && window.location.pathname === "/parola-noua"
+    ? readRecoveryCallback(window.location.href)
+    : { kind: "none" };
 
 export const Route = createFileRoute("/parola-noua")({
   ssr: false,
@@ -63,36 +73,68 @@ function PasswordInput({
 }
 
 function ResetPassword() {
+  const navigate = useNavigate();
   const [state, setState] = useState<RecoveryState>("checking");
+  const [reason, setReason] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const currentUrl = window.location.href;
-    if (hasRecoveryError(currentUrl) || !hasRecoveryMarker(currentUrl)) {
+    const callback =
+      initialCallback.kind === "none"
+        ? readRecoveryCallback(window.location.href)
+        : initialCallback;
+    if (callback.kind === "error" || callback.kind === "incomplete" || callback.kind === "none") {
+      setReason(recoveryErrorMessage(callback));
       setState("invalid");
       return;
     }
 
     let active = true;
-    let recoveryEvent = false;
-    const timer = window.setTimeout(() => {
-      if (active && !recoveryEvent) setState("invalid");
-    }, 4000);
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!active || event !== "PASSWORD_RECOVERY" || !session) return;
-      recoveryEvent = true;
-      window.clearTimeout(timer);
-      window.history.replaceState(null, "", "/parola-noua");
+    let settled = false;
+    const acceptSession = (session: unknown) => {
+      if (!active || settled || !session) return;
+      settled = true;
       setState("ready");
+    };
+    const rejectSession = () => {
+      if (!active || settled) return;
+      settled = true;
+      setReason(recoveryErrorMessage(callback));
+      setState("invalid");
+    };
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        acceptSession(session);
+      } else if (
+        (event === "INITIAL_SESSION" || event === "SIGNED_IN") &&
+        recoveryCallbackConsumed(callback, window.location.href)
+      ) {
+        acceptSession(session);
+      }
     });
+
+    // getSession waits for SDK initialization. It recovers a callback session
+    // even if PASSWORD_RECOVERY fired before this route subscribed. A pre-existing
+    // login alone is not enough: the callback parameters must also be consumed.
+    void supabase.auth.getSession().then(({ data, error: sessionError }) => {
+      if (
+        !sessionError &&
+        data.session &&
+        recoveryCallbackConsumed(callback, window.location.href)
+      ) {
+        acceptSession(data.session);
+      } else {
+        rejectSession();
+      }
+    }, rejectSession);
 
     return () => {
       active = false;
-      window.clearTimeout(timer);
-      data.subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
   }, []);
 
@@ -105,15 +147,23 @@ function ResetPassword() {
     }
     setBusy(true);
     setError(null);
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-    if (updateError) {
-      setBusy(false);
-      setError("Parola nu a putut fi schimbată. Linkul poate fi expirat sau deja folosit.");
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password });
+      if (updateError) {
+        setError("Parola nu a putut fi schimbată. Verifică sesiunea și încearcă din nou.");
+        return;
+      }
+    } catch {
+      setError("Parola nu a putut fi schimbată. Verifică sesiunea și încearcă din nou.");
       return;
+    } finally {
+      setBusy(false);
     }
-    await supabase.auth.signOut({ scope: "local" });
-    setBusy(false);
     setState("success");
+    // The password is already updated. A sign-out/navigation failure must not
+    // present the save as failed or invite a second update attempt.
+    await supabase.auth.signOut({ scope: "local" });
+    await navigate({ to: "/autentificare", search: { reset: "success" } });
   }
 
   if (state === "checking") {
@@ -130,10 +180,7 @@ function ResetPassword() {
     return (
       <main className="site-container max-w-[480px] py-28">
         <h1 className="display text-3xl">Link indisponibil</h1>
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-          Linkul de resetare este invalid, a expirat sau a fost deja folosit. Solicită un link nou
-          pentru a continua.
-        </p>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{reason}</p>
         <Link
           to="/resetare-parola"
           className="micro mt-7 inline-block border border-foreground px-5 py-3"
@@ -147,16 +194,9 @@ function ResetPassword() {
   if (state === "success") {
     return (
       <main className="site-container max-w-[480px] py-28">
-        <h1 className="display text-3xl">Parola a fost actualizată cu succes.</h1>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Acum te poți autentifica folosind noua parolă.
+        <p role="status" className="text-sm text-muted-foreground">
+          Parola a fost actualizată. Te redirecționăm către autentificare…
         </p>
-        <Link
-          to="/autentificare"
-          className="micro mt-7 inline-block border border-foreground bg-foreground px-5 py-3 text-background"
-        >
-          Conectează-te
-        </Link>
       </main>
     );
   }

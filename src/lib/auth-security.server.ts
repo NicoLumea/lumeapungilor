@@ -243,7 +243,13 @@ export function publicSiteOrigin(request?: Request): string {
 }
 
 export function passwordRecoveryRedirect(request?: Request): string {
-  return new URL("/parola-noua", `${publicSiteOrigin(request)}/`).toString();
+  // Use the origin that served this request, so a stale PUBLIC_SITE_URL cannot
+  // send a recovery email to an old Lovable preview or former production host.
+  const origin = request ? new URL(request.url).origin : publicSiteOrigin();
+  if (process.env["NODE_ENV"] === "production" && !origin.startsWith("https://")) {
+    throw new Error("Password recovery requires an HTTPS request origin in production.");
+  }
+  return new URL("/parola-noua", `${origin}/`).toString();
 }
 
 export function isSameOrigin(request: Request): boolean {

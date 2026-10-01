@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  hasRecoveryError,
-  hasRecoveryMarker,
   PASSWORD_RESET_GENERIC_MESSAGE,
   passwordValidationError,
+  readRecoveryCallback,
+  recoveryCallbackConsumed,
+  recoveryErrorMessage,
 } from "./password-recovery.ts";
 
 test("public reset response never identifies an account", () => {
@@ -23,16 +24,42 @@ test("password policy rejects short and mismatched passwords", () => {
   assert.equal(passwordValidationError("parola-lunga", "parola-lunga"), null);
 });
 
-test("recovery markers and provider errors are recognized without exposing tokens", () => {
-  assert.equal(
-    hasRecoveryMarker(
-      "https://example.ro/parola-noua#access_token=secret&refresh_token=secret2&type=recovery",
-    ),
-    true,
+test("implicit recovery callback is recognized before Supabase consumes its fragment", () => {
+  const callback = readRecoveryCallback(
+    "https://example.com/parola-noua#access_token=secret&refresh_token=secret&type=recovery",
   );
-  assert.equal(hasRecoveryMarker("https://example.ro/parola-noua"), false);
+  assert.equal(callback.kind, "implicit");
+  assert.equal(recoveryCallbackConsumed(callback, "https://example.com/parola-noua"), true);
   assert.equal(
-    hasRecoveryError("https://example.ro/parola-noua#error=access_denied&error_code=otp_expired"),
-    true,
+    recoveryCallbackConsumed(callback, "https://example.com/parola-noua#access_token=secret"),
+    false,
+  );
+});
+
+test("PKCE callback is recognized but cannot authorize a pre-existing session", () => {
+  const callback = readRecoveryCallback("https://example.com/parola-noua?code=secret");
+  assert.equal(callback.kind, "pkce");
+  assert.equal(
+    recoveryCallbackConsumed(callback, "https://example.com/parola-noua?code=secret"),
+    false,
+  );
+  assert.equal(recoveryCallbackConsumed(callback, "https://example.com/parola-noua"), true);
+});
+
+test("callback errors in query or fragment remain distinct from missing links", () => {
+  const expired = readRecoveryCallback(
+    "https://example.com/parola-noua?error=access_denied&error_code=otp_expired",
+  );
+  assert.equal(expired.kind, "error");
+  assert.match(recoveryErrorMessage(expired), /expirat/);
+  const denied = readRecoveryCallback(
+    "https://example.com/parola-noua#error=access_denied&error_description=invalid",
+  );
+  assert.equal(denied.kind, "error");
+  assert.doesNotMatch(recoveryErrorMessage(denied), /expirat/);
+  assert.equal(readRecoveryCallback("https://example.com/parola-noua").kind, "none");
+  assert.equal(
+    readRecoveryCallback("https://example.com/parola-noua?type=recovery").kind,
+    "incomplete",
   );
 });
