@@ -49,7 +49,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: Error; reset: () => void; info?: unknown }) {
   console.error("[client] Application error:", error?.name, error?.message);
   const router = useRouter();
   useEffect(() => {
