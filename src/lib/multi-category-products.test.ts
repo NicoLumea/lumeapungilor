@@ -3,6 +3,8 @@ import { test } from "node:test";
 import {
   assignedCategories,
   belongsToCategory,
+  PRODUCT_BASE_SELECT,
+  PRODUCT_SELECT,
   productAvailableStock,
   toggleCategorySelection,
   type Product,
@@ -37,8 +39,8 @@ function sampleProduct(): Product {
     updated_at: "2026-10-02",
     categories: plastic,
     product_categories: [
-      { category_id: plastic.id, categories: plastic },
-      { category_id: handles.id, categories: handles },
+      { product_id: "product-1", category_id: plastic.id, categories: plastic },
+      { product_id: "product-1", category_id: handles.id, categories: handles },
     ],
   };
 }
@@ -85,4 +87,21 @@ test("legacy single category remains available after backfill and canonical site
   assert.equal((sitemap.match(/\/produs\/punga-thank-you<\/loc>/g) ?? []).length, 1);
   assert.match(sitemap, /\/categorie\/pungi-plastic<\/loc>/);
   assert.match(sitemap, /\/categorie\/pungi-cu-maner<\/loc>/);
+});
+
+test("public catalog query is independent of the join table and disambiguates the primary category", () => {
+  assert.doesNotMatch(PRODUCT_BASE_SELECT, /product_categories/);
+  assert.match(PRODUCT_BASE_SELECT, /categories!products_category_id_fkey/);
+  assert.match(PRODUCT_SELECT, /product_categories\(product_id,category_id/);
+  assert.match(PRODUCT_SELECT, /categories!product_categories_category_id_fkey/);
+});
+
+test("a published product without categories stays in the catalog", () => {
+  const product = sampleProduct();
+  product.categories = null;
+  product.category_id = null;
+  product.product_categories = [];
+  assert.deepEqual(assignedCategories(product), []);
+  assert.equal(product.status, "published");
+  assert.equal(productAvailableStock(product), 100);
 });

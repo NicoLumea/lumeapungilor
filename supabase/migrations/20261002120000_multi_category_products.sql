@@ -1,23 +1,26 @@
 -- Keep products.category_id as the primary/breadcrumb category. Membership lives here.
-create table public.product_categories (
+create table if not exists public.product_categories (
   product_id uuid not null references public.products(id) on delete cascade,
   category_id uuid not null references public.categories(id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (product_id, category_id)
 );
 
-create index product_categories_category_id_idx on public.product_categories (category_id, product_id);
+create index if not exists product_categories_category_id_idx on public.product_categories (category_id, product_id);
 
 -- Existing products retain their current category without touching product, order or stock rows.
 insert into public.product_categories (product_id, category_id)
 select id, category_id from public.products where category_id is not null
 on conflict do nothing;
 
+-- Lovable/Supabase default privileges may grant anon more than SELECT on new tables.
+revoke all on public.product_categories from public, anon;
 grant select on public.product_categories to anon;
 grant select, insert, delete on public.product_categories to authenticated;
 grant all on public.product_categories to service_role;
 alter table public.product_categories enable row level security;
 
+drop policy if exists "public reads browsable product categories" on public.product_categories;
 create policy "public reads browsable product categories" on public.product_categories
 for select to anon, authenticated using (
   public.is_staff() or (
@@ -25,13 +28,15 @@ for select to anon, authenticated using (
     and exists (select 1 from public.categories c where c.id = category_id and c.is_visible)
   )
 );
+drop policy if exists "staff insert product categories" on public.product_categories;
 create policy "staff insert product categories" on public.product_categories
 for insert to authenticated with check (public.is_staff());
+drop policy if exists "staff delete product categories" on public.product_categories;
 create policy "staff delete product categories" on public.product_categories
 for delete to authenticated using (public.is_staff());
 
 -- Replace only memberships, atomically. A primary category must be one of them.
-create function public.set_product_categories(
+create or replace function public.set_product_categories(
   p_product_id uuid,
   p_category_ids uuid[],
   p_primary_category_id uuid
