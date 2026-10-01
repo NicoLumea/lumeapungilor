@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Keep the root `.env` tracked in Git (public publishable values only) — published builds need VITE_SUPABASE_* from it or the site blanks.

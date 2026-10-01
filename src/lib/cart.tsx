@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { storageGet, storageSet } from "@/lib/safe-storage";
 
 export type CartLine = {
   productId: string;
@@ -29,8 +30,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setLines(JSON.parse(raw) as CartLine[]);
+      const raw = storageGet("local", STORAGE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) {
+        setLines(
+          parsed
+            .filter(
+              (l): l is CartLine =>
+                !!l &&
+                typeof l === "object" &&
+                typeof (l as CartLine).productId === "string" &&
+                Number.isFinite((l as CartLine).qty) &&
+                (l as CartLine).qty > 0,
+            )
+            .map((l) => ({ productId: l.productId, variantId: l.variantId ?? null, qty: l.qty })),
+        );
+      }
     } catch {
       /* ignore malformed cart */
     }
@@ -39,7 +54,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+    storageSet("local", STORAGE_KEY, JSON.stringify(lines));
   }, [lines, hydrated]);
 
   const add = useCallback((line: CartLine) => {

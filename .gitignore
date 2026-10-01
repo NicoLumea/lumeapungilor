@@ -16,9 +16,16 @@ dist-ssr
 .nitro
 *.local
 
+# Environment and deployment secrets. The root .env is platform-managed, holds only
+# public (publishable) connection values and MUST stay in Git: the published site is
+# built from Git, and without it the browser has no database connection (blank screen).
+.env.*
+!.env.example
+.dev.vars*
+.npmrc
+
 # Wrangler / Cloudflare
 .wrangler/
-.dev.vars
 
 # Editor directories and files
 .vscode/*

@@ -179,7 +179,7 @@ export function useMyOrders(userId: string | undefined, enabled = true) {
       const { data, error } = await supabase
         .from("orders")
         .select(
-          "id,order_number,status,payment_status,total,created_at,order_items(product_name,quantity,line_total),return_requests(id,status,return_request_items(order_item_id))",
+          "id,order_number,status,payment_status,total,created_at,order_items(id,product_id,variant_id,product_image_url,product_name,variant_name,sku,quantity,unit_price,line_total),return_requests(id,status,return_request_items(order_item_id))",
         )
         .eq("user_id", userId!)
         .order("created_at", { ascending: false });

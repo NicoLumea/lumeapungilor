@@ -1,0 +1,1 @@
+revoke execute on function public.snapshot_order_item_image() from public, anon, authenticated;

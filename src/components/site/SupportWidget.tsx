@@ -1,4 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { storageGet, storageSet } from "@/lib/safe-storage";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -77,13 +78,13 @@ export function SupportWidget() {
 
   useEffect(() => {
     if (!storageKey) return;
-    setMessages(restoreSupportMessages(window.sessionStorage.getItem(storageKey)));
+    setMessages(restoreSupportMessages(storageGet("session", storageKey)));
     setLoadedStorageKey(storageKey);
   }, [storageKey]);
 
   useEffect(() => {
     if (!storageKey || loadedStorageKey !== storageKey) return;
-    window.sessionStorage.setItem(storageKey, JSON.stringify(messages));
+    storageSet("session", storageKey, JSON.stringify(messages));
   }, [loadedStorageKey, messages, storageKey]);
 
   useEffect(() => {
@@ -229,6 +230,14 @@ export function SupportWidget() {
           </header>
 
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-5">
+            <DialogPrimitive.Close asChild>
+              <Link
+                to="/feedback"
+                className="micro-sm mb-4 inline-flex min-h-10 items-center link-underline"
+              >
+                Trimite feedback despre experiența ta
+              </Link>
+            </DialogPrimitive.Close>
             <div className="max-w-[88%] rounded-[1.1rem] rounded-tl-sm bg-field px-4 py-3 text-sm leading-relaxed">
               <p className="micro-sm mb-2 text-brand">Echipa Lumea Pungilor</p>
               <p>Salut! 👋</p>

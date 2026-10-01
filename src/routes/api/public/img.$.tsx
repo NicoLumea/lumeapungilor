@@ -21,8 +21,8 @@ export const Route = createFileRoute("/api/public/img/$")({
           const result = await supabaseAdmin.storage.from(BUCKET).download(path);
           if (result.error) return new Response("Not found", { status: 404 });
           data = result.data;
-        } catch (err) {
-          console.warn("[img] storage unavailable:", err instanceof Error ? err.message : err);
+        } catch {
+          console.warn("[img] storage unavailable");
           return new Response("Image temporarily unavailable", {
             status: 503,
             headers: { "Cache-Control": "no-store" },

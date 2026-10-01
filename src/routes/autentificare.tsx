@@ -36,6 +36,10 @@ function AuthenticationPage() {
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           Autentifică-te sau creează un cont. Poți răsfoi magazinul și comanda și fără cont.
         </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Cu un cont poți vedea istoricul comenzilor, poți cumpăra din nou produsele disponibile și
+          îți poți urmări retururile.
+        </p>
       </div>
       <div className="mt-8">
         <AuthPanel

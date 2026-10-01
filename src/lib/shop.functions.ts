@@ -10,6 +10,10 @@ const lineSchema = z.object({
 
 const orderSchema = z.object({
   idempotencyKey: z.string().min(8).max(80),
+  guestAccessToken: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/)
+    .optional(),
   expectedTotal: z.number().nonnegative().optional(),
   termsAccepted: z.literal(true),
   customer: z.object({
@@ -31,6 +35,11 @@ const orderSchema = z.object({
 
 export type PlaceOrderResult =
   { ok: true; orderNumber: string; total: number; isTest: boolean } | { ok: false; error: string };
+
+async function guestTokenHash(token: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
 
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
@@ -65,6 +74,9 @@ export const placeOrder = createServerFn({ method: "POST" })
     const distinctProducts = new Set(data.lines.map((l) => l.productId)).size;
 
     if (!userId) {
+      if (!data.guestAccessToken) {
+        return { ok: false, error: "Reîncarcă pagina și încearcă din nou." };
+      }
       // Guests: configurable distinct-product limit, enforced server-side.
       const { data: limitRow } = await supabaseAdmin
         .from("site_settings")
@@ -87,6 +99,27 @@ export const placeOrder = createServerFn({ method: "POST" })
         .eq("email", email)
         .maybeSingle();
       if (used) {
+        const { data: prior } = await supabaseAdmin
+          .from("orders")
+          .select("id,order_number,total,is_test")
+          .eq("payment_reference", `chk_${data.idempotencyKey}`)
+          .is("user_id", null)
+          .maybeSingle();
+        if (prior) {
+          const { data: access } = await supabaseAdmin
+            .from("guest_order_access")
+            .select("token_hash")
+            .eq("order_id", prior.id)
+            .maybeSingle();
+          if (access?.token_hash === (await guestTokenHash(data.guestAccessToken!))) {
+            return {
+              ok: true,
+              orderNumber: prior.order_number,
+              total: Number(prior.total),
+              isTest: prior.is_test,
+            };
+          }
+        }
         return {
           ok: false,
           error:
@@ -99,10 +132,33 @@ export const placeOrder = createServerFn({ method: "POST" })
     const reference = `chk_${data.idempotencyKey}`;
     const existing = await supabaseAdmin
       .from("orders")
-      .select("order_number,total,is_test")
+      .select("id,order_number,total,is_test,user_id")
       .eq("payment_reference", reference)
       .maybeSingle();
     if (existing.data) {
+      if (existing.data.user_id !== userId) {
+        return { ok: false, error: "Această comandă nu îți aparține." };
+      }
+      if (!userId) {
+        const { data: access } = await supabaseAdmin
+          .from("guest_order_access")
+          .select("token_hash")
+          .eq("order_id", existing.data.id)
+          .maybeSingle();
+        if (access && access.token_hash !== (await guestTokenHash(data.guestAccessToken!))) {
+          return { ok: false, error: "Această comandă nu îți aparține." };
+        }
+        if (!access) {
+          const { error: accessError } = await supabaseAdmin.from("guest_order_access").insert({
+            order_id: existing.data.id,
+            token_hash: await guestTokenHash(data.guestAccessToken!),
+          });
+          if (accessError) return { ok: false, error: "Confirmarea nu este disponibilă momentan." };
+        }
+        await supabaseAdmin
+          .from("guest_checkout_usage")
+          .upsert({ email, first_order_id: existing.data.id }, { onConflict: "email" });
+      }
       return {
         ok: true,
         orderNumber: existing.data.order_number,
@@ -271,10 +327,23 @@ export const placeOrder = createServerFn({ method: "POST" })
       // A unique violation means a parallel submit already created this exact order.
       const retry = await supabaseAdmin
         .from("orders")
-        .select("order_number,total,is_test")
+        .select("id,order_number,total,is_test,user_id")
         .eq("payment_reference", reference)
         .maybeSingle();
       if (retry.data) {
+        if (retry.data.user_id !== userId) {
+          return { ok: false, error: "Această comandă nu îți aparține." };
+        }
+        if (!userId) {
+          const { data: access } = await supabaseAdmin
+            .from("guest_order_access")
+            .select("token_hash")
+            .eq("order_id", retry.data.id)
+            .maybeSingle();
+          if (access?.token_hash !== (await guestTokenHash(data.guestAccessToken!))) {
+            return { ok: false, error: "Confirmarea nu este disponibilă momentan." };
+          }
+        }
         return {
           ok: true,
           orderNumber: retry.data.order_number,
@@ -286,6 +355,11 @@ export const placeOrder = createServerFn({ method: "POST" })
     }
 
     if (!userId) {
+      const { error: accessError } = await supabaseAdmin.from("guest_order_access").insert({
+        order_id: order.id,
+        token_hash: await guestTokenHash(data.guestAccessToken!),
+      });
+      if (accessError) return { ok: false, error: "Confirmarea nu este disponibilă momentan." };
       await supabaseAdmin
         .from("guest_checkout_usage")
         .upsert({ email, first_order_id: order.id }, { onConflict: "email" });
