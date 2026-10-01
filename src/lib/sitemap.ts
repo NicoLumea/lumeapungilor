@@ -1,4 +1,5 @@
-export const SITEMAP_ORIGIN = "https://lumeapungilor.ro";
+// Current public site. Switch to the custom domain only once it serves these pages.
+export const SITEMAP_ORIGIN = "https://lumeapungilor.lovable.app";
 
 // The root route redirects to /magazin, so only its canonical destination belongs here.
 export const INDEXABLE_STATIC_PATHS = [

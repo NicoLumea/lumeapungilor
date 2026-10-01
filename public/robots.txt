@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://lumeapungilor.ro/sitemap.xml
+Sitemap: https://lumeapungilor.lovable.app/sitemap.xml
