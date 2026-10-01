@@ -11,6 +11,7 @@ export const Route = createFileRoute("/feedback")({
     meta: [
       { title: "Trimite feedback — Lumea Pungilor" },
       { name: "description", content: "Spune-ne cum putem îmbunătăți experiența ta." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: FeedbackPage,
