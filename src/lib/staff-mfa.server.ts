@@ -132,7 +132,6 @@ export async function staffVerificationStatus(userId: string, sessionId: string)
       .select("expires_at")
       .eq("auth_session_id", sessionId)
       .eq("user_id", userId)
-      .gt("expires_at", now)
       .maybeSingle(),
     supabaseAdmin.auth.admin.getUserById(userId),
     supabaseAdmin
@@ -222,9 +221,9 @@ export async function verifyStaffCode(userId: string, sessionId: string, code: s
     return { ok: false as const, error: "Sesiunea verificată nu a putut fi stabilită." };
   }
 
-  const expiresAt = new Date(
-    now.getTime() + positiveInteger("STAFF_MFA_SESSION_HOURS", 12) * 60 * 60 * 1000,
-  ).toISOString();
+  // The legacy column remains populated for schema compatibility. Access is
+  // bounded by the valid Supabase session_id, whose revocation ends access.
+  const expiresAt = "9999-12-31T23:59:59.999Z";
   const { error: sessionWriteError } = await supabaseAdmin.from("staff_verified_sessions").upsert(
     {
       auth_session_id: verifiedSessionId,
@@ -248,7 +247,7 @@ export async function verifyStaffCode(userId: string, sessionId: string, code: s
     action: "staff_mfa.verified",
     entity: "auth.session",
     entityId: verifiedSessionId,
-    details: { expires_at: expiresAt, assurance: "application_email_check" },
+    details: { session_bound: true, assurance: "application_email_check" },
   });
   return {
     ok: true as const,
