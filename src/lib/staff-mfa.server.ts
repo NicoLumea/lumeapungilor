@@ -123,7 +123,8 @@ export async function beginStaffChallenge(
 
 export async function staffVerificationStatus(userId: string, sessionId: string) {
   const roles = await rolesForUser(userId);
-  if (!requiresStaffEmailVerification(roles)) return { required: false, verified: true as const };
+  if (!requiresStaffEmailVerification(roles))
+    return { roles, required: false, verified: true as const };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const now = new Date().toISOString();
   const [{ data: verified }, { data: user }, { data: challenge }] = await Promise.all([
@@ -147,6 +148,7 @@ export async function staffVerificationStatus(userId: string, sessionId: string)
       .maybeSingle(),
   ]);
   return {
+    roles,
     required: true,
     verified: !!verified,
     verifiedUntil: verified?.expires_at ?? null,

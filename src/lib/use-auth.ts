@@ -21,6 +21,7 @@ export type AuthState = {
   staffVerified: boolean;
   staffVerificationLoading: boolean;
   maskedStaffEmail: string | null;
+  error: string | null;
   refresh: () => void;
 };
 
@@ -32,6 +33,7 @@ type InternalAuthState = {
   staffVerified: boolean;
   staffVerificationLoading: boolean;
   maskedStaffEmail: string | null;
+  error: string | null;
 };
 
 const SIGNED_OUT_STATE: InternalAuthState = {
@@ -42,6 +44,7 @@ const SIGNED_OUT_STATE: InternalAuthState = {
   staffVerified: false,
   staffVerificationLoading: false,
   maskedStaffEmail: null,
+  error: null,
 };
 
 export function useAuth(): AuthState {
@@ -54,6 +57,7 @@ export function useAuth(): AuthState {
     staffVerified: false,
     staffVerificationLoading: false,
     maskedStaffEmail: null,
+    error: null,
   });
   const [tick, setTick] = useState(0);
   const refresh = useCallback(() => setTick((t) => t + 1), []);
@@ -66,54 +70,47 @@ export function useAuth(): AuthState {
         if (active) setState(SIGNED_OUT_STATE);
         return;
       }
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
-      const roles = (data ?? []).map((r) => r.role as AppRole);
-      if (!requiresStaffEmailVerification(roles)) {
-        if (active)
-          setState({
-            loading: false,
-            user,
-            roles,
-            staffVerificationRequired: false,
-            staffVerified: true,
-            staffVerificationLoading: false,
-            maskedStaffEmail: null,
-          });
-        return;
-      }
-
       if (active)
         setState({
-          loading: false,
+          loading: true,
           user,
-          roles,
-          staffVerificationRequired: true,
+          roles: [],
+          staffVerificationRequired: false,
           staffVerified: false,
           staffVerificationLoading: true,
           maskedStaffEmail: null,
+          error: null,
         });
       try {
         const status = await getVerificationStatus();
+        if ("error" in status && status.error) throw new Error(status.error);
+        const roleValues: string[] = status.roles;
+        const roles = roleValues.filter(
+          (role): role is AppRole =>
+            role === "customer" || role === "employee" || role === "admin" || role === "owner",
+        );
         if (active)
           setState({
             loading: false,
             user,
             roles,
-            staffVerificationRequired: status.required,
+            staffVerificationRequired: status.required || requiresStaffEmailVerification(roles),
             staffVerified: status.verified,
             staffVerificationLoading: false,
             maskedStaffEmail: "maskedEmail" in status ? (status.maskedEmail ?? null) : null,
+            error: null,
           });
       } catch {
         if (active)
           setState({
             loading: false,
             user,
-            roles,
+            roles: [],
             staffVerificationRequired: true,
             staffVerified: false,
             staffVerificationLoading: false,
             maskedStaffEmail: null,
+            error: "Rolul sau sesiunea nu au putut fi verificate. Reîncearcă.",
           });
       }
     }
@@ -151,6 +148,7 @@ export function useAuth(): AuthState {
     staffVerified: state.staffVerified,
     staffVerificationLoading: state.staffVerificationLoading,
     maskedStaffEmail: state.maskedStaffEmail,
+    error: state.error,
     refresh,
   };
 }

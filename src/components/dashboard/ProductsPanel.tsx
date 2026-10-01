@@ -17,6 +17,7 @@ import { useCategories } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { formatRon, slugify } from "@/lib/format";
 import { primaryImage, sortedImages, type Product, type Spec } from "@/lib/shop-types";
+import { adminErrorMessage } from "@/lib/admin-errors";
 
 type ImageDraft = AdminProductImageDraft;
 type VariantDraft = AdminProductVariantDraft;
@@ -128,9 +129,11 @@ export function ProductsPanel() {
     [],
   );
 
-  function invalidate() {
-    qc.invalidateQueries({ queryKey: ["admin", "products"] });
-    qc.invalidateQueries({ queryKey: ["products"] });
+  async function invalidate() {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["admin", "products"] }),
+      qc.invalidateQueries({ queryKey: ["products"] }),
+    ]);
   }
 
   async function persistGallery(productId: string, images: ImageDraft[]): Promise<boolean> {
@@ -144,7 +147,7 @@ export function ProductsPanel() {
       p_primary_image_id: primaryId,
     });
     if (error) throw error;
-    invalidate();
+    await invalidate();
     return true;
   }
 
@@ -252,12 +255,12 @@ export function ProductsPanel() {
     setBusy(true);
     try {
       await saveProductCatalogEntry(draft);
+      await invalidate();
       pendingImagePaths.current.clear();
       toast.success("Produs salvat.");
       setDraft(null);
-      invalidate();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Produsul nu a putut fi salvat.");
+      toast.error(adminErrorMessage(err, "Salvarea produsului"));
     } finally {
       setBusy(false);
     }
