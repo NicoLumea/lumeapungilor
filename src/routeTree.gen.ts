@@ -24,6 +24,7 @@ import { Route as DezabonareRouteImport } from './routes/dezabonare'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as MagazinRouteImport } from './routes/magazin'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as N7q4V2m9RouteImport } from './routes/n7q4-v2m9'
 import { Route as ParolaNouaRouteImport } from './routes/parola-noua'
 import { Route as ProduseRouteImport } from './routes/produse'
@@ -32,6 +33,7 @@ import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
 import { Route as N7q4V2m9IndexRouteImport } from './routes/n7q4-v2m9.index'
@@ -58,6 +60,7 @@ import { Route as StaffMesajeRouteImport } from './routes/staff.mesaje'
 import { Route as StaffProduseRouteImport } from './routes/staff.produse'
 import { Route as StaffRetururiRouteImport } from './routes/staff.retururi'
 import { Route as StaffStocRouteImport } from './routes/staff.stoc'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiAuthLoginRouteImport } from './routes/api.auth.login'
 import { Route as ApiAuthPasswordResetRouteImport } from './routes/api.auth.password-reset'
 import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
@@ -137,6 +140,11 @@ const MagazinRoute = MagazinRouteImport.update({
   path: '/magazin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const N7q4V2m9Route = N7q4V2m9RouteImport.update({
   id: '/n7q4-v2m9',
   path: '/n7q4-v2m9',
@@ -177,6 +185,12 @@ const TermeniRoute = TermeniRouteImport.update({
   path: '/termeni',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CategorieSlugRoute = CategorieSlugRouteImport.update({
   id: '/categorie/$slug',
   path: '/categorie/$slug',
@@ -307,6 +321,11 @@ const StaffStocRoute = StaffStocRouteImport.update({
   path: '/stoc',
   getParentRoute: () => StaffRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
   id: '/api/auth/login',
   path: '/api/auth/login',
@@ -339,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/mcp': typeof McpRoute
   '/n7q4-v2m9': typeof N7q4V2m9RouteWithChildren
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
@@ -347,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
@@ -373,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/staff/stoc': typeof StaffStocRoute
   '/n7q4-v2m9/': typeof N7q4V2m9IndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
@@ -393,12 +415,14 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/mcp': typeof McpRoute
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
   '/termeni': typeof TermeniRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
@@ -425,6 +449,7 @@ export interface FileRoutesByTo {
   '/staff/stoc': typeof StaffStocRoute
   '/n7q4-v2m9': typeof N7q4V2m9IndexRoute
   '/staff': typeof StaffIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
@@ -446,6 +471,7 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/livrare': typeof LivrareRoute
   '/magazin': typeof MagazinRoute
+  '/mcp': typeof McpRoute
   '/n7q4-v2m9': typeof N7q4V2m9RouteWithChildren
   '/parola-noua': typeof ParolaNouaRoute
   '/produse': typeof ProduseRoute
@@ -454,6 +480,7 @@ export interface FileRoutesById {
   '/retururi': typeof RetururiRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
   '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
@@ -480,6 +507,7 @@ export interface FileRoutesById {
   '/staff/stoc': typeof StaffStocRoute
   '/n7q4-v2m9/': typeof N7q4V2m9IndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
   '/api/public/img/$': typeof ApiPublicImgSplatRoute
@@ -502,6 +530,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/livrare'
     | '/magazin'
+    | '/mcp'
     | '/n7q4-v2m9'
     | '/parola-noua'
     | '/produse'
@@ -510,6 +539,7 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
+    | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/n7q4-v2m9/audit'
@@ -536,6 +566,7 @@ export interface FileRouteTypes {
     | '/staff/stoc'
     | '/n7q4-v2m9/'
     | '/staff/'
+    | '/.lovable/oauth/consent'
     | '/api/auth/login'
     | '/api/auth/password-reset'
     | '/api/public/img/$'
@@ -556,12 +587,14 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/livrare'
     | '/magazin'
+    | '/mcp'
     | '/parola-noua'
     | '/produse'
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
     | '/termeni'
+    | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/n7q4-v2m9/audit'
@@ -588,6 +621,7 @@ export interface FileRouteTypes {
     | '/staff/stoc'
     | '/n7q4-v2m9'
     | '/staff'
+    | '/.lovable/oauth/consent'
     | '/api/auth/login'
     | '/api/auth/password-reset'
     | '/api/public/img/$'
@@ -608,6 +642,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/livrare'
     | '/magazin'
+    | '/mcp'
     | '/n7q4-v2m9'
     | '/parola-noua'
     | '/produse'
@@ -616,6 +651,7 @@ export interface FileRouteTypes {
     | '/retururi'
     | '/staff'
     | '/termeni'
+    | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
     | '/comanda/$number'
     | '/n7q4-v2m9/audit'
@@ -642,6 +678,7 @@ export interface FileRouteTypes {
     | '/staff/stoc'
     | '/n7q4-v2m9/'
     | '/staff/'
+    | '/.lovable/oauth/consent'
     | '/api/auth/login'
     | '/api/auth/password-reset'
     | '/api/public/img/$'
@@ -663,6 +700,7 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   LivrareRoute: typeof LivrareRoute
   MagazinRoute: typeof MagazinRoute
+  McpRoute: typeof McpRoute
   N7q4V2m9Route: typeof N7q4V2m9RouteWithChildren
   ParolaNouaRoute: typeof ParolaNouaRoute
   ProduseRoute: typeof ProduseRoute
@@ -671,9 +709,11 @@ export interface RootRouteChildren {
   RetururiRoute: typeof RetururiRoute
   StaffRoute: typeof StaffRouteWithChildren
   TermeniRoute: typeof TermeniRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
   ProdusSlugRoute: typeof ProdusSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiAuthLoginRoute: typeof ApiAuthLoginRoute
   ApiAuthPasswordResetRoute: typeof ApiAuthPasswordResetRoute
   ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
@@ -786,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagazinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/n7q4-v2m9': {
       id: '/n7q4-v2m9'
       path: '/n7q4-v2m9'
@@ -840,6 +887,13 @@ declare module '@tanstack/react-router' {
       path: '/termeni'
       fullPath: '/termeni'
       preLoaderRoute: typeof TermeniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categorie/$slug': {
@@ -1024,6 +1078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffStocRouteImport
       parentRoute: typeof StaffRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/login': {
       id: '/api/auth/login'
       path: '/api/auth/login'
@@ -1128,6 +1189,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   LivrareRoute: LivrareRoute,
   MagazinRoute: MagazinRoute,
+  McpRoute: McpRoute,
   N7q4V2m9Route: N7q4V2m9RouteWithChildren,
   ParolaNouaRoute: ParolaNouaRoute,
   ProduseRoute: ProduseRoute,
@@ -1136,9 +1198,12 @@ const rootRouteChildren: RootRouteChildren = {
   RetururiRoute: RetururiRoute,
   StaffRoute: StaffRouteWithChildren,
   TermeniRoute: TermeniRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
   ProdusSlugRoute: ProdusSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiAuthLoginRoute: ApiAuthLoginRoute,
   ApiAuthPasswordResetRoute: ApiAuthPasswordResetRoute,
   ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
