@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useContent } from "@/lib/content";
 import { uploadProductImage } from "@/lib/admin-data";
 import { imageUrl } from "@/lib/images";
+import { adminErrorMessage } from "@/lib/admin-errors";
 
 type FieldKind = "text" | "textarea" | "image" | "number" | "boolean";
 type Field = { name: string; label: string; kind: FieldKind; hint?: string };
@@ -90,16 +91,21 @@ export function ContentPanel() {
 
   async function save(key: string) {
     setBusy(key);
-    const { error } = await supabase
-      .from("site_content")
-      .upsert({ key, value: (values[key] ?? {}) as never }, { onConflict: "key" });
-    setBusy(null);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const { data: saved, error } = await supabase
+        .from("site_content")
+        .upsert({ key, value: (values[key] ?? {}) as never }, { onConflict: "key" })
+        .select("key")
+        .single();
+      if (error) throw error;
+      if (saved?.key !== key) throw new Error("Content save was not confirmed");
+      await qc.invalidateQueries({ queryKey: ["site_content"] });
+      toast.success("Salvat.");
+    } catch (error) {
+      toast.error(adminErrorMessage(error, "Salvarea conținutului"));
+    } finally {
+      setBusy(null);
     }
-    toast.success("Salvat.");
-    qc.invalidateQueries({ queryKey: ["site_content"] });
   }
 
   function set(group: string, field: string, value: unknown) {

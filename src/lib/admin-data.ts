@@ -70,5 +70,21 @@ export async function saveProductCatalogEntry(draft: AdminProductDraft): Promise
   });
   if (error) throw error;
   if (!data) throw new Error("Produsul nu a fost confirmat de baza de date.");
+  const { data: persisted, error: readError } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("id", data)
+    .single();
+  if (readError) throw readError;
+  const saved = persisted as unknown as Product;
+  if (
+    saved.name !== input.product["name"] ||
+    saved.slug !== input.product["slug"] ||
+    saved.status !== input.product["status"] ||
+    saved.product_images?.length !== input.images.length ||
+    saved.product_variants?.length !== input.variants.length
+  ) {
+    throw new Error("Produsul nu a putut fi confirmat după salvarea în Supabase.");
+  }
   return data;
 }
