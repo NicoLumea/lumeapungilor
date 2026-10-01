@@ -28,7 +28,8 @@ alter table public.order_items
 alter table public.products
   add column if not exists variant_stock_tracked boolean not null default false;
 update public.products p set variant_stock_tracked=true
-where exists (select 1 from public.product_variants pv where pv.product_id=p.id and pv.stock > 0);
+where not p.variant_stock_tracked
+  and exists (select 1 from public.product_variants pv where pv.product_id=p.id and pv.stock > 0);
 
 create or replace function public.prevent_variant_stock_mode_reset()
 returns trigger language plpgsql set search_path = public as $$
@@ -39,6 +40,7 @@ begin
   return new;
 end;
 $$;
+drop trigger if exists products_preserve_variant_stock_mode on public.products;
 create trigger products_preserve_variant_stock_mode before update of variant_stock_tracked on public.products
 for each row execute function public.prevent_variant_stock_mode_reset();
 
@@ -52,12 +54,19 @@ begin
   return new;
 end;
 $$;
+drop trigger if exists variants_mark_stock_tracked on public.product_variants;
 create trigger variants_mark_stock_tracked after insert or update of stock on public.product_variants
 for each row execute function public.mark_variant_stock_tracked();
 
 -- NOT VALID preserves any legacy rows while enforcing nonnegative stock on new writes.
-alter table public.products add constraint products_stock_nonnegative check (stock >= 0) not valid;
-alter table public.product_variants add constraint variants_stock_nonnegative check (stock >= 0) not valid;
+do $$ begin
+  if not exists (select 1 from pg_constraint where conrelid='public.products'::regclass and conname='products_stock_nonnegative') then
+    alter table public.products add constraint products_stock_nonnegative check (stock >= 0) not valid;
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid='public.product_variants'::regclass and conname='variants_stock_nonnegative') then
+    alter table public.product_variants add constraint variants_stock_nonnegative check (stock >= 0) not valid;
+  end if;
+end $$;
 
 create index if not exists orders_created_page_idx on public.orders (created_at desc, id desc);
 create index if not exists orders_user_history_idx on public.orders (user_id, created_at desc) where user_id is not null;
@@ -78,6 +87,7 @@ begin
   return old;
 end;
 $$;
+drop trigger if exists variants_preserve_active_orders on public.product_variants;
 create trigger variants_preserve_active_orders before delete on public.product_variants
 for each row execute function public.prevent_active_variant_delete();
 
@@ -91,6 +101,7 @@ begin
   return old;
 end;
 $$;
+drop trigger if exists products_preserve_active_orders on public.products;
 create trigger products_preserve_active_orders before delete on public.products
 for each row execute function public.prevent_active_product_delete();
 
@@ -270,7 +281,8 @@ begin
   return query
   select o.* from public.orders o
   where (nullif(trim(p_search),'') is null or
-    o.order_number ilike '%'||p_search||'%' or o.contact_name ilike '%'||p_search||'%' or
+    o.id::text ilike '%'||p_search||'%' or o.order_number ilike '%'||p_search||'%' or
+    o.contact_name ilike '%'||p_search||'%' or
     o.email ilike '%'||p_search||'%' or coalesce(o.company_name,'') ilike '%'||p_search||'%' or
     o.user_id::text ilike '%'||p_search||'%' or exists (
       select 1 from public.order_items oi where oi.order_id=o.id and oi.product_name ilike '%'||p_search||'%'
