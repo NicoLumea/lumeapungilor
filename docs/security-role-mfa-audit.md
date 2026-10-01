@@ -110,33 +110,10 @@ server-only verification table. Browser-provided role values are never accepted.
   session boundary if cleanup cannot run.
 - No OTP, password, refresh token or service secret is logged or included in an audit record.
 
-## Staff session handoff and redirect restoration
-
-The email OTP verification call creates a fresh Supabase authentication session. Previously, the
-application discarded that returned session and wrote the privileged-verification record against
-the earlier password session. A refresh or session-policy invalidation could therefore leave the
-browser using an unverified or obsolete session and restart the MFA challenge.
-
-The completed flow now:
-
-1. sanitizes and remembers an internal staff destination before password login starts the email
-   challenge;
-2. verifies the OTP and user identity server-side;
-3. binds `staff_verified_sessions` to the fresh session ID returned by Supabase OTP verification;
-4. establishes that exact session in the browser and confirms the authenticated user ID;
-5. resolves the destination against roles loaded from `user_roles`; and
-6. replaces the current page with the authorized destination so reloads and normal navigation use
-   the same verified session.
-
-External, protocol-relative, encoded-slash and malformed destinations are rejected. Employees
-cannot restore Admin destinations, Customers cannot restore either staff area, and a missing or
-unauthorized destination falls back to the dashboard allowed by the trusted role.
-
 ## Tests run
 
 - Role hierarchy and employee/Admin separation unit tests.
 - Session-binding parsing and masked-email tests.
-- Session handoff destination sanitization, trusted-role defaults and redirect authorization tests.
 - Existing authentication, password recovery, product gallery, return and support tests.
 - TypeScript, focused ESLint, migration static review and production build.
 

@@ -2,12 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { roleAllows, sessionIdFromClaims } from "./authorization.server.ts";
 import { maskEmail, sessionIdFromAccessToken } from "./staff-mfa.server.ts";
-import {
-  ADMIN_DASHBOARD,
-  EMPLOYEE_DASHBOARD,
-  resolvePostAuthDestination,
-  sanitizeInternalDestination,
-} from "./staff-auth-flow.ts";
 
 test("enforces the role hierarchy without granting employee admin access", () => {
   assert.equal(roleAllows(["employee"], "employee"), true);
@@ -38,30 +32,4 @@ test("extracts the session binding from an access token without exposing credent
 test("masks staff email addresses in the verification screen", () => {
   assert.equal(maskEmail("birou@company.ro"), "b***@company.ro");
   assert.equal(maskEmail("invalid"), "***");
-});
-
-test("rejects external, protocol-relative, encoded-slash and malformed redirect targets", () => {
-  assert.equal(sanitizeInternalDestination("https://example.com"), null);
-  assert.equal(sanitizeInternalDestination("//example.com"), null);
-  assert.equal(sanitizeInternalDestination("/%2F%2Fexample.com"), null);
-  assert.equal(sanitizeInternalDestination("/staff\\example"), null);
-  assert.equal(sanitizeInternalDestination("/staff/comenzi?tab=noi"), "/staff/comenzi?tab=noi");
-});
-
-test("restores only role-authorized staff destinations", () => {
-  assert.equal(
-    resolvePostAuthDestination("/n7q4-v2m9/orders?status=nou", ["admin"]),
-    "/n7q4-v2m9/orders?status=nou",
-  );
-  assert.equal(resolvePostAuthDestination("/staff/comenzi", ["employee"]), "/staff/comenzi");
-  assert.equal(resolvePostAuthDestination("/n7q4-v2m9/orders", ["employee"]), EMPLOYEE_DASHBOARD);
-  assert.equal(resolvePostAuthDestination("/staff/comenzi", ["customer"]), "/cont");
-  assert.equal(resolvePostAuthDestination("/admin", ["customer"]), "/cont");
-});
-
-test("uses the correct trusted-role default when no protected destination exists", () => {
-  assert.equal(resolvePostAuthDestination(undefined, ["admin"]), ADMIN_DASHBOARD);
-  assert.equal(resolvePostAuthDestination("/cont", ["owner"]), ADMIN_DASHBOARD);
-  assert.equal(resolvePostAuthDestination(undefined, ["employee"]), EMPLOYEE_DASHBOARD);
-  assert.equal(resolvePostAuthDestination("/checkout", ["customer"]), "/checkout");
 });

@@ -1,11 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { PASSWORD_RESET_GENERIC_MESSAGE } from "@/lib/password-recovery";
-import {
-  isStaffDestination,
-  sanitizeInternalDestination,
-  STAFF_DESTINATION_STORAGE_KEY,
-} from "@/lib/staff-auth-flow";
-import { storageRemove, storageSet } from "@/lib/safe-storage";
 
 type AuthErrorPayload = {
   error?: string;
@@ -28,24 +22,18 @@ export class PublicAuthError extends Error {
 export async function protectedSignIn(
   email: string,
   password: string,
-  requestedDestination?: string,
-): Promise<{ requiresStaffVerification: boolean; nextDestination: string }> {
-  const safeDestination = sanitizeInternalDestination(requestedDestination) ?? "/cont";
-  if (isStaffDestination(safeDestination)) {
-    storageSet("session", STAFF_DESTINATION_STORAGE_KEY, safeDestination);
-  }
+): Promise<{ requiresStaffVerification: boolean }> {
   const response = await fetch("/api/auth/login", {
     method: "POST",
     credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, destination: safeDestination }),
+    body: JSON.stringify({ email, password }),
   });
   const payload = (await response.json()) as AuthErrorPayload & {
     ok?: boolean;
     accessToken?: string;
     refreshToken?: string;
     requiresStaffVerification?: boolean;
-    nextDestination?: string;
   };
   if (!response.ok || !payload.ok || !payload.accessToken || !payload.refreshToken) {
     throw new PublicAuthError(payload);
@@ -55,14 +43,7 @@ export async function protectedSignIn(
     refresh_token: payload.refreshToken,
   });
   if (error) throw new PublicAuthError({ error: "Autentificarea nu a putut fi finalizată." });
-  const requiresStaffVerification = payload.requiresStaffVerification === true;
-  const nextDestination = sanitizeInternalDestination(payload.nextDestination) ?? "/cont";
-  if (requiresStaffVerification) {
-    storageSet("session", STAFF_DESTINATION_STORAGE_KEY, nextDestination);
-  } else {
-    storageRemove("session", STAFF_DESTINATION_STORAGE_KEY);
-  }
-  return { requiresStaffVerification, nextDestination };
+  return { requiresStaffVerification: payload.requiresStaffVerification === true };
 }
 
 export async function protectedPasswordReset(email: string): Promise<string> {

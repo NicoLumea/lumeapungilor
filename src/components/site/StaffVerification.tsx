@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,26 +8,13 @@ import {
   resendStaffVerificationCode,
 } from "@/lib/staff-mfa.functions";
 import type { AuthState } from "@/lib/use-auth";
-import { storageGet, storageRemove, storageSet } from "@/lib/safe-storage";
-import {
-  isStaffDestination,
-  sanitizeInternalDestination,
-  STAFF_DESTINATION_STORAGE_KEY,
-} from "@/lib/staff-auth-flow";
 
-export function StaffVerification({ auth, destination }: { auth: AuthState; destination: string }) {
+export function StaffVerification({ auth }: { auth: AuthState }) {
   const confirm = useServerFn(confirmStaffVerificationCode);
   const resend = useServerFn(resendStaffVerificationCode);
   const clearVerification = useServerFn(clearStaffVerification);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
-
-  const currentDestination = sanitizeInternalDestination(destination);
-  useEffect(() => {
-    if (currentDestination && isStaffDestination(currentDestination)) {
-      storageSet("session", STAFF_DESTINATION_STORAGE_KEY, currentDestination);
-    }
-  }, [currentDestination]);
 
   async function verify(event: React.FormEvent) {
     event.preventDefault();
@@ -37,31 +24,13 @@ export function StaffVerification({ auth, destination }: { auth: AuthState; dest
     }
     setBusy(true);
     try {
-      const intendedDestination =
-        currentDestination ?? storageGet("session", STAFF_DESTINATION_STORAGE_KEY) ?? undefined;
-      const result = await confirm({ data: { code, destination: intendedDestination } });
+      const result = await confirm({ data: { code } });
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: result.accessToken,
-        refresh_token: result.refreshToken,
-      });
-      if (sessionError) {
-        toast.error("Sesiunea verificată nu a putut fi salvată. Încearcă din nou.");
-        return;
-      }
-      const { data: identity, error: identityError } = await supabase.auth.getUser();
-      if (identityError || identity.user?.id !== auth.user?.id) {
-        storageRemove("session", STAFF_DESTINATION_STORAGE_KEY);
-        await supabase.auth.signOut();
-        toast.error("Identitatea sesiunii verificate nu a putut fi confirmată.");
-        return;
-      }
-      storageRemove("session", STAFF_DESTINATION_STORAGE_KEY);
       toast.success("Autentificarea personalului a fost verificată.");
-      window.location.replace(result.destination);
+      auth.refresh();
     } catch {
       toast.error("Codul de verificare este invalid sau a expirat.");
     } finally {
@@ -133,7 +102,6 @@ export function StaffVerification({ auth, destination }: { auth: AuthState; dest
               // Supabase sign-out still revokes the authentication session.
             }
             await supabase.auth.signOut();
-            storageRemove("session", STAFF_DESTINATION_STORAGE_KEY);
             window.location.assign("/autentificare");
           }}
           className="micro-sm min-h-10 text-muted-foreground underline underline-offset-4"

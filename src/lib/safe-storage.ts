@@ -25,11 +25,3 @@ export function storageSet(kind: Kind, key: string, value: string): void {
     /* storage unavailable or full */
   }
 }
-
-export function storageRemove(kind: Kind, key: string): void {
-  try {
-    store(kind)?.removeItem(key);
-  } catch {
-    /* storage unavailable */
-  }
-}

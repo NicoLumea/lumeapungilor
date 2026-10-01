@@ -43,7 +43,7 @@ export function RequireAccess({
         <p className="py-32 text-center text-sm text-muted-foreground">Se verifică sesiunea…</p>
       );
     }
-    return <StaffVerification auth={auth} destination={href} />;
+    return <StaffVerification auth={auth} />;
   }
 
   if (!hasAccess(!!auth.user, auth.roles, level)) {
