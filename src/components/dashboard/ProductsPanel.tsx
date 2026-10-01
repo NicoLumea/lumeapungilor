@@ -6,7 +6,14 @@ import { useAdminProducts, uploadProductImage } from "@/lib/admin-data";
 import { useCategories } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { formatRon, slugify } from "@/lib/format";
-import { primaryImage, sortedImages, type Product, type Spec } from "@/lib/shop-types";
+import {
+  assignedCategories,
+  primaryImage,
+  sortedImages,
+  toggleCategorySelection,
+  type Product,
+  type Spec,
+} from "@/lib/shop-types";
 
 type ImageDraft = { id?: string; url: string; alt: string; isPrimary: boolean };
 type VariantDraft = { id?: string; name: string; sku: string; price: string; stock: number };
@@ -17,6 +24,7 @@ type Draft = {
   slug: string;
   description: string;
   category_id: string;
+  category_ids: string[];
   sku: string;
   price: string;
   selling_unit: string;
@@ -39,6 +47,7 @@ const blank: Draft = {
   slug: "",
   description: "",
   category_id: "",
+  category_ids: [],
   sku: "",
   price: "",
   selling_unit: "set",
@@ -62,7 +71,8 @@ function toDraft(p: Product): Draft {
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
-    category_id: p.category_id ?? "",
+    category_id: p.category_id ?? assignedCategories(p)[0]?.id ?? "",
+    category_ids: assignedCategories(p).map((category) => category.id),
     sku: p.sku ?? "",
     price: String(p.price),
     selling_unit: p.selling_unit,
@@ -242,13 +252,20 @@ export function ProductsPanel() {
       toast.error("Prețul trebuie să fie un număr.");
       return;
     }
+    if (draft.status === "published" && draft.category_ids.length === 0) {
+      toast.error("Alege cel puțin o categorie pentru un produs publicat.");
+      return;
+    }
+    if (draft.category_id && !draft.category_ids.includes(draft.category_id)) {
+      toast.error("Categoria principală trebuie să fie selectată.");
+      return;
+    }
     setBusy(true);
     try {
       const payload = {
         name: draft.name.trim(),
         slug: (draft.slug.trim() || slugify(draft.name)).toLowerCase(),
         description: draft.description.trim() || null,
-        category_id: draft.category_id || null,
         sku: draft.sku.trim() || null,
         price,
         selling_unit: draft.selling_unit.trim() || "set",
@@ -271,12 +288,19 @@ export function ProductsPanel() {
       } else {
         const { data, error } = await supabase
           .from("products")
-          .insert(payload)
+          .insert({ ...payload, category_id: draft.category_id || null })
           .select("id")
           .single();
         if (error) throw error;
         productId = data.id;
       }
+
+      const { error: categoriesError } = await supabase.rpc("set_product_categories", {
+        p_product_id: productId,
+        p_category_ids: draft.category_ids,
+        p_primary_category_id: draft.category_id || null,
+      });
+      if (categoriesError) throw categoriesError;
 
       const savedImages: ImageDraft[] = [];
       for (const [index, image] of draft.images.entries()) {
@@ -399,21 +423,52 @@ export function ProductsPanel() {
               placeholder={slugify(draft.name)}
               onChange={(v) => setDraft({ ...draft, slug: v })}
             />
-            <label className="block">
-              <span className="micro-sm text-muted-foreground">Categorie</span>
-              <select
-                value={draft.category_id}
-                onChange={(e) => setDraft({ ...draft, category_id: e.target.value })}
-                className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-              >
-                <option value="">Fără categorie</option>
+            <fieldset className="block border border-input p-3">
+              <legend className="micro-sm px-1 text-muted-foreground">Categorii</legend>
+              <div className="max-h-44 space-y-2 overflow-y-auto">
                 {(categories ?? []).map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <label key={c.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={draft.category_ids.includes(c.id)}
+                      onChange={(event) => {
+                        const { categoryIds, primaryId } = toggleCategorySelection(
+                          draft.category_ids,
+                          draft.category_id,
+                          c.id,
+                          event.target.checked,
+                        );
+                        setDraft({
+                          ...draft,
+                          category_ids: categoryIds,
+                          category_id: primaryId,
+                        });
+                      }}
+                      className="size-4 accent-foreground"
+                    />
                     {c.name}
-                  </option>
+                  </label>
                 ))}
-              </select>
-            </label>
+              </div>
+              {draft.category_ids.length > 1 ? (
+                <label className="mt-3 block text-xs text-muted-foreground">
+                  Categorie principală pentru navigare
+                  <select
+                    value={draft.category_id}
+                    onChange={(event) => setDraft({ ...draft, category_id: event.target.value })}
+                    className="mt-1 w-full border border-input bg-background px-2 py-2 text-sm text-foreground"
+                  >
+                    {(categories ?? [])
+                      .filter((category) => draft.category_ids.includes(category.id))
+                      .map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              ) : null}
+            </fieldset>
             <Text
               label="Cod produs"
               value={draft.sku}
@@ -814,8 +869,10 @@ export function ProductsPanel() {
               <div className="min-w-[200px] flex-1">
                 <p className="text-sm">{p.name}</p>
                 <p className="micro-sm text-muted-foreground">
-                  {p.categories?.name ?? "Fără categorie"} · {formatRon(Number(p.price))} /{" "}
-                  {p.selling_unit} ·{" "}
+                  {assignedCategories(p)
+                    .map((category) => category.name)
+                    .join(", ") || "Fără categorie"}{" "}
+                  · {formatRon(Number(p.price))} / {p.selling_unit} ·{" "}
                   {p.is_archived ? "arhivat" : p.status === "published" ? "publicat" : "ciornă"}
                 </p>
               </div>

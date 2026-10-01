@@ -4,7 +4,13 @@ import { toast } from "sonner";
 import { useProduct } from "@/lib/products";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
-import { normalizeQty, primaryImage, productAvailableStock, sortedImages } from "@/lib/shop-types";
+import {
+  assignedCategories,
+  normalizeQty,
+  primaryImage,
+  productAvailableStock,
+  sortedImages,
+} from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
 import { RestockNotice } from "@/components/site/RestockNotice";
 
@@ -275,6 +281,22 @@ function ProductPage() {
             {inStock ? "În stoc" : "Stoc epuizat"}
             {product.sku ? ` · Cod ${product.sku}` : ""}
           </p>
+
+          {assignedCategories(product).length > 0 ? (
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span className="text-muted-foreground">Categorii:</span>
+              {assignedCategories(product).map((category) => (
+                <Link
+                  key={category.id}
+                  to="/categorie/$slug"
+                  params={{ slug: category.slug }}
+                  className="link-underline"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          ) : null}
 
           {variants.length > 0 ? (
             <div className="mt-6">

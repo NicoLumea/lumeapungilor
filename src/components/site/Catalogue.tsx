@@ -6,7 +6,12 @@ import { useCategories } from "@/lib/content";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { matchesQuery } from "@/lib/search";
-import { productAvailableStock, type Product } from "@/lib/shop-types";
+import {
+  assignedCategories,
+  belongsToCategory,
+  productAvailableStock,
+  type Product,
+} from "@/lib/shop-types";
 
 type Sort = "recent" | "pret-asc" | "pret-desc" | "nume";
 
@@ -47,7 +52,7 @@ function searchIndex(p: Product): string {
     p.name,
     p.sku ?? "",
     p.description ?? "",
-    p.categories?.name ?? "",
+    ...assignedCategories(p).map((category) => category.name),
     ...p.specs.map((s) => `${s.label} ${s.value}`),
   ].join(" ");
 }
@@ -89,7 +94,7 @@ export function Catalogue({
 
   const scoped = useMemo(() => {
     const list = all ?? [];
-    return categorySlug ? list.filter((p) => p.categories?.slug === categorySlug) : list;
+    return categorySlug ? list.filter((p) => belongsToCategory(p, categorySlug)) : list;
   }, [all, categorySlug]);
 
   const materials = useMemo(() => specValues(scoped, "material"), [scoped]);
@@ -99,7 +104,7 @@ export function Catalogue({
     let list = [...scoped];
     const q = query.trim();
     if (q) list = list.filter((p) => matchesQuery(searchIndex(p), q));
-    if (cat) list = list.filter((p) => p.categories?.slug === cat);
+    if (cat) list = list.filter((p) => belongsToCategory(p, cat));
     if (material)
       list = list.filter((p) =>
         p.specs.some(
