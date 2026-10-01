@@ -31,6 +31,7 @@ import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ResetareParolaRouteImport } from './routes/resetare-parola'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -173,6 +174,11 @@ const ReturRoute = ReturRouteImport.update({
 const RetururiRoute = RetururiRouteImport.update({
   id: '/retururi',
   path: '/retururi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StaffRoute = StaffRouteImport.update({
@@ -365,6 +371,7 @@ export interface FileRoutesByFullPath {
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -421,6 +428,7 @@ export interface FileRoutesByTo {
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/termeni': typeof TermeniRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
@@ -478,6 +486,7 @@ export interface FileRoutesById {
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -537,6 +546,7 @@ export interface FileRouteTypes {
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
+    | '/sitemap.xml'
     | '/staff'
     | '/termeni'
     | '/.well-known/oauth-protected-resource'
@@ -593,6 +603,7 @@ export interface FileRouteTypes {
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
+    | '/sitemap.xml'
     | '/termeni'
     | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
@@ -649,6 +660,7 @@ export interface FileRouteTypes {
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
+    | '/sitemap.xml'
     | '/staff'
     | '/termeni'
     | '/.well-known/oauth-protected-resource'
@@ -707,6 +719,7 @@ export interface RootRouteChildren {
   ResetareParolaRoute: typeof ResetareParolaRoute
   ReturRoute: typeof ReturRoute
   RetururiRoute: typeof RetururiRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StaffRoute: typeof StaffRouteWithChildren
   TermeniRoute: typeof TermeniRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -873,6 +886,13 @@ declare module '@tanstack/react-router' {
       path: '/retururi'
       fullPath: '/retururi'
       preLoaderRoute: typeof RetururiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/staff': {
@@ -1196,6 +1216,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetareParolaRoute: ResetareParolaRoute,
   ReturRoute: ReturRoute,
   RetururiRoute: RetururiRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StaffRoute: StaffRouteWithChildren,
   TermeniRoute: TermeniRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
