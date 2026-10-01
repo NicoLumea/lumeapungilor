@@ -15,16 +15,6 @@ export function effectiveRole(roles: readonly AppRole[]): AppRole {
   return "customer";
 }
 
-/**
- * Employee accounts keep the additional email challenge. Administrator and
- * Owner accounts use the authenticated Supabase session plus their trusted
- * database role instead, even when they also retain an Employee role row.
- */
-export function requiresStaffEmailVerification(roles: readonly string[]): boolean {
-  const hasAdministrativeRole = roles.includes("admin") || roles.includes("owner");
-  return roles.includes("employee") && !hasAdministrativeRole;
-}
-
 export function hasAccess(
   authenticated: boolean,
   roles: readonly AppRole[],
