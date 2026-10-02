@@ -687,9 +687,9 @@ export type Database = {
           created_at: string
           currency: string
           description: string | null
+          eco_tax_applicable: boolean | null
           id: string
           is_archived: boolean
-          eco_tax_applicable: boolean | null
           is_featured: boolean
           meta_description: string | null
           meta_title: string | null
@@ -714,9 +714,9 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          eco_tax_applicable?: boolean | null
           id?: string
           is_archived?: boolean
-          eco_tax_applicable?: boolean | null
           is_featured?: boolean
           meta_description?: string | null
           meta_title?: string | null
@@ -741,9 +741,9 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          eco_tax_applicable?: boolean | null
           id?: string
           is_archived?: boolean
-          eco_tax_applicable?: boolean | null
           is_featured?: boolean
           meta_description?: string | null
           meta_title?: string | null
