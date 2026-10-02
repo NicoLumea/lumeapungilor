@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Catalogue } from "@/components/site/Catalogue";
-import { useCategories } from "@/lib/content";
 
 /** Permanent slug changes: old catalog URLs must keep working. */
 const SLUG_REDIRECTS: Record<string, string> = {
@@ -27,14 +26,5 @@ export const Route = createFileRoute("/categorie/$slug")({
 
 function CategoryPage() {
   const { slug } = Route.useParams();
-  const { data: categories } = useCategories();
-  const category = (categories ?? []).find((c) => c.slug === slug);
-
-  return (
-    <Catalogue
-      categorySlug={slug}
-      title={category?.name ?? "Categorie"}
-      intro={category?.description ?? null}
-    />
-  );
+  return <Catalogue key={slug} categorySlug={slug} title="Categorie" />;
 }

@@ -7,6 +7,7 @@ import { slugify } from "@/lib/format";
 import { uploadProductImage } from "@/lib/admin-data";
 import { imageUrl } from "@/lib/images";
 import type { Category } from "@/lib/shop-types";
+import { CategoryProductOrder } from "@/components/dashboard/CategoryProductOrder";
 
 type Draft = {
   id?: string;
@@ -197,7 +198,11 @@ export function CategoriesPanel() {
             <li key={c.id} className="flex flex-wrap items-center gap-4 py-4">
               <div className="size-14 shrink-0 bg-field p-1">
                 {c.image_url ? (
-                  <img src={imageUrl(c.image_url) ?? ""} alt="" className="size-full object-contain" />
+                  <img
+                    src={imageUrl(c.image_url) ?? ""}
+                    alt=""
+                    className="size-full object-contain"
+                  />
                 ) : null}
               </div>
               <div className="flex-1">
@@ -230,6 +235,7 @@ export function CategoriesPanel() {
           ))}
         </ul>
       )}
+      <CategoryProductOrder categories={categories ?? []} />
     </div>
   );
 }

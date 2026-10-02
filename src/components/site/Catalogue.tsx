@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { storageGet, storageSet } from "@/lib/safe-storage";
 import { Search, X } from "lucide-react";
-import { usePublishedProducts } from "@/lib/products";
+import { useCategoryProducts, usePublishedProducts } from "@/lib/products";
 import { useCategories } from "@/lib/content";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { matchesQuery } from "@/lib/search";
-import {
-  assignedCategories,
-  belongsToCategory,
-  productAvailableStock,
-  type Product,
-} from "@/lib/shop-types";
-
-type Sort = "recent" | "pret-asc" | "pret-desc" | "nume";
+import { sortCatalogProducts, type CatalogSort } from "@/lib/category-sorting";
+import { belongsToCategory, productAvailableStock, type Product } from "@/lib/shop-types";
 
 const PAGE_SIZE = 24;
 
@@ -52,7 +46,6 @@ function searchIndex(p: Product): string {
     p.name,
     p.sku ?? "",
     p.description ?? "",
-    ...assignedCategories(p).map((category) => category.name),
     ...p.specs.map((s) => `${s.label} ${s.value}`),
   ].join(" ");
 }
@@ -66,8 +59,25 @@ export function Catalogue({
   title: string;
   intro?: string | null;
 }) {
-  const { data: all, isLoading, error, refetch, isFetching } = usePublishedProducts();
-  const { data: categories } = useCategories();
+  const allProducts = usePublishedProducts(!categorySlug);
+  const categoriesQuery = useCategories();
+  const categories = categoriesQuery.data;
+  const category = categorySlug
+    ? categories?.find((item) => item.slug === categorySlug)
+    : undefined;
+  const categoryProducts = useCategoryProducts(category?.id);
+  const all = categorySlug ? categoryProducts.data?.products : allProducts.data;
+  const isLoading = categorySlug
+    ? categoriesQuery.isLoading || (!!category && categoryProducts.isLoading)
+    : allProducts.isLoading;
+  const error = categorySlug
+    ? (categoriesQuery.error ?? categoryProducts.error)
+    : allProducts.error;
+  const isFetching = categorySlug
+    ? categoriesQuery.isFetching || categoryProducts.isFetching
+    : allProducts.isFetching;
+  const categoryMissing =
+    !!categorySlug && !categoriesQuery.isLoading && !categoriesQuery.error && !category;
   const [panelOpen, setPanelOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -76,7 +86,7 @@ export function Catalogue({
   const [size, setSize] = useState<string>("");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState<string>("");
-  const [sort, setSort] = useState<Sort>("recent");
+  const [sort, setSort] = useState<CatalogSort>("default");
   const searchRef = useRef<HTMLInputElement>(null);
 
   const positionKey = `lp-catalog-shown:${categorySlug ?? "toate"}`;
@@ -92,10 +102,7 @@ export function Catalogue({
     storageSet("session", positionKey, String(shown));
   }, [positionKey, shown]);
 
-  const scoped = useMemo(() => {
-    const list = all ?? [];
-    return categorySlug ? list.filter((p) => belongsToCategory(p, categorySlug)) : list;
-  }, [all, categorySlug]);
+  const scoped = useMemo(() => all ?? [], [all]);
 
   const materials = useMemo(() => specValues(scoped, "material"), [scoped]);
   const sizes = useMemo(() => specValues(scoped, "dimensiuni"), [scoped]);
@@ -121,20 +128,7 @@ export function Catalogue({
     const max = Number(maxPrice);
     if (maxPrice !== "" && Number.isFinite(max)) list = list.filter((p) => Number(p.price) <= max);
 
-    switch (sort) {
-      case "pret-asc":
-        list.sort((a, b) => Number(a.price) - Number(b.price));
-        break;
-      case "pret-desc":
-        list.sort((a, b) => Number(b.price) - Number(a.price));
-        break;
-      case "nume":
-        list.sort((a, b) => a.name.localeCompare(b.name, "ro"));
-        break;
-      default:
-        break;
-    }
-    return list;
+    return sortCatalogProducts(list, sort);
   }, [scoped, query, cat, material, size, inStockOnly, maxPrice, sort]);
 
   // A new search or filter always starts from the first page.
@@ -195,9 +189,11 @@ export function Catalogue({
 
   return (
     <div className="catalogue-container py-14">
-      <h1 className="display text-3xl md:text-4xl">{title}</h1>
-      {intro ? (
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">{intro}</p>
+      <h1 className="display text-3xl md:text-4xl">{category?.name ?? title}</h1>
+      {category?.description || intro ? (
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          {category?.description ?? intro}
+        </p>
       ) : null}
 
       <div className="mt-8 hidden md:block">{searchField}</div>
@@ -306,10 +302,10 @@ export function Catalogue({
             <span className="micro-sm text-muted-foreground">Sortare</span>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
+              onChange={(e) => setSort(e.target.value as CatalogSort)}
               className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             >
-              <option value="recent">Recomandate</option>
+              <option value="default">Sortare implicită</option>
               <option value="pret-asc">Preț crescător</option>
               <option value="pret-desc">Preț descrescător</option>
               <option value="nume">Alfabetic</option>
@@ -356,14 +352,23 @@ export function Catalogue({
             variant="outline"
             className="micro mt-6 rounded-none"
             disabled={isFetching}
-            onClick={() => void refetch()}
+            onClick={() => {
+              void categoriesQuery.refetch();
+              void (categorySlug ? categoryProducts.refetch() : allProducts.refetch());
+            }}
           >
             {isFetching ? "Se reîncearcă…" : "Încearcă din nou"}
           </Button>
         </div>
+      ) : categoryMissing ? (
+        <p className="py-24 text-center text-sm text-muted-foreground">
+          Categoria nu a fost găsită.
+        </p>
       ) : scoped.length === 0 ? (
         <p className="py-24 text-center text-sm text-muted-foreground">
-          Catalogul este în pregătire. Produsele vor apărea aici în curând.
+          {categorySlug
+            ? "Nu există produse atribuite acestei categorii momentan."
+            : "Catalogul este în pregătire. Produsele vor apărea aici în curând."}
         </p>
       ) : filtered.length === 0 ? (
         <div className="py-24 text-center">
