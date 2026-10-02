@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AuthPanel } from "@/components/site/AuthPanel";
 import { useCart } from "@/lib/cart";
@@ -32,7 +33,7 @@ function CartPage() {
 
   return (
     <div className="site-container max-w-[1200px] py-14">
-      <h1 className="display text-3xl md:text-4xl">Coș</h1>
+      <h1 className="display text-3xl md:text-4xl"><HeadingText id="cos_h1" /></h1>
 
       {isLoading ? (
         <p className="py-20 text-sm text-muted-foreground">Se încarcă…</p>
@@ -192,7 +193,7 @@ function CartPage() {
               <div className="mt-6 grid items-start gap-6 md:grid-cols-2">
                 <div className="border-2 border-foreground bg-field p-6 sm:p-8">
                   <p className="micro-sm text-muted-foreground">Recomandat</p>
-                  <h3 className="display mt-3 text-2xl">Continuă ca vizitator</h3>
+                  <h3 className="display mt-3 text-2xl"><HeadingText id="cos_guest_h3" /></h3>
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                     Nu ai nevoie de cont. Datele de contact, livrare și facturare vor fi completate
                     în pasul următor.
@@ -207,7 +208,7 @@ function CartPage() {
                 </div>
 
                 <div className="border border-border p-6 sm:p-8">
-                  <h3 className="display text-2xl">Ai deja cont?</h3>
+                  <h3 className="display text-2xl"><HeadingText id="cos_account_h3" /></h3>
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                     Autentificarea sau crearea unui cont este opțională și te ajută să păstrezi
                     datele și istoricul comenzilor viitoare.

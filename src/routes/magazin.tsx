@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RecommendedProducts } from "@/components/site/RecommendedProducts";
 import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
@@ -107,7 +108,7 @@ function Shop() {
 
       <section className="rule-t">
         <div className="site-container grid gap-6 py-10 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:items-start md:gap-12 md:py-14">
-          <h2 className="display text-3xl md:text-4xl">Despre Lumea Pungilor</h2>
+          <h2 className="display text-3xl md:text-4xl"><HeadingText id="magazin_about_h2" /></h2>
           <div>
             <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
               Lumea Pungilor reunește într-un singur catalog produse practice pentru ambalare,

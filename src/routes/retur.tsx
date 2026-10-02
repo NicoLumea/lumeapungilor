@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
@@ -22,14 +23,14 @@ function ReturnsPage() {
   return (
     <article className="site-container max-w-[900px] py-16 sm:py-20">
       <p className="micro-sm text-muted-foreground">Asistență clienți</p>
-      <h1 className="display mt-3 text-4xl md:text-5xl">Retururi și reclamații</h1>
+      <h1 className="display mt-3 text-4xl md:text-5xl"><HeadingText id="retur_h1" /></h1>
       <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
         Dacă există o problemă cu produsele primite, ne poți trimite o cerere de retur sau
         reclamație folosind formularul disponibil pentru comanda ta.
       </p>
 
       <section className="mt-12 border-t border-border pt-8">
-        <h2 className="display text-2xl">Condiții pentru reclamațiile privind produsele</h2>
+        <h2 className="display text-2xl"><HeadingText id="retur_conditii_h2" /></h2>
         <ol className="mt-6 list-decimal space-y-3 pl-5 text-sm leading-relaxed">
           <li>Comanda trebuie să fie achitată.</li>
           <li>
@@ -47,7 +48,7 @@ function ReturnsPage() {
       </section>
 
       <section className="mt-12 border-t border-border pt-8">
-        <h2 className="display text-2xl">Cum funcționează procesul</h2>
+        <h2 className="display text-2xl"><HeadingText id="retur_proces_h2" /></h2>
         <ol className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
           {[
             "Completează formularul.",
@@ -72,7 +73,7 @@ function ReturnsPage() {
       </section>
 
       <section className="mt-12 border border-border p-6 sm:p-8">
-        <h2 className="display text-2xl">Trimite o cerere</h2>
+        <h2 className="display text-2xl"><HeadingText id="retur_cerere_h2" /></h2>
         <p className="mt-3 text-sm text-muted-foreground">
           Alege varianta potrivită comenzii tale. Formularul afișează numai comenzile achitate și
           produsele care apar în acestea.

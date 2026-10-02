@@ -1,0 +1,15 @@
+export const HEADINGS: { id: string; label: string; fallback: string }[] = [
+  { id: "magazin_about_h2", label: "Magazin — H2 Despre", fallback: "Despre Lumea Pungilor" },
+  { id: "contact_h1", label: "Contact — H1", fallback: "Contactează-ne" },
+  { id: "livrare_h1", label: "Livrare — H1", fallback: "Livrare" },
+  { id: "despre_h1", label: "Despre — H1", fallback: "Despre Lumea Pungilor" },
+  { id: "despre_cta_h2", label: "Despre — H2 final", fallback: "Vă așteptăm online sau la stand" },
+  { id: "retur_h1", label: "Retur — H1", fallback: "Retururi și reclamații" },
+  { id: "retur_conditii_h2", label: "Retur — H2 condiții", fallback: "Condiții pentru reclamațiile privind produsele" },
+  { id: "retur_proces_h2", label: "Retur — H2 proces", fallback: "Cum funcționează procesul" },
+  { id: "retur_cerere_h2", label: "Retur — H2 cerere", fallback: "Trimite o cerere" },
+  { id: "cos_h1", label: "Coș — H1", fallback: "Coș" },
+  { id: "cos_guest_h3", label: "Coș — H3 vizitator", fallback: "Continuă ca vizitator" },
+  { id: "cos_account_h3", label: "Coș — H3 cont", fallback: "Ai deja cont?" },
+  { id: "feedback_h1", label: "Feedback — H1", fallback: "Trimite feedback" },
+];

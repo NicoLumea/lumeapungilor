@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import type { ReactNode } from "react";
@@ -85,7 +86,7 @@ function AboutPage() {
     <article className="site-container max-w-[1120px] py-10 sm:py-14 md:py-16">
       <header className="max-w-4xl">
         <p className="micro-sm text-brand">Despre noi</p>
-        <h1 className="display mt-4 text-4xl leading-tight sm:text-5xl">Despre Lumea Pungilor</h1>
+        <h1 className="display mt-4 text-4xl leading-tight sm:text-5xl"><HeadingText id="despre_h1" /></h1>
         <p className="mt-5 max-w-3xl text-base leading-relaxed text-foreground/85 sm:text-lg">
           Lumea Pungilor este furnizor de produse pentru ambalare, transport și servire: pungi,
           pungi de curierat, fețe de masă, mușama la rolă și folie cu bule.
@@ -259,7 +260,7 @@ function AboutPage() {
 
         <section className="border-t border-border bg-hero px-5 py-8 sm:px-8 md:flex md:items-center md:justify-between md:gap-8 md:py-10">
           <div className="min-w-0">
-            <h2 className="display text-2xl sm:text-3xl">Vă așteptăm online sau la stand</h2>
+            <h2 className="display text-2xl sm:text-3xl"><HeadingText id="despre_cta_h2" /></h2>
             <p className="mt-2 text-sm leading-relaxed text-foreground/75">
               Alegeți produsele din catalog sau contactați-ne pentru mai multe informații.
             </p>

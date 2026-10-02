@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
@@ -27,7 +28,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function LivrarePage() {
   return (
     <article className="site-container max-w-[900px] py-20">
-      <h1 className="display text-4xl md:text-5xl">Livrare</h1>
+      <h1 className="display text-4xl md:text-5xl"><HeadingText id="livrare_h1" /></h1>
       <p className="mt-6 text-base leading-relaxed text-muted-foreground">
         Comenzile sunt procesate și pregătite pentru livrare cât mai rapid posibil. Timpul estimativ de livrare depinde de locația destinatarului.
       </p>
