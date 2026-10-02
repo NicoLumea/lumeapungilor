@@ -262,9 +262,7 @@
 .category-card-label::after,
 .featured-product-image,
 .featured-product-name,
-.featured-product-link,
-.site-header,
-.site-header-inner {
+.featured-product-link {
   transition-duration: 350ms;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -339,20 +337,6 @@
   transform: scale(0.995);
 }
 
-.site-header {
-  transition-property: background-color, border-color, box-shadow;
-  transition-duration: 280ms;
-}
-
-.site-header-inner {
-  transition-property: height;
-  transition-duration: 280ms;
-}
-
-.site-header.is-compact .site-header-inner {
-  height: 3.5rem;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .category-card:hover .category-card-image,
   .category-card:focus-visible .category-card-image {
@@ -405,9 +389,7 @@
   .featured-product,
   .featured-product-image,
   .featured-product-name,
-  .featured-product-link,
-  .site-header,
-  .site-header-inner {
+  .featured-product-link {
     transition-duration: 0.01ms;
     transition-delay: 0ms;
   }
