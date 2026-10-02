@@ -19,7 +19,7 @@ export function CustomersPanel({
     queryKey: ["staff", "customers", search, page],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("staff_customer_catalog", {
-        p_search: search || null,
+        p_search: search || undefined,
         p_limit: PAGE_SIZE + 1,
         p_offset: page * PAGE_SIZE,
       });
