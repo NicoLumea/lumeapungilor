@@ -12,8 +12,8 @@ export function StoreHero({ welcome = false }: { welcome?: boolean }) {
     "Pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule, disponibile pentru comenzi de la persoane fizice și firme.";
 
   return (
-    <section className="overflow-hidden border-b border-border bg-hero">
-      <div className="relative w-full">
+    <section className="overflow-hidden border-b border-border bg-[linear-gradient(90deg,#e9e1d6_0%,#f8f4ee_16%,#f8f4ee_84%,#e9e1d6_100%)]">
+      <div className="relative mx-auto w-full max-w-[1920px] bg-hero">
         <div className="relative z-10 px-5 py-5 xl:absolute xl:inset-0 xl:flex xl:items-center xl:px-[clamp(28px,4vw,56px)] xl:py-0">
           <div className="max-w-[500px] text-left xl:w-[30%] xl:max-w-[390px]">
             <h1 className="display text-3xl leading-[1.08] xl:text-[clamp(28px,2.7vw,40px)]">
@@ -46,9 +46,10 @@ export function StoreHero({ welcome = false }: { welcome?: boolean }) {
           width="1920"
           height="800"
           fetchPriority="high"
-          className="pointer-events-none relative block h-auto w-full xl:h-[min(41.6667vw,800px)] xl:object-cover"
+          className="pointer-events-none relative block h-auto w-full xl:h-[min(41.6667vw,600px)] xl:object-cover"
         />
       </div>
     </section>
   );
 }
+
