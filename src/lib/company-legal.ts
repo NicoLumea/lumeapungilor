@@ -11,5 +11,6 @@ export const COMPANY_LEGAL = {
   vatStatement: "Societatea este plătitoare de TVA.",
 } as const;
 
-export const COMPANY_PHONE = "+40 54039462";
+// Matches the existing verified public CMS value; do not infer or fabricate missing digits.
+export const COMPANY_PHONE = "0765 514 422";
 export const SUPPORT_EMAIL = "contact@lumeapungilor.ro";

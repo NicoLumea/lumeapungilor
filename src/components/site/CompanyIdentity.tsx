@@ -23,8 +23,11 @@ export function CompanyIdentity({
         </p>
       ) : null}
       {company.address ? (
+        <p className="mt-1 break-words text-muted-foreground">Sediu social: {company.address}</p>
+      ) : null}
+      {company.tradingAddress ? (
         <p className="mt-1 break-words text-muted-foreground">
-          {sellerLabel ? `Adresă: ${company.address}` : company.address}
+          Punct de lucru: {company.tradingAddress}
         </p>
       ) : null}
       {company.cui ? <p className="mt-1 text-muted-foreground">CUI: {company.cui}</p> : null}

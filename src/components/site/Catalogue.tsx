@@ -14,6 +14,8 @@ import {
   type Category,
   type Product,
 } from "@/lib/shop-types";
+import { SafeMarkdown } from "@/lib/safe-markdown";
+import { categoryRouteSlug } from "@/lib/sitemap";
 
 const PAGE_SIZE = 24;
 
@@ -205,10 +207,19 @@ export function Catalogue({
 
   return (
     <div className="catalogue-container py-14">
+      {category ? (
+        <nav className="micro-sm mb-5 text-muted-foreground" aria-label="Breadcrumb">
+          <Link to="/magazin" className="link-underline">
+            Acasă
+          </Link>
+          {" / "}
+          <span aria-current="page">{category.name}</span>
+        </nav>
+      ) : null}
       <h1 className="display text-3xl md:text-4xl">{category?.name ?? title}</h1>
-      {category?.description || intro ? (
+      {category?.intro_text || category?.description || intro ? (
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          {category?.description ?? intro}
+          {category?.intro_text ?? category?.description ?? intro}
         </p>
       ) : null}
 
@@ -446,6 +457,32 @@ export function Catalogue({
           ) : null}
         </>
       )}
+      {category?.body_text ? (
+        <SafeMarkdown
+          className="mt-14 border-t border-border pt-10 text-sm text-muted-foreground"
+          children={category.body_text}
+        />
+      ) : null}
+      {category && (categories ?? []).filter((item) => item.id !== category.id).length > 0 ? (
+        <nav className="mt-10 border-t border-border pt-6" aria-label="Alte categorii">
+          <p className="micro-sm text-muted-foreground">Alte categorii</p>
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {(categories ?? [])
+              .filter((item) => item.id !== category.id)
+              .map((item) => (
+                <li key={item.id}>
+                  <Link
+                    to="/categorie/$slug"
+                    params={{ slug: categoryRouteSlug(item.slug) }}
+                    className="link-underline"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </nav>
+      ) : null}
     </div>
   );
 }

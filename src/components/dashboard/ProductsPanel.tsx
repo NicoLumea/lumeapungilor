@@ -14,6 +14,12 @@ import {
   type Product,
   type Spec,
 } from "@/lib/shop-types";
+import {
+  duplicateSeoWarning,
+  HeadingOutline,
+  SeoField,
+  SeoPreview,
+} from "@/components/dashboard/SeoEditorTools";
 
 type ImageDraft = { id?: string; url: string; alt: string; isPrimary: boolean };
 type VariantDraft = { id?: string; name: string; sku: string; price: string; stock: number };
@@ -23,6 +29,8 @@ type Draft = {
   name: string;
   slug: string;
   description: string;
+  meta_title: string;
+  meta_description: string;
   category_id: string;
   category_ids: string[];
   sku: string;
@@ -46,6 +54,8 @@ const blank: Draft = {
   name: "",
   slug: "",
   description: "",
+  meta_title: "",
+  meta_description: "",
   category_id: "",
   category_ids: [],
   sku: "",
@@ -71,6 +81,8 @@ function toDraft(p: Product): Draft {
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
+    meta_title: p.meta_title ?? "",
+    meta_description: p.meta_description ?? "",
     category_id: p.category_id ?? assignedCategories(p)[0]?.id ?? "",
     category_ids: assignedCategories(p).map((category) => category.id),
     sku: p.sku ?? "",
@@ -110,21 +122,24 @@ function Text({
   onChange,
   placeholder,
   hint,
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   hint?: string;
+  disabled?: boolean;
 }) {
   return (
     <label className="block">
       <span className="micro-sm text-muted-foreground">{label}</span>
       <input
         value={value}
+        disabled={disabled}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+        className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground disabled:opacity-60"
       />
       {hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}
     </label>
@@ -137,6 +152,7 @@ export function ProductsPanel() {
   const { data: categories } = useCategories(true);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
+  const [slugEditable, setSlugEditable] = useState(true);
   const draggedImageKey = useRef<string | null>(null);
   const dragStartImages = useRef<ImageDraft[] | null>(null);
 
@@ -266,6 +282,8 @@ export function ProductsPanel() {
         name: draft.name.trim(),
         slug: (draft.slug.trim() || slugify(draft.name)).toLowerCase(),
         description: draft.description.trim() || null,
+        meta_title: draft.meta_title.trim() || null,
+        meta_description: draft.meta_description.trim() || null,
         sku: draft.sku.trim() || null,
         price,
         selling_unit: draft.selling_unit.trim() || "set",
@@ -402,7 +420,10 @@ export function ProductsPanel() {
         <h1 className="display text-3xl">Produse</h1>
         <button
           type="button"
-          onClick={() => setDraft({ ...blank })}
+          onClick={() => {
+            setSlugEditable(true);
+            setDraft({ ...blank });
+          }}
           className="micro border border-foreground bg-foreground px-6 py-3 text-background"
         >
           Produs nou
@@ -418,11 +439,32 @@ export function ProductsPanel() {
               onChange={(v) => setDraft({ ...draft, name: v })}
             />
             <Text
-              label="Adresă în link"
+              label="Adresă pagină (slug)"
               value={draft.slug}
               placeholder={slugify(draft.name)}
-              onChange={(v) => setDraft({ ...draft, slug: v })}
+              disabled={!!draft.id && !slugEditable}
+              onChange={(v) => {
+                if (!draft.id || slugEditable) setDraft({ ...draft, slug: v });
+              }}
             />
+            {draft.id && !slugEditable ? (
+              <div className="-mt-3 md:col-start-2">
+                <button
+                  type="button"
+                  className="micro-sm link-underline"
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "Schimbarea adresei modifică URL-ul public. Vechea adresă va primi redirect permanent. Continui?",
+                      )
+                    )
+                      setSlugEditable(true);
+                  }}
+                >
+                  Editează adresa
+                </button>
+              </div>
+            ) : null}
             <fieldset className="block border border-input p-3">
               <legend className="micro-sm px-1 text-muted-foreground">Categorii</legend>
               <div className="max-h-44 space-y-2 overflow-y-auto">
@@ -519,6 +561,41 @@ export function ProductsPanel() {
               className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             />
           </label>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <SeoField
+              label="Titlu SEO"
+              value={draft.meta_title}
+              target={60}
+              onChange={(value) => setDraft({ ...draft, meta_title: value })}
+            />
+            <SeoField
+              label="Descriere SEO"
+              value={draft.meta_description}
+              target={155}
+              multiline
+              onChange={(value) => setDraft({ ...draft, meta_description: value })}
+            />
+          </div>
+          {["meta_title", "meta_description"].map((field) => {
+            const key = field as "meta_title" | "meta_description";
+            const warning = duplicateSeoWarning(draft.id, key, draft[key], products ?? []);
+            return warning ? (
+              <p key={field} className="text-xs text-amber-700">
+                {warning}
+              </p>
+            ) : null;
+          })}
+          <div className="grid gap-4 md:grid-cols-2">
+            <SeoPreview
+              title={draft.meta_title}
+              fallbackTitle={`${draft.name || "Produs"} — Lumea Pungilor`}
+              url={`https://lumeapungilor.ro/produs/${draft.slug || slugify(draft.name)}`}
+              description={draft.meta_description}
+              fallbackDescription={draft.description}
+            />
+            <HeadingOutline h1={draft.name} markdown={draft.description} />
+          </div>
 
           <div className="grid gap-5 md:grid-cols-4">
             <label className="block">
@@ -683,7 +760,7 @@ export function ProductsPanel() {
                 try {
                   const uploaded: ImageDraft[] = [];
                   for (const file of files) {
-                    const url = await uploadProductImage(file);
+                    const url = await uploadProductImage(file, draft.slug || draft.name);
                     const isPrimary = draft.images.length === 0 && uploaded.length === 0;
                     if (draft.id) {
                       const { data, error } = await supabase
@@ -715,6 +792,11 @@ export function ProductsPanel() {
                 e.target.value = "";
               }}
             />
+            {draft.status === "published" && draft.images.some((image) => !image.alt.trim()) ? (
+              <p className="mt-3 text-xs text-amber-700">
+                Avertisment: produsul publicat are imagini fără text alternativ.
+              </p>
+            ) : null}
           </div>
 
           <div>
@@ -886,7 +968,10 @@ export function ProductsPanel() {
               <button
                 type="button"
                 className="micro-sm link-underline"
-                onClick={() => setDraft(toDraft(p))}
+                onClick={() => {
+                  setSlugEditable(false);
+                  setDraft(toDraft(p));
+                }}
               >
                 Editează
               </button>

@@ -7,6 +7,7 @@ export function StoreHero({ welcome = false }: { welcome?: boolean }) {
   const home = content?.["home"];
   const heroTitle = text(home, "hero_title") ?? "Ambalaje pentru magazine, restaurante și ateliere";
   const heroSubtitle =
+    text(home, "hero_text") ??
     text(home, "hero_subtitle") ??
     "Pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule, disponibile pentru comenzi de la persoane fizice și firme.";
 

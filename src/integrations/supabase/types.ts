@@ -49,33 +49,45 @@ export type Database = {
       }
       categories: {
         Row: {
+          body_text: string | null
           created_at: string
           description: string | null
           id: string
           image_url: string | null
+          intro_text: string | null
           is_visible: boolean
+          meta_description: string | null
+          meta_title: string | null
           name: string
           slug: string
           sort_order: number
           updated_at: string
         }
         Insert: {
+          body_text?: string | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          intro_text?: string | null
           is_visible?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           name: string
           slug: string
           sort_order?: number
           updated_at?: string
         }
         Update: {
+          body_text?: string | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          intro_text?: string | null
           is_visible?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           name?: string
           slug?: string
           sort_order?: number
@@ -678,6 +690,8 @@ export type Database = {
           id: string
           is_archived: boolean
           is_featured: boolean
+          meta_description: string | null
+          meta_title: string | null
           min_order_qty: number
           name: string
           price: number
@@ -702,6 +716,8 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_featured?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           min_order_qty?: number
           name: string
           price?: number
@@ -726,6 +742,8 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_featured?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           min_order_qty?: number
           name?: string
           price?: number
@@ -1086,6 +1104,30 @@ export type Database = {
           requested_role?: Database["public"]["Enums"]["app_role"]
           requester_email?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      seo_redirects: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          from_path: string
+          to_path: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          from_path: string
+          to_path: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          from_path?: string
+          to_path?: string
         }
         Relationships: []
       }

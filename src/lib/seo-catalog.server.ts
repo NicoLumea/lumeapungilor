@@ -6,7 +6,7 @@ import { categoryRouteSlug } from "@/lib/sitemap";
 
 const PAGE_SIZE = 500;
 
-function publicCatalogClient() {
+export function publicCatalogClient() {
   const url = process.env["SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
   const key =
     process.env["SUPABASE_PUBLISHABLE_KEY"] || import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
@@ -67,13 +67,28 @@ export async function fetchSeoCategories(): Promise<Category[]> {
   const client = publicCatalogClient();
   const categories: Category[] = [];
   for (let start = 0; ; start += PAGE_SIZE) {
-    const { data, error } = await client
+    const expanded = await client
       .from("categories")
-      .select("id,slug,name,description,image_url,sort_order,is_visible")
+      .select(
+        "id,slug,name,description,intro_text,body_text,meta_title,meta_description,image_url,sort_order,is_visible",
+      )
       .eq("is_visible", true)
       .order("sort_order")
       .order("id")
       .range(start, start + PAGE_SIZE - 1);
+    let data: unknown[] | null = expanded.data as unknown[] | null;
+    let error = expanded.error;
+    if (error && ["42703", "PGRST204"].includes(error.code)) {
+      const legacy = await client
+        .from("categories")
+        .select("id,slug,name,description,image_url,sort_order,is_visible")
+        .eq("is_visible", true)
+        .order("sort_order")
+        .order("id")
+        .range(start, start + PAGE_SIZE - 1);
+      data = legacy.data as unknown[] | null;
+      error = legacy.error;
+    }
     if (error) throw error;
     categories.push(...((data ?? []) as Category[]));
     if ((data ?? []).length < PAGE_SIZE) break;
@@ -213,4 +228,50 @@ export async function fetchSeoCatalog() {
     fetchSeoPublishedProducts(),
   ]);
   return { categories, products };
+}
+
+export type SeoContent = Record<string, string | number | boolean | null>;
+
+export async function fetchSeoContent(key: string): Promise<SeoContent> {
+  const client = publicCatalogClient();
+  const { data, error } = await client
+    .from("site_content")
+    .select("value")
+    .eq("key", key)
+    .maybeSingle();
+  if (error) throw error;
+  const raw = data?.value;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const content: SeoContent = {};
+  for (const [name, value] of Object.entries(raw)) {
+    if (value === null || ["string", "number", "boolean"].includes(typeof value)) {
+      content[name] = value as string | number | boolean | null;
+    }
+  }
+  return content;
+}
+
+export async function fetchSeoRedirect(path: string): Promise<string | null> {
+  if (!/^\/(produs|categorie)\/[a-z0-9][a-z0-9-]*$/.test(path)) return null;
+  const client = publicCatalogClient();
+  const visited = new Set<string>();
+  let current = path;
+  for (let hop = 0; hop < 8; hop += 1) {
+    if (visited.has(current)) return null;
+    visited.add(current);
+    const { data, error } = await client
+      .from("seo_redirects")
+      .select("to_path")
+      .eq("from_path", current)
+      .maybeSingle();
+    if (error) {
+      // The application remains deployable before the additive migration is applied.
+      if (["42P01", "PGRST205"].includes(error.code)) return null;
+      throw error;
+    }
+    if (!data?.to_path) return current === path ? null : current;
+    if (!/^\/(produs|categorie)\/[a-z0-9][a-z0-9-]*$/.test(data.to_path)) return null;
+    current = data.to_path;
+  }
+  return null;
 }

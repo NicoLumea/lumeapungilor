@@ -7,29 +7,30 @@ import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { companyInfo, telephoneHref } from "@/lib/company";
 import { getSeoCatalog } from "@/lib/seo-catalog.functions";
-import { absolutePublicUrl } from "@/lib/product-seo";
+import { getSeoContent } from "@/lib/seo-catalog.functions";
 import { categoryRouteSlug } from "@/lib/sitemap";
+import { staticPageHead } from "@/lib/seo-meta";
+import { SafeMarkdown } from "@/lib/safe-markdown";
 
 export const Route = createFileRoute("/magazin")({
-  loader: () => getSeoCatalog(),
-  head: () => ({
-    meta: [
-      { title: "Magazin — Lumea Pungilor" },
-      {
-        name: "description",
-        content:
-          "Furnizor de pungi de plastic, pungi de hârtie, fețe de masă și folie cu bule pentru afaceri.",
-      },
-      { property: "og:title", content: "Magazin — Lumea Pungilor" },
-      {
-        property: "og:description",
-        content: "Pungi de plastic, pungi de hârtie, fețe de masă și folie cu bule.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: absolutePublicUrl("/magazin") }],
-  }),
+  loader: async () => {
+    const [catalog, home] = await Promise.all([
+      getSeoCatalog(),
+      getSeoContent({ data: { key: "home" } }),
+    ]);
+    return { ...catalog, home };
+  },
+  head: ({ loaderData }) => {
+    const home = loaderData?.home;
+    const h1 = text(home, "hero_title") ?? "Lumea Pungilor";
+    return staticPageHead({
+      block: home,
+      h1,
+      body: text(home, "hero_text") ?? text(home, "hero_subtitle"),
+      path: "/magazin",
+      image: text(home, "hero_image_url"),
+    });
+  },
   component: Shop,
 });
 
@@ -38,10 +39,10 @@ function Shop() {
   const { data: content } = useContent();
   const { data: liveCategories } = useCategories();
   const categories = liveCategories ?? initial.categories;
-  const home = content?.["home"];
+  const home = content?.["home"] ?? initial.home;
   const company = companyInfo(content);
   const edTitle = text(home, "editorial_title");
-  const edBody = text(home, "editorial_body");
+  const edBody = text(home, "editorial_text") ?? text(home, "editorial_body");
   const edImage = imageUrl(text(home, "editorial_image_url"));
 
   return (
@@ -97,9 +98,9 @@ function Shop() {
                     <span className="category-card-overlay absolute inset-0" aria-hidden="true" />
                   </div>
                   <div className="category-card-label mt-2 min-h-8 text-center sm:mt-3 sm:text-left">
-                    <p className="line-clamp-2 inline text-xs font-medium uppercase leading-4 sm:text-[0.6875rem] sm:leading-[1.2]">
+                    <h3 className="line-clamp-2 inline text-xs font-medium uppercase leading-4 sm:text-[0.6875rem] sm:leading-[1.2]">
                       {c.name}
-                    </p>
+                    </h3>
                   </div>
                   {c.description ? (
                     <p className="mt-1 hidden text-sm text-muted-foreground md:block">
@@ -115,14 +116,17 @@ function Shop() {
 
       <section className="rule-t">
         <div className="site-container grid gap-6 py-10 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:items-start md:gap-12 md:py-14">
-          <h2 className="display text-3xl md:text-4xl"><HeadingText id="magazin_about_h2" /></h2>
+          <h2 className="display text-3xl md:text-4xl">
+            {text(home, "magazin_about_title") ?? <HeadingText id="magazin_about_h2" />}
+          </h2>
           <div>
-            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
-              Lumea Pungilor reunește într-un singur catalog produse practice pentru ambalare,
-              servire și protejarea mărfurilor. Oferta include pungi cu mâner, pungi fără mâner,
-              fețe de masă și folie cu bule pentru magazine, revânzători, restaurante, ateliere și
-              alte activități profesionale.
-            </p>
+            <SafeMarkdown
+              className="max-w-3xl text-sm text-muted-foreground md:text-base"
+              children={
+                text(home, "magazin_about_body") ??
+                "Lumea Pungilor reunește într-un singur catalog produse practice pentru ambalare, servire și protejarea mărfurilor. Oferta include pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule pentru magazine, revânzători, restaurante, ateliere și alte activități profesionale."
+              }
+            />
             <Link
               to="/despre"
               className="micro mt-6 inline-flex min-h-11 w-fit items-center border border-foreground px-5 py-2.5 transition-colors active:bg-foreground active:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground hover:bg-foreground hover:text-background"
