@@ -55,6 +55,7 @@ export type Product = {
   variant_stock_tracked?: boolean;
   status: string;
   is_featured: boolean;
+  eco_tax_applicable?: boolean | null;
   is_archived: boolean;
   sort_order: number;
   specs: Spec[];

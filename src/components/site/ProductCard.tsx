@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { imageUrl } from "@/lib/images";
+import { PriceNotice } from "@/components/site/PriceNotice";
 import { imageVariantSrcSet, imageVariantUrl } from "@/lib/image-variants";
 import { formatRon } from "@/lib/format";
 import { primaryImage, productAvailableStock, sortedImages, type Product } from "@/lib/shop-types";
+import { priceNotice } from "@/lib/price-notice";
 import { cn } from "@/lib/utils";
 
 type StockState = "available" | "low" | "unavailable";
@@ -42,7 +44,7 @@ export function ProductCard({
     <Link
       to="/produs/$slug"
       params={{ slug: product.slug }}
-      aria-label={`${product.name}, ${cataloguePrice(product.price)} per ${product.selling_unit}`}
+      aria-label={`${product.name}, ${cataloguePrice(product.price)} per ${product.selling_unit}, ${priceNotice(product)}`}
       title={product.name}
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") setSecondaryRequested(true);
@@ -123,6 +125,7 @@ export function ProductCard({
               / {product.selling_unit}
             </span>
           </p>
+          <PriceNotice product={product} />
         </div>
       </div>
     </Link>

@@ -30,6 +30,9 @@ export function CompanyIdentity({
           Punct de lucru: {company.tradingAddress}
         </p>
       ) : null}
+      <p className="mt-1 break-words text-muted-foreground">
+        Adresă pentru retururi: {company.returnsAddress}
+      </p>
       {company.cui ? <p className="mt-1 text-muted-foreground">CUI: {company.cui}</p> : null}
       {company.tradeRegisterNumber ? (
         <p className="mt-1 break-words text-muted-foreground">

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useCategoryProducts, useProduct } from "@/lib/products";
+import { PriceNotice } from "@/components/site/PriceNotice";
 import { imageVariantSrcSet, imageVariantUrl } from "@/lib/image-variants";
 import { formatRon } from "@/lib/format";
 import {
@@ -324,6 +325,7 @@ function ProductPage() {
             <p className="text-lg">
               {formatRon(unitPrice)} <span className="micro-sm">/ {product.selling_unit}</span>
             </p>
+            <PriceNotice product={product} />
             {perPiece ? (
               <p className="mt-1 text-sm text-muted-foreground">
                 Informativ: {formatRon(perPiece)} / bucată · {product.units_per_pack} buc. per{" "}

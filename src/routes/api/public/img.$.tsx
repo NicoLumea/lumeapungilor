@@ -65,12 +65,22 @@ export const Route = createFileRoute("/api/public/img/$")({
             }
           }
           if (!data) {
-            const original = await bucket.download(path);
+            let original;
+            try {
+              original = await bucket.download(path);
+            } catch {
+              // Retry brief storage/network hiccups while preserving the original fallback.
+              await new Promise((resolve) => setTimeout(resolve, 400));
+              original = await bucket.download(path);
+            }
             if (original.error) return new Response("Not found", { status: 404 });
             data = original.data;
           }
-        } catch {
-          console.warn("[img] storage unavailable");
+        } catch (err) {
+          console.warn(
+            "[img] storage unavailable",
+            err instanceof Error ? err.message : String(err),
+          );
           return new Response("Image temporarily unavailable", {
             status: 503,
             headers: { "Cache-Control": "no-store" },

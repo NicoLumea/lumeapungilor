@@ -25,6 +25,7 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
       { name: "phone_secondary", label: "Telefon secundar", kind: "text" },
       { name: "secondary_phone_note", label: "Notă telefon secundar", kind: "text" },
       { name: "registered_address", label: "Sediu social", kind: "textarea" },
+      { name: "returns_address", label: "Adresă pentru retururi", kind: "textarea" },
       { name: "trading_address", label: "Punct de lucru", kind: "textarea" },
       { name: "cui", label: "CUI", kind: "text" },
       { name: "trade_register_number", label: "Registrul Comerțului", kind: "text" },

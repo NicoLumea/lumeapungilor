@@ -1,5 +1,5 @@
 import { companyInfo, internationalTelephone } from "@/lib/company";
-import { COMPANY_LEGAL } from "@/lib/company-legal";
+import { COMPANY_LEGAL, SUPPORT_EMAIL } from "@/lib/company-legal";
 import { useContent } from "@/lib/content";
 
 export function OrganizationStructuredData() {
@@ -14,6 +14,8 @@ export function OrganizationStructuredData() {
     "@type": "Organization",
     name: company.brandName,
     legalName: company.legalName,
+    url: "https://lumeapungilor.ro",
+    email: SUPPORT_EMAIL,
     address: {
       "@type": "PostalAddress",
       streetAddress: COMPANY_LEGAL.streetAddress,
