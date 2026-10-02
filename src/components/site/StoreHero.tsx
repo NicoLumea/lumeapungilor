@@ -1,15 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
-import { useContent, text } from "@/lib/content";
+import { text } from "@/lib/content";
 
-export function StoreHero({ welcome = false }: { welcome?: boolean }) {
-  const { data: content } = useContent();
-  const home = content?.["home"];
-  const heroTitle = text(home, "hero_title") ?? "Ambalaje pentru magazine, restaurante și ateliere";
+export function StoreHero({
+  home,
+  welcome = false,
+}: {
+  home: Record<string, unknown>;
+  welcome?: boolean;
+}) {
+  const heroTitle =
+    text(home, "hero_title") ??
+    "Pungi plastic, pungi curierat, mușama și folie cu bule pentru magazine și comercianți";
   const heroSubtitle =
     text(home, "hero_text") ??
     text(home, "hero_subtitle") ??
-    "Pungi cu mâner, pungi fără mâner, fețe de masă și folie cu bule, disponibile pentru comenzi de la persoane fizice și firme.";
+    "Pungute mici, pungi cadou din plastic și pungi curierat, pentru magazine, standuri comerciale și firme care expediază produse.";
 
   return (
     <section className="overflow-hidden border-b border-border bg-[linear-gradient(90deg,#e9e1d6_0%,#f8f4ee_16%,#f8f4ee_84%,#e9e1d6_100%)]">
