@@ -86,4 +86,3 @@ console.log(
     ? `Verified ${products.length} unique product URLs and ${changes.length} permanent redirect records.`
     : `Verified pre-rollout product URLs; ${changes.length} slug changes are pending.`,
 );
-
