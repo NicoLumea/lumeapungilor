@@ -5,6 +5,10 @@ export type Category = {
   slug: string;
   name: string;
   description: string | null;
+  intro_text?: string | null;
+  body_text?: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
   image_url: string | null;
   sort_order: number;
   is_visible: boolean;
@@ -36,6 +40,8 @@ export type Product = {
   slug: string;
   name: string;
   description: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
   category_id: string | null;
   sku: string | null;
   price: number;

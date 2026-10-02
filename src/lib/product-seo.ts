@@ -84,6 +84,25 @@ export function productBreadcrumbJsonLd(product: Product): Record<string, unknow
   return { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: items };
 }
 
+export function categoryBreadcrumbJsonLd(category: {
+  slug: string;
+  name: string;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Magazin", item: absolutePublicUrl("/magazin") },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: category.name,
+        item: categoryCanonical(category.slug),
+      },
+    ],
+  };
+}
+
 export function jsonLd(value: Record<string, unknown>): string {
   return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
