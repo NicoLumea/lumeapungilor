@@ -208,7 +208,7 @@ function AboutPage() {
             </p>
             <p>
               Pentru întrebări despre produse, stoc sau comenzi mai mari, ne puteți contacta
-              telefonic de luni până vineri, între 09:00 și 17:00.
+              telefonic de luni până vineri, între 07:00 și 15:00.
             </p>
           </div>
           <Link
@@ -260,7 +260,7 @@ function AboutPage() {
             </div>
             <div className="min-w-0 bg-background p-5 sm:p-6">
               <dt className="micro-sm text-muted-foreground">Program</dt>
-              <dd className="mt-2 text-sm font-medium">luni–vineri, 09:00–17:00</dd>
+              <dd className="mt-2 text-sm font-medium">luni–vineri, 07:00–15:00</dd>
             </div>
           </dl>
         </AboutSection>

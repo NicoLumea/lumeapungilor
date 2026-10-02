@@ -1,5 +1,5 @@
 import { text, type ContentMap } from "@/lib/content";
-import { COMPANY_LEGAL, COMPANY_PHONE } from "@/lib/company-legal";
+import { COMPANY_LEGAL, COMPANY_PHONE, RETURNS_ADDRESS } from "@/lib/company-legal";
 
 export { COMPANY_PHONE, SUPPORT_EMAIL } from "@/lib/company-legal";
 
@@ -14,6 +14,7 @@ export type CompanyInfo = {
   legalName: string | null;
   address: string | null;
   tradingAddress: string | null;
+  returnsAddress: string;
   cui: string | null;
   tradeRegisterNumber: string | null;
   vatStatement: string;
@@ -29,18 +30,19 @@ export type CompanyInfo = {
 export function companyInfo(content: ContentMap | undefined): CompanyInfo {
   const company = content?.["company"];
   return {
-    brandName: text(company, "brand_name") ?? text(company, "name"),
+    brandName: text(company, "brand_name") ?? text(company, "name") ?? "Lumea Pungilor",
     legalName: COMPANY_LEGAL.name,
     address: text(company, "registered_address") ?? COMPANY_LEGAL.registeredOffice,
     tradingAddress: text(company, "trading_address"),
+    returnsAddress: text(company, "returns_address") ?? RETURNS_ADDRESS,
     cui: COMPANY_LEGAL.cui,
     tradeRegisterNumber: COMPANY_LEGAL.tradeRegisterNumber,
     vatStatement: COMPANY_LEGAL.vatStatement,
     phonePrimary: text(company, "phone_primary") ?? COMPANY_PHONE,
     phoneSecondary: text(company, "phone_secondary"),
     secondaryPhoneNote: text(company, "secondary_phone_note"),
-    operatingDays: text(company, "operating_days"),
-    operatingHours: text(company, "operating_hours"),
+    operatingDays: text(company, "operating_days") ?? "Luni–Vineri",
+    operatingHours: text(company, "operating_hours") ?? "07:00–15:00",
     sellerEnquiryHeading: text(company, "seller_enquiry_heading"),
     sellerEnquiryCopy: text(company, "seller_enquiry_copy"),
   };

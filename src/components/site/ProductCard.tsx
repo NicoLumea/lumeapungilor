@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { imageUrl } from "@/lib/images";
+import { PriceNotice } from "@/components/site/PriceNotice";
 import { formatRon } from "@/lib/format";
 import { primaryImage, productAvailableStock, sortedImages, type Product } from "@/lib/shop-types";
+import { priceNotice } from "@/lib/price-notice";
 import { cn } from "@/lib/utils";
 
 type StockState = "available" | "low" | "unavailable";
@@ -34,7 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
     <Link
       to="/produs/$slug"
       params={{ slug: product.slug }}
-      aria-label={`${product.name}, ${cataloguePrice(product.price)} per ${product.selling_unit}`}
+      aria-label={`${product.name}, ${cataloguePrice(product.price)} per ${product.selling_unit}, ${priceNotice(product)}`}
       title={product.name}
       className="product-card group flex h-full w-full min-w-0 max-w-[20rem] flex-col justify-self-center outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
@@ -103,6 +105,7 @@ export function ProductCard({ product }: { product: Product }) {
               / {product.selling_unit}
             </span>
           </p>
+          <PriceNotice product={product} />
         </div>
       </div>
     </Link>

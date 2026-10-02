@@ -11,6 +11,8 @@ export const COMPANY_LEGAL = {
   vatStatement: "Societatea este plătitoare de TVA.",
 } as const;
 
-// Matches the existing verified public CMS value; do not infer or fabricate missing digits.
-export const COMPANY_PHONE = "0765 514 422";
+// Confirmed store contact details.
+export const COMPANY_PHONE = "0754 039 462";
+export const RETURNS_ADDRESS =
+  "Str. Dragonul Roșu nr. 1-10, sat Fundeni, comuna Dobroești, județul Ilfov, cod poștal 077086, România";
 export const SUPPORT_EMAIL = "contact@lumeapungilor.ro";
