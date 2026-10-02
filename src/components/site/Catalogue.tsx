@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { storageGet, storageSet } from "@/lib/safe-storage";
 import { Search, X } from "lucide-react";
 import { useCategoryProducts, usePublishedProducts } from "@/lib/products";
@@ -7,7 +8,12 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { matchesQuery } from "@/lib/search";
 import { sortCatalogProducts, type CatalogSort } from "@/lib/category-sorting";
-import { belongsToCategory, productAvailableStock, type Product } from "@/lib/shop-types";
+import {
+  belongsToCategory,
+  productAvailableStock,
+  type Category,
+  type Product,
+} from "@/lib/shop-types";
 
 const PAGE_SIZE = 24;
 
@@ -54,22 +60,32 @@ export function Catalogue({
   categorySlug,
   title,
   intro,
+  initialProducts,
+  initialCategories,
+  initialCategory,
 }: {
   categorySlug?: string;
   title: string;
   intro?: string | null;
+  initialProducts?: Product[];
+  initialCategories?: Category[];
+  initialCategory?: Category;
 }) {
   const allProducts = usePublishedProducts(!categorySlug);
   const categoriesQuery = useCategories();
-  const categories = categoriesQuery.data;
+  const categories = categoriesQuery.data ?? initialCategories;
   const category = categorySlug
-    ? categories?.find((item) => item.slug === categorySlug)
+    ? (categories?.find((item) => item.slug === categorySlug) ?? initialCategory)
     : undefined;
   const categoryProducts = useCategoryProducts(category?.id);
-  const all = categorySlug ? categoryProducts.data?.products : allProducts.data;
+  // Loader data makes the first HTML useful. These existing hooks remain the live authority and
+  // replace the initial snapshot as soon as their normal browser queries finish.
+  const all = categorySlug
+    ? (categoryProducts.data?.products ?? initialProducts)
+    : (allProducts.data ?? initialProducts);
   const isLoading = categorySlug
-    ? categoriesQuery.isLoading || (!!category && categoryProducts.isLoading)
-    : allProducts.isLoading;
+    ? !all && (categoriesQuery.isLoading || (!!category && categoryProducts.isLoading))
+    : !all && allProducts.isLoading;
   const error = categorySlug
     ? (categoriesQuery.error ?? categoryProducts.error)
     : allProducts.error;
@@ -225,7 +241,7 @@ export function Catalogue({
         >
           Filtrează și sortează{activeFilters ? ` (${activeFilters})` : ""}
         </button>
-        {!isLoading && !error ? (
+        {!isLoading && !(error && scoped.length === 0) ? (
           <span className="micro-sm text-muted-foreground" aria-live="polite">
             {filtered.length} {filtered.length === 1 ? "produs" : "produse"}
           </span>
@@ -342,7 +358,7 @@ export function Catalogue({
             <ProductCardSkeleton key={index} />
           ))}
         </div>
-      ) : error ? (
+      ) : error && scoped.length === 0 ? (
         <div className="py-24 text-center" role="alert">
           <p className="text-sm text-muted-foreground">
             Produsele nu au putut fi încărcate. Te rugăm să încerci din nou.
@@ -405,6 +421,28 @@ export function Catalogue({
                 {visible.length} din {filtered.length} produse afișate
               </p>
             </div>
+          ) : null}
+          {scoped.length > visible.length ? (
+            <details className="mt-12 border-y border-border py-5">
+              <summary className="micro cursor-pointer">Index complet produse</summary>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Toate produsele publicate din această secțiune, inclusiv cele care apar după
+                încărcarea următoarei pagini.
+              </p>
+              <ul className="mt-5 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                {scoped.map((product) => (
+                  <li key={product.id}>
+                    <Link
+                      to="/produs/$slug"
+                      params={{ slug: product.slug }}
+                      className="link-underline"
+                    >
+                      {product.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
           ) : null}
         </>
       )}

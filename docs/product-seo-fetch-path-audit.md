@@ -1,0 +1,31 @@
+# Product SEO fetch-path audit
+
+Captured from `origin/main` (`0e74222`) before the SEO implementation on 2026-10-02.
+
+## Protected live runtime path
+
+| Public surface            | Runtime path                                                                                                               | Supabase source                                                                                                                                                               |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/produse`                | `Catalogue` → `usePublishedProducts` → `fetchPublishedProducts`                                                            | `products` selected with `PRODUCT_BASE_SELECT`, filtered by `status = published` and `is_archived = false`; category labels are added by a separate `product_categories` read |
+| `/categorie/{slug}`       | `Catalogue` → `useCategories` → category ID → `useCategoryProducts` → `fetchCategoryMemberships` + `fetchCategoryProducts` | visible `categories`; `product_categories` filtered by `category_id`; `products` filtered by the returned IDs; legacy `products.category_id` fallback                         |
+| `/produs/{slug}`          | `useProduct(slug)`                                                                                                         | one `products` row selected by stable slug with `PRODUCT_BASE_SELECT`, followed by a separate `product_categories` read (public RLS controls visibility)                      |
+| Homepage product sections | `RecommendedProducts` / `PreviouslyPurchased` → `usePublishedProducts` or `useProductsByIds`                               | the same `products` source and relationship enrichment                                                                                                                        |
+
+`products` remains the authoritative product, price, stock, inventory and slug source. Category membership remains ID-based in `product_categories(product_id, category_id)`, with `products.category_id` retained only as the existing legacy-primary fallback. `sort_order` affects display order through `sortCategoryProducts`; null or missing ranks never remove a product.
+
+The SEO implementation does not import generated catalogue JSON into the browser. It uses an anonymous, RLS-protected server adapter for initial HTML only. After hydration, the runtime hooks above execute unchanged and replace the initial snapshot with current live data.
+
+## Pre-change category membership baseline
+
+The snapshot contained 63 published, non-archived products and six visible category records. IDs below are sorted for comparison; display order is tested independently. The stored `/pungi-cadou` slug is a pre-existing data anomaly. Only its URL presentation is normalized; its category ID and membership query are unchanged.
+
+- `/pungi-cadou` (`054c8930-796d-4f44-978a-5a627a42b950`): `[]`
+- `folie-cu-bule` (`b1424eb5-3c42-41b3-a70a-a48d97ec999c`): `084e8aeb-4e87-42ac-9c8f-4534600ed51f`, `f009d311-e9f6-46d9-a02b-b67124ed0635`
+- `musama` (`1096eb34-6d46-4f11-83da-6e9dc73c2ec8`): `30692bb3-b3f2-4f7e-8499-1f317de2fe31`, `55270d09-ea1d-496a-a718-28f36d885df9`, `5d52634b-0a5e-419f-b68c-20b765256b3e`, `5d5af286-50b8-4825-bc1c-a2cae3be9c5c`, `9bec2440-d648-4314-b27a-bf2a2742bfcb`, `e3416c44-5743-490a-b154-b1f559f6c052`, `ed81c639-9bf1-49d5-8942-0b421ae28825`, `f7e8287e-d256-4945-a885-d44bdb50a8df`, `f94b6862-87c6-436c-8fbf-4f608456fc12`
+- `pungi-curierat` (`9f21f544-03b4-4952-a44b-4129c89191dd`): `126608ee-7697-4e13-8d23-143362b77efa`, `200f12db-17d7-4f95-ba3c-1a0d520b3512`, `3a7a1d7c-587d-448b-9f21-272d824a9ee5`, `50f37d29-0365-4551-8e25-62c06ce13231`, `6ba3a00b-429a-4d55-a690-df3c388febaf`, `800f63cd-fd01-4098-93ef-6c6c33057610`, `86a7f04d-bbea-446e-a61e-ca3be4634545`, `c16b33cd-ecec-459d-93ad-d2a81d4a6b15`, `d38323df-da59-4023-8974-a0fecfd7828b`
+- `pungi-mici` (`7476c192-29f2-42ec-9577-ec803e6fa4a9`): `0c9f0e89-4df8-42a1-897d-5f1449a0e365`, `0dd34762-7064-4f10-b257-c6c00339043b`, `1100e0aa-03c1-417c-be88-d208710432c5`, `2067b918-5faa-47e4-bc4d-fc31b8666944`, `435a7ba2-f0c5-4711-8a9e-e9c7f53abf72`, `587836de-e830-43c7-bd24-9740d01a671a`, `599dbf35-e275-4706-9faa-e6a6ae32ca5b`, `5cb3f8db-8162-4385-a9c3-259fe907d18d`, `61a56730-ac00-48a4-8280-c1aae80300d3`, `6c8d9d24-a04f-4352-b325-b46544549fda`, `71ddc0d9-4cec-47e3-bb80-e067456e9c53`, `81faefa7-55bb-4b61-8162-89e800b7f6be`, `845a3586-e162-423d-9316-088c9440de81`, `9d6c090a-e6ea-4ad9-a594-ffada8a19659`, `d0543933-e463-45c4-b749-ea8a52b1a690`, `d1848912-b94e-4e6e-b20f-26894ca359c3`, `dba80922-fce1-49f9-ae04-8805212bb39d`, `ec1de721-9763-44a9-968f-c2844d6517ed`, `ef068a60-ff63-4465-ba83-3e409999088d`, `f452329e-cb3c-4da1-8a00-464827c84bfb`, `f87fb017-643d-443a-ba35-4014a195a36c`
+- `pungute-plastic` (`96356541-7c2e-41e1-aae3-962a5d99fc52`): `066869c2-22b1-423f-b1df-9e72684aa324`, `22be2229-a904-4b95-9fd9-254aefe57613`, `29fe7666-0daa-4d55-b3b1-ad2cb8f3878a`, `39825658-bf41-4a08-abd6-26ff47a50b0d`, `449e8934-b28c-4037-af48-616a1531712f`, `50052f43-1016-4e1c-acfa-65bf718b2ef5`, `559a4d3f-e87b-4400-ae76-30d45466489d`, `7b670b0a-84d0-41d7-a599-10227c361ed3`, `7ea4d146-1452-4fcc-bc6e-a1d09acccd5f`, `9c8ad456-e5b8-43dc-a3d7-86ca8981ae2b`, `a3224379-1070-4928-b9be-ca79de9010f2`, `ab45a59b-9912-4a95-9db4-96712650c104`, `b181690a-cc72-496c-9eeb-957216be516a`, `e7864789-7a41-4b28-b705-220f9bf80aa7`, `e7e415e1-2382-4410-a9f8-14da314f7c6e`, `e808c4a6-5740-4c39-99d8-886d2886bbe3`, `f09e8b27-74bc-4c48-a3f8-5cbb7622425b`, `f96f5dde-21c4-4f8e-a2ce-4a1c503b0def`
+
+## Slug editing
+
+Product slugs are stored on the authoritative `products` row and `/produs/{slug}` uses that value. The current schema has no slug-history table, so this change preserves existing slugs but does not invent an unsafe redirect mechanism. A future editable-slug workflow should add an explicit old-slug mapping before administrators change published URLs.
