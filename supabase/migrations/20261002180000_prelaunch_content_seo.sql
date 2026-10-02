@@ -116,5 +116,5 @@ set value = value
 where key = 'home';
 
 insert into public.site_content(key, value)
-values ('seo', '{"google_site_verification":null,"default_social_image_url":null}'::jsonb)
+values ('seo', '{"google_site_verification":null}'::jsonb)
 on conflict (key) do nothing;

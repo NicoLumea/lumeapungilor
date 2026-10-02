@@ -57,7 +57,7 @@ The migration does not delete or rename populated columns and does not mutate pr
 - Enter the Google Search Console token in Admin → Content → SEO technical, then verify ownership in Search Console.
 - Review and complete any pre-existing legal placeholders in Terms/Privacy with Romanian legal counsel.
 - Set `VITE_PUBLIC_SITE_URL=https://lumeapungilor.ro` in the production environment before the domain cutover.
-- Optionally upload a dedicated default social-sharing image; the existing site hero asset is the safe fallback.
+- The bundled site hero asset is the default social-sharing image when a page has no own image.
 - Review all editable metadata and category body copy before publishing; no marketing claims were fabricated.
 
 The verified primary and secondary phone values already stored in `site_content.company` are now preferred everywhere. The hardcoded fallback was reconciled to the verified primary value; the suspicious incomplete value was not guessed.

@@ -106,7 +106,6 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
     note: "Introdu numai tokenul Search Console, niciodată HTML sau scripturi.",
     fields: [
       { name: "google_site_verification", label: "Token Google Search Console", kind: "text" },
-      { name: "default_social_image_url", label: "Imagine socială implicită", kind: "image" },
     ],
   },
 ];
