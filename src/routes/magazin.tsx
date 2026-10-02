@@ -48,7 +48,7 @@ function Shop() {
 
   return (
     <div>
-      <StoreHero />
+      <StoreHero home={initial.home} />
 
       <section className="border-b border-border">
         <ul className="site-container grid gap-3 py-5 text-sm sm:grid-cols-3">
