@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { IMAGE_VARIANT_WIDTHS, imageVariantPath } from "@/lib/image-variants";
 
 const BUCKET = "product-images";
 
 export const Route = createFileRoute("/api/public/img/$")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const raw = (params as { _splat?: string })._splat ?? "";
         const path = raw.replace(/^\/+/, "");
 
@@ -16,11 +17,27 @@ export const Route = createFileRoute("/api/public/img/$")({
         // The bucket is private with no public read policy; images are served
         // exclusively through this endpoint using the server-side admin client.
         let data: Blob | null = null;
+        let variantFound = false;
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const result = await supabaseAdmin.storage.from(BUCKET).download(path);
-          if (result.error) return new Response("Not found", { status: 404 });
-          data = result.data;
+          const bucket = supabaseAdmin.storage.from(BUCKET);
+          const requestedWidth = Number(new URL(request.url).searchParams.get("w"));
+          if (
+            IMAGE_VARIANT_WIDTHS.includes(requestedWidth as (typeof IMAGE_VARIANT_WIDTHS)[number])
+          ) {
+            const variant = await bucket.download(
+              imageVariantPath(path, requestedWidth as (typeof IMAGE_VARIANT_WIDTHS)[number]),
+            );
+            if (!variant.error) {
+              data = variant.data;
+              variantFound = true;
+            }
+          }
+          if (!data) {
+            const original = await bucket.download(path);
+            if (original.error) return new Response("Not found", { status: 404 });
+            data = original.data;
+          }
         } catch {
           console.warn("[img] storage unavailable");
           return new Response("Image temporarily unavailable", {
@@ -37,7 +54,10 @@ export const Route = createFileRoute("/api/public/img/$")({
           status: 200,
           headers: {
             "Content-Type": data.type || "application/octet-stream",
-            "Cache-Control": "public, max-age=31536000, immutable",
+            // A short fallback TTL lets a newly backfilled variant replace an original.
+            "Cache-Control": variantFound
+              ? "public, max-age=31536000, immutable"
+              : "public, max-age=300",
           },
         });
       },

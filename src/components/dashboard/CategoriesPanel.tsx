@@ -6,6 +6,7 @@ import { useCategories } from "@/lib/content";
 import { slugify } from "@/lib/format";
 import { uploadProductImage } from "@/lib/admin-data";
 import { imageUrl } from "@/lib/images";
+import { categoryRouteSlug } from "@/lib/sitemap";
 import type { Category } from "@/lib/shop-types";
 import { CategoryProductOrder } from "@/components/dashboard/CategoryProductOrder";
 import {
@@ -62,7 +63,7 @@ export function CategoriesPanel() {
     setBusy(true);
     const payload = {
       name: draft.name.trim(),
-      slug: (draft.slug.trim() || slugify(draft.name)).toLowerCase(),
+      slug: categoryRouteSlug(draft.slug.trim() || slugify(draft.name)).toLowerCase(),
       description: draft.description.trim() || null,
       intro_text: draft.intro_text.trim() || null,
       body_text: draft.body_text.trim() || null,
@@ -211,7 +212,7 @@ export function CategoriesPanel() {
             <SeoPreview
               title={draft.meta_title}
               fallbackTitle={`${draft.name || "Categorie"} — Lumea Pungilor`}
-              url={`https://lumeapungilor.ro/categorie/${draft.slug || slugify(draft.name)}`}
+              url={`https://lumeapungilor.ro/categorie/${categoryRouteSlug(draft.slug || slugify(draft.name))}`}
               description={draft.meta_description}
               fallbackDescription={draft.intro_text || draft.description}
             />
@@ -305,7 +306,7 @@ export function CategoriesPanel() {
               <div className="flex-1">
                 <p className="text-sm">{c.name}</p>
                 <p className="micro-sm text-muted-foreground">
-                  /{c.slug} · {c.is_visible ? "vizibilă" : "ascunsă"}
+                  /{categoryRouteSlug(c.slug)} · {c.is_visible ? "vizibilă" : "ascunsă"}
                 </p>
               </div>
               <button
@@ -316,7 +317,7 @@ export function CategoriesPanel() {
                   setDraft({
                     id: c.id,
                     name: c.name,
-                    slug: c.slug,
+                    slug: categoryRouteSlug(c.slug),
                     description: c.description ?? "",
                     intro_text: c.intro_text ?? "",
                     body_text: c.body_text ?? "",

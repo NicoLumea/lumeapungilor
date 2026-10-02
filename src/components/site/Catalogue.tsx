@@ -415,8 +415,8 @@ export function Catalogue({
       ) : (
         <>
           <div className="product-grid mt-8">
-            {visible.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {visible.map((p, index) => (
+              <ProductCard key={p.id} product={p} priority={index < 2} />
             ))}
           </div>
           {filtered.length > visible.length ? (

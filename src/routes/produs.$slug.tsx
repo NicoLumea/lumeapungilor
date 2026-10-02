@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useCategoryProducts, useProduct } from "@/lib/products";
-import { imageUrl } from "@/lib/images";
+import { imageVariantSrcSet, imageVariantUrl } from "@/lib/image-variants";
 import { formatRon } from "@/lib/format";
 import {
   assignedCategories,
@@ -240,8 +240,13 @@ function ProductPage() {
             {images[activeIndex] && !mainFailed ? (
               <img
                 key={images[activeIndex]?.id}
-                src={imageUrl(images[activeIndex]?.url) ?? ""}
+                src={imageVariantUrl(images[activeIndex]?.url, 1600) ?? ""}
+                srcSet={imageVariantSrcSet(images[activeIndex]?.url, [960, 1600])}
+                sizes="(max-width: 1023px) 100vw, 50vw"
                 alt={images[activeIndex]?.alt ?? product.name}
+                loading={activeIndex === primaryIndex ? "eager" : "lazy"}
+                fetchPriority={activeIndex === primaryIndex ? "high" : undefined}
+                decoding="async"
                 onError={() => setMainFailed(true)}
                 className="absolute inset-0 size-full object-contain p-10"
               />
@@ -289,8 +294,10 @@ function ProductPage() {
                     }}
                   >
                     <img
-                      src={imageUrl(img.url) ?? ""}
+                      src={imageVariantUrl(img.url, 160) ?? ""}
                       alt={img.alt ?? product.name}
+                      loading="lazy"
+                      decoding="async"
                       className="size-full object-contain"
                     />
                   </button>
