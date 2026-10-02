@@ -31,6 +31,7 @@ import { Route as ProduseRouteImport } from './routes/produse'
 import { Route as ResetareParolaRouteImport } from './routes/resetare-parola'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as RetururiRouteImport } from './routes/retururi'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as TermeniRouteImport } from './routes/termeni'
@@ -179,6 +180,11 @@ const ReturRoute = ReturRouteImport.update({
 const RetururiRoute = RetururiRouteImport.update({
   id: '/retururi',
   path: '/retururi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -401,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
@@ -463,6 +470,7 @@ export interface FileRoutesByTo {
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/termeni': typeof TermeniRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/resetare-parola': typeof ResetareParolaRoute
   '/retur': typeof ReturRoute
   '/retururi': typeof RetururiRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRouteWithChildren
   '/termeni': typeof TermeniRoute
@@ -591,6 +600,7 @@ export interface FileRouteTypes {
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/staff'
     | '/termeni'
@@ -653,6 +663,7 @@ export interface FileRouteTypes {
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/termeni'
     | '/.well-known/oauth-protected-resource'
@@ -715,6 +726,7 @@ export interface FileRouteTypes {
     | '/resetare-parola'
     | '/retur'
     | '/retururi'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/staff'
     | '/termeni'
@@ -779,6 +791,7 @@ export interface RootRouteChildren {
   ResetareParolaRoute: typeof ResetareParolaRoute
   ReturRoute: typeof ReturRoute
   RetururiRoute: typeof RetururiRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StaffRoute: typeof StaffRouteWithChildren
   TermeniRoute: typeof TermeniRoute
@@ -946,6 +959,13 @@ declare module '@tanstack/react-router' {
       path: '/retururi'
       fullPath: '/retururi'
       preLoaderRoute: typeof RetururiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -1341,6 +1361,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetareParolaRoute: ResetareParolaRoute,
   ReturRoute: ReturRoute,
   RetururiRoute: RetururiRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StaffRoute: StaffRouteWithChildren,
   TermeniRoute: TermeniRoute,

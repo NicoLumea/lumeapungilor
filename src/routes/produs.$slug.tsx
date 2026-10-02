@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useProduct } from "@/lib/products";
@@ -13,14 +13,45 @@ import {
 } from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
 import { RestockNotice } from "@/components/site/RestockNotice";
+import { getSeoProduct } from "@/lib/seo-catalog.functions";
+import {
+  factualProductDescription,
+  jsonLd,
+  productBreadcrumbJsonLd,
+  productCanonical,
+  productJsonLd,
+} from "@/lib/product-seo";
+import { categoryRouteSlug } from "@/lib/sitemap";
 
 export const Route = createFileRoute("/produs/$slug")({
-  head: ({ params }) => ({
+  loader: async ({ params }) => {
+    const product = await getSeoProduct({ data: { slug: params.slug } });
+    if (!product) throw notFound();
+    return product;
+  },
+  head: ({ loaderData, params }) => ({
     meta: [
-      { title: `${params.slug} — Lumea Pungilor` },
-      { name: "description", content: "Detalii produs, specificații și preț." },
-      { property: "og:title", content: `${params.slug} — Lumea Pungilor` },
-      { property: "og:description", content: "Detalii produs, specificații și preț." },
+      { title: `${loaderData?.name ?? params.slug} | Lumea Pungilor` },
+      {
+        name: "description",
+        content: loaderData
+          ? factualProductDescription(loaderData)
+          : "Detalii produs, specificații și preț.",
+      },
+      { property: "og:title", content: `${loaderData?.name ?? params.slug} | Lumea Pungilor` },
+      {
+        property: "og:description",
+        content: loaderData
+          ? factualProductDescription(loaderData)
+          : "Detalii produs, specificații și preț.",
+      },
+      { property: "og:type", content: "product" },
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: loaderData ? productCanonical(loaderData) : productCanonical({ slug: params.slug }),
+      },
     ],
   }),
   component: ProductPage,
@@ -28,7 +59,9 @@ export const Route = createFileRoute("/produs/$slug")({
 
 function ProductPage() {
   const { slug } = Route.useParams();
-  const { data: product, isLoading } = useProduct(slug);
+  const initialProduct = Route.useLoaderData();
+  const { data: liveProduct, isLoading } = useProduct(slug);
+  const product = liveProduct ?? initialProduct;
   const { add } = useCart();
   const [active, setActive] = useState<number | null>(null);
   const [variantId, setVariantId] = useState<string | null>(null);
@@ -67,7 +100,7 @@ function ProductPage() {
     return () => window.clearInterval(timer);
   }, [activeIndex, autoRotate, galleryHovered, images.length]);
 
-  if (isLoading) {
+  if (isLoading && !product) {
     return <p className="py-32 text-center text-sm text-muted-foreground">Se încarcă…</p>;
   }
 
@@ -153,6 +186,8 @@ function ProductPage() {
 
   return (
     <div className="site-container py-10">
+      <script type="application/ld+json">{jsonLd(productJsonLd(product))}</script>
+      <script type="application/ld+json">{jsonLd(productBreadcrumbJsonLd(product))}</script>
       <nav className="micro-sm text-muted-foreground">
         <Link to="/produse" className="link-underline">
           Catalog
@@ -162,7 +197,7 @@ function ProductPage() {
             {" / "}
             <Link
               to="/categorie/$slug"
-              params={{ slug: product.categories.slug }}
+              params={{ slug: categoryRouteSlug(product.categories.slug) }}
               className="link-underline"
             >
               {product.categories.name}
@@ -289,7 +324,7 @@ function ProductPage() {
                 <Link
                   key={category.id}
                   to="/categorie/$slug"
-                  params={{ slug: category.slug }}
+                  params={{ slug: categoryRouteSlug(category.slug) }}
                   className="link-underline"
                 >
                   {category.name}

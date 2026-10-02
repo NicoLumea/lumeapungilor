@@ -3,10 +3,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { ProductCard } from "@/components/site/ProductCard";
 import { usePublishedProducts } from "@/lib/products";
 import { getTopSellingProducts } from "@/lib/recommendations.functions";
-import { productAvailableStock } from "@/lib/shop-types";
+import { productAvailableStock, type Product } from "@/lib/shop-types";
 
-export function RecommendedProducts({ concise = false }: { concise?: boolean }) {
-  const { data: products } = usePublishedProducts();
+export function RecommendedProducts({
+  concise = false,
+  initialProducts,
+}: {
+  concise?: boolean;
+  initialProducts?: Product[];
+}) {
+  const { data: liveProducts } = usePublishedProducts();
+  const products = liveProducts ?? initialProducts;
   const topSelling = useServerFn(getTopSellingProducts);
   const { data: sales } = useQuery({
     queryKey: ["recommendations", "top-selling"],

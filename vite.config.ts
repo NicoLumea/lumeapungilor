@@ -14,6 +14,8 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    plugins: [mcpPlugin()],
+    // mcp-js 3.0.4 compares mixed slash styles on Windows and aborts before Vite starts.
+    // Generated MCP routes are committed; Lovable/Linux builds still run the generator normally.
+    plugins: process.platform === "win32" ? [] : [mcpPlugin()],
   },
 });

@@ -1,5 +1,7 @@
-// Current public site. Switch to the custom domain only once it serves these pages.
-export const SITEMAP_ORIGIN = "https://lumeapungilor.lovable.app";
+// Current public site. Override together with hosting/DNS when the custom domain is connected.
+export const SITEMAP_ORIGIN = (
+  import.meta.env?.["VITE_PUBLIC_SITE_URL"] || "https://lumeapungilor.lovable.app"
+).replace(/\/$/, "");
 
 // The root route redirects to /magazin, so only its canonical destination belongs here.
 export const INDEXABLE_STATIC_PATHS = [
@@ -19,6 +21,11 @@ export type SitemapRow = {
 };
 
 const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** URL-only cleanup for a legacy category whose stored slug begins with a slash. */
+export function categoryRouteSlug(slug: string): string {
+  return slug.trim().replace(/^\/+/, "");
+}
 
 function lastModified(value: string | null): string | null {
   if (!value) return null;
@@ -44,7 +51,7 @@ export function buildSitemap(categories: SitemapRow[], products: SitemapRow[]): 
     ["/produs/", products],
   ] as const) {
     for (const row of rows) {
-      const slug = row.slug?.trim();
+      const slug = prefix === "/categorie/" ? categoryRouteSlug(row.slug ?? "") : row.slug?.trim();
       if (!slug || !PUBLIC_SLUG.test(slug)) continue;
       const path = `${prefix}${slug}`;
       const modified = lastModified(row.updated_at);

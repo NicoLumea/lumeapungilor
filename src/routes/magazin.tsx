@@ -6,8 +6,12 @@ import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { companyInfo, telephoneHref } from "@/lib/company";
+import { getSeoCatalog } from "@/lib/seo-catalog.functions";
+import { absolutePublicUrl } from "@/lib/product-seo";
+import { categoryRouteSlug } from "@/lib/sitemap";
 
 export const Route = createFileRoute("/magazin")({
+  loader: () => getSeoCatalog(),
   head: () => ({
     meta: [
       { title: "Magazin — Lumea Pungilor" },
@@ -24,13 +28,16 @@ export const Route = createFileRoute("/magazin")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: absolutePublicUrl("/magazin") }],
   }),
   component: Shop,
 });
 
 function Shop() {
+  const initial = Route.useLoaderData();
   const { data: content } = useContent();
-  const { data: categories } = useCategories();
+  const { data: liveCategories } = useCategories();
+  const categories = liveCategories ?? initial.categories;
   const home = content?.["home"];
   const company = companyInfo(content);
   const edTitle = text(home, "editorial_title");
@@ -71,7 +78,7 @@ function Shop() {
                 <Link
                   key={c.id}
                   to="/categorie/$slug"
-                  params={{ slug: c.slug }}
+                  params={{ slug: categoryRouteSlug(c.slug) }}
                   className="category-card group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
                 >
                   <div className="category-card-media relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
@@ -126,7 +133,7 @@ function Shop() {
         </div>
       </section>
 
-      <RecommendedProducts />
+      <RecommendedProducts initialProducts={initial.products} />
       <PreviouslyPurchased />
 
       {edTitle || edBody || edImage ? (
