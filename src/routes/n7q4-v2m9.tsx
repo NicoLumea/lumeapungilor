@@ -35,6 +35,7 @@ const NAV = [
   { to: "/n7q4-v2m9/mesaje", label: "Mesaje", exact: false },
   { to: "/n7q4-v2m9/feedback", label: "Feedback", exact: false },
   { to: "/n7q4-v2m9/content", label: "Conținut site", exact: false },
+  { to: "/n7q4-v2m9/seo", label: "SEO", exact: false },
   { to: "/n7q4-v2m9/setari", label: "Setări", exact: false },
   { to: "/n7q4-v2m9/audit", label: "Jurnal de audit", exact: false },
   { to: "/n7q4-v2m9/guide", label: "Ghid", exact: false },

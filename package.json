@@ -12,6 +12,7 @@
     "test:password-recovery": "node --test src/lib/password-recovery.test.ts",
     "test:gallery": "node --test src/lib/product-gallery.test.ts",
     "test:seo": "node --test src/lib/product-seo.test.ts src/lib/product-fetch-path-contract.test.ts src/lib/multi-category-products.test.ts src/lib/category-sorting.test.ts",
+    "test:prelaunch-seo": "node --test src/lib/prelaunch-seo-contract.test.ts",
     "test:crawl": "node scripts/crawl-public-html.mjs",
     "test:category-regression": "node --env-file=.env scripts/verify-category-membership-regression.mjs",
     "test:returns": "node --test src/lib/returns-core.test.ts",

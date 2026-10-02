@@ -6,6 +6,7 @@ import { useContent } from "@/lib/content";
 import { uploadProductImage } from "@/lib/admin-data";
 import { imageUrl } from "@/lib/images";
 import { HEADINGS } from "@/lib/headings";
+import { HeadingOutline, SeoPreview } from "@/components/dashboard/SeoEditorTools";
 
 type FieldKind = "text" | "textarea" | "image" | "number" | "boolean";
 type Field = { name: string; label: string; kind: FieldKind; hint?: string };
@@ -24,6 +25,7 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
       { name: "phone_secondary", label: "Telefon secundar", kind: "text" },
       { name: "secondary_phone_note", label: "Notă telefon secundar", kind: "text" },
       { name: "registered_address", label: "Sediu social", kind: "textarea" },
+      { name: "trading_address", label: "Punct de lucru", kind: "textarea" },
       { name: "cui", label: "CUI", kind: "text" },
       { name: "trade_register_number", label: "Registrul Comerțului", kind: "text" },
       { name: "operating_days", label: "Zile de lucru", kind: "text" },
@@ -43,6 +45,10 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
       { name: "editorial_title", label: "Titlu secțiune text", kind: "text" },
       { name: "editorial_text", label: "Text secțiune", kind: "textarea" },
       { name: "editorial_image_url", label: "Imagine secțiune", kind: "image" },
+      { name: "magazin_about_title", label: "Titlu bloc Despre din magazin", kind: "text" },
+      { name: "magazin_about_body", label: "Text bloc Despre din magazin", kind: "textarea" },
+      { name: "meta_title", label: "Titlu SEO", kind: "text" },
+      { name: "meta_description", label: "Descriere SEO", kind: "textarea" },
     ],
   },
   {
@@ -51,7 +57,12 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
     note: "Aceste valori se folosesc la calculul comenzii.",
     fields: [
       { name: "free_shipping_over", label: "Livrare gratuită peste (RON)", kind: "number" },
-      { name: "vat_rate", label: "Cotă TVA (%)", kind: "number", hint: "Lasă gol dacă prețurile includ deja TVA." },
+      {
+        name: "vat_rate",
+        label: "Cotă TVA (%)",
+        kind: "number",
+        hint: "Lasă gol dacă prețurile includ deja TVA.",
+      },
       {
         name: "payments_configured",
         label: "Plăți online activate",
@@ -85,9 +96,30 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
       { name: "title", label: "Titlu", kind: "text" as FieldKind },
       { name: "body", label: "Text", kind: "textarea" as FieldKind },
       { name: "image_url", label: "Imagine", kind: "image" as FieldKind },
+      { name: "meta_title", label: "Titlu SEO", kind: "text" as FieldKind },
+      { name: "meta_description", label: "Descriere SEO", kind: "textarea" as FieldKind },
     ],
   })),
+  {
+    key: "seo",
+    title: "SEO tehnic",
+    note: "Introdu numai tokenul Search Console, niciodată HTML sau scripturi.",
+    fields: [
+      { name: "google_site_verification", label: "Token Google Search Console", kind: "text" },
+      { name: "default_social_image_url", label: "Imagine socială implicită", kind: "image" },
+    ],
+  },
 ];
+
+const PUBLIC_PATHS: Record<string, string> = {
+  home: "/magazin",
+  about: "/despre",
+  contact: "/contact",
+  shipping: "/livrare",
+  returns: "/retur",
+  terms: "/termeni",
+  privacy: "/confidentialitate",
+};
 
 export function ContentPanel() {
   const qc = useQueryClient();
@@ -114,7 +146,12 @@ export function ContentPanel() {
   }
 
   function set(group: string, field: string, value: unknown) {
-    setValues((v) => ({ ...v, [group]: { ...(v[group] ?? {}), [field]: value } }));
+    setValues((v) => {
+      const next = { ...(v[group] ?? {}), [field]: value };
+      if (group === "home" && field === "hero_text") next["hero_subtitle"] = value;
+      if (group === "home" && field === "editorial_text") next["editorial_body"] = value;
+      return { ...v, [group]: next };
+    });
   }
 
   if (isLoading) return <p className="py-16 text-sm text-muted-foreground">Se încarcă…</p>;
@@ -129,6 +166,21 @@ export function ContentPanel() {
       <div className="mt-10 space-y-10">
         {GROUPS.map((group) => {
           const block = values[group.key] ?? {};
+          const duplicateFields = (["meta_title", "meta_description"] as const).filter((field) => {
+            const current = String(block[field] ?? "")
+              .trim()
+              .toLocaleLowerCase("ro");
+            return (
+              current.length > 0 &&
+              Object.entries(values).some(
+                ([key, value]) =>
+                  key !== group.key &&
+                  String(value[field] ?? "")
+                    .trim()
+                    .toLocaleLowerCase("ro") === current,
+              )
+            );
+          });
           return (
             <section key={group.key} className="border border-border p-6">
               <h2 className="micro">{group.title}</h2>
@@ -224,10 +276,36 @@ export function ContentPanel() {
                       {f.hint ? (
                         <span className="mt-1 block text-xs text-muted-foreground">{f.hint}</span>
                       ) : null}
+                      {f.name === "meta_title" || f.name === "meta_description" ? (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {value.length}/{f.name === "meta_title" ? 60 : 155} caractere
+                        </span>
+                      ) : null}
                     </label>
                   );
                 })}
               </div>
+              {!["company", "settings", "headings", "seo"].includes(group.key) ? (
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <SeoPreview
+                    title={String(block["meta_title"] ?? "")}
+                    fallbackTitle={`${String(block["title"] ?? block["hero_title"] ?? group.title)} — Lumea Pungilor`}
+                    url={`https://lumeapungilor.ro${PUBLIC_PATHS[group.key] ?? `/${group.key}`}`}
+                    description={String(block["meta_description"] ?? "")}
+                    fallbackDescription={String(block["body"] ?? block["hero_text"] ?? "")}
+                  />
+                  <HeadingOutline
+                    h1={String(block["title"] ?? block["hero_title"] ?? group.title)}
+                    markdown={String(block["body"] ?? block["magazin_about_body"] ?? "")}
+                  />
+                </div>
+              ) : null}
+              {duplicateFields.length > 0 ? (
+                <p className="mt-4 text-xs text-amber-700">
+                  Avertisment: {duplicateFields.join(" și ")} este duplicat pe altă pagină. Salvarea
+                  rămâne permisă.
+                </p>
+              ) : null}
               <button
                 type="button"
                 onClick={() => save(group.key)}

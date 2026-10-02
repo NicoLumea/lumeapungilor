@@ -51,6 +51,7 @@ import { Route as N7q4V2m9OrdersRouteImport } from './routes/n7q4-v2m9.orders'
 import { Route as N7q4V2m9ProductsRouteImport } from './routes/n7q4-v2m9.products'
 import { Route as N7q4V2m9RetururiRouteImport } from './routes/n7q4-v2m9.retururi'
 import { Route as N7q4V2m9RoluriRouteImport } from './routes/n7q4-v2m9.roluri'
+import { Route as N7q4V2m9SeoRouteImport } from './routes/n7q4-v2m9.seo'
 import { Route as N7q4V2m9SetariRouteImport } from './routes/n7q4-v2m9.setari'
 import { Route as N7q4V2m9StocRouteImport } from './routes/n7q4-v2m9.stoc'
 import { Route as N7q4V2m9UtilizatoriRouteImport } from './routes/n7q4-v2m9.utilizatori'
@@ -283,6 +284,11 @@ const N7q4V2m9RoluriRoute = N7q4V2m9RoluriRouteImport.update({
   path: '/roluri',
   getParentRoute: () => N7q4V2m9Route,
 } as any)
+const N7q4V2m9SeoRoute = N7q4V2m9SeoRouteImport.update({
+  id: '/seo',
+  path: '/seo',
+  getParentRoute: () => N7q4V2m9Route,
+} as any)
 const N7q4V2m9SetariRoute = N7q4V2m9SetariRouteImport.update({
   id: '/setari',
   path: '/setari',
@@ -426,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
   '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
   '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
+  '/n7q4-v2m9/seo': typeof N7q4V2m9SeoRoute
   '/n7q4-v2m9/setari': typeof N7q4V2m9SetariRoute
   '/n7q4-v2m9/stoc': typeof N7q4V2m9StocRoute
   '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
@@ -488,6 +495,7 @@ export interface FileRoutesByTo {
   '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
   '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
   '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
+  '/n7q4-v2m9/seo': typeof N7q4V2m9SeoRoute
   '/n7q4-v2m9/setari': typeof N7q4V2m9SetariRoute
   '/n7q4-v2m9/stoc': typeof N7q4V2m9StocRoute
   '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
@@ -553,6 +561,7 @@ export interface FileRoutesById {
   '/n7q4-v2m9/products': typeof N7q4V2m9ProductsRoute
   '/n7q4-v2m9/retururi': typeof N7q4V2m9RetururiRoute
   '/n7q4-v2m9/roluri': typeof N7q4V2m9RoluriRoute
+  '/n7q4-v2m9/seo': typeof N7q4V2m9SeoRoute
   '/n7q4-v2m9/setari': typeof N7q4V2m9SetariRoute
   '/n7q4-v2m9/stoc': typeof N7q4V2m9StocRoute
   '/n7q4-v2m9/utilizatori': typeof N7q4V2m9UtilizatoriRoute
@@ -619,6 +628,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/products'
     | '/n7q4-v2m9/retururi'
     | '/n7q4-v2m9/roluri'
+    | '/n7q4-v2m9/seo'
     | '/n7q4-v2m9/setari'
     | '/n7q4-v2m9/stoc'
     | '/n7q4-v2m9/utilizatori'
@@ -681,6 +691,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/products'
     | '/n7q4-v2m9/retururi'
     | '/n7q4-v2m9/roluri'
+    | '/n7q4-v2m9/seo'
     | '/n7q4-v2m9/setari'
     | '/n7q4-v2m9/stoc'
     | '/n7q4-v2m9/utilizatori'
@@ -745,6 +756,7 @@ export interface FileRouteTypes {
     | '/n7q4-v2m9/products'
     | '/n7q4-v2m9/retururi'
     | '/n7q4-v2m9/roluri'
+    | '/n7q4-v2m9/seo'
     | '/n7q4-v2m9/setari'
     | '/n7q4-v2m9/stoc'
     | '/n7q4-v2m9/utilizatori'
@@ -1101,6 +1113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof N7q4V2m9RoluriRouteImport
       parentRoute: typeof N7q4V2m9Route
     }
+    '/n7q4-v2m9/seo': {
+      id: '/n7q4-v2m9/seo'
+      path: '/seo'
+      fullPath: '/n7q4-v2m9/seo'
+      preLoaderRoute: typeof N7q4V2m9SeoRouteImport
+      parentRoute: typeof N7q4V2m9Route
+    }
     '/n7q4-v2m9/setari': {
       id: '/n7q4-v2m9/setari'
       path: '/setari'
@@ -1269,6 +1288,7 @@ interface N7q4V2m9RouteChildren {
   N7q4V2m9ProductsRoute: typeof N7q4V2m9ProductsRoute
   N7q4V2m9RetururiRoute: typeof N7q4V2m9RetururiRoute
   N7q4V2m9RoluriRoute: typeof N7q4V2m9RoluriRoute
+  N7q4V2m9SeoRoute: typeof N7q4V2m9SeoRoute
   N7q4V2m9SetariRoute: typeof N7q4V2m9SetariRoute
   N7q4V2m9StocRoute: typeof N7q4V2m9StocRoute
   N7q4V2m9UtilizatoriRoute: typeof N7q4V2m9UtilizatoriRoute
@@ -1288,6 +1308,7 @@ const N7q4V2m9RouteChildren: N7q4V2m9RouteChildren = {
   N7q4V2m9ProductsRoute: N7q4V2m9ProductsRoute,
   N7q4V2m9RetururiRoute: N7q4V2m9RetururiRoute,
   N7q4V2m9RoluriRoute: N7q4V2m9RoluriRoute,
+  N7q4V2m9SeoRoute: N7q4V2m9SeoRoute,
   N7q4V2m9SetariRoute: N7q4V2m9SetariRoute,
   N7q4V2m9StocRoute: N7q4V2m9StocRoute,
   N7q4V2m9UtilizatoriRoute: N7q4V2m9UtilizatoriRoute,

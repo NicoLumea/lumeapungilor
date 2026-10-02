@@ -8,12 +8,22 @@ import { uploadProductImage } from "@/lib/admin-data";
 import { imageUrl } from "@/lib/images";
 import type { Category } from "@/lib/shop-types";
 import { CategoryProductOrder } from "@/components/dashboard/CategoryProductOrder";
+import {
+  duplicateSeoWarning,
+  HeadingOutline,
+  SeoField,
+  SeoPreview,
+} from "@/components/dashboard/SeoEditorTools";
 
 type Draft = {
   id?: string;
   name: string;
   slug: string;
   description: string;
+  intro_text: string;
+  body_text: string;
+  meta_title: string;
+  meta_description: string;
   image_url: string | null;
   sort_order: number;
   is_visible: boolean;
@@ -23,6 +33,10 @@ const blank: Draft = {
   name: "",
   slug: "",
   description: "",
+  intro_text: "",
+  body_text: "",
+  meta_title: "",
+  meta_description: "",
   image_url: null,
   sort_order: 0,
   is_visible: true,
@@ -33,6 +47,7 @@ export function CategoriesPanel() {
   const { data: categories, isLoading } = useCategories(true);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
+  const [slugEditable, setSlugEditable] = useState(true);
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["categories"] });
@@ -49,6 +64,10 @@ export function CategoriesPanel() {
       name: draft.name.trim(),
       slug: (draft.slug.trim() || slugify(draft.name)).toLowerCase(),
       description: draft.description.trim() || null,
+      intro_text: draft.intro_text.trim() || null,
+      body_text: draft.body_text.trim() || null,
+      meta_title: draft.meta_title.trim() || null,
+      meta_description: draft.meta_description.trim() || null,
       image_url: draft.image_url,
       sort_order: draft.sort_order,
       is_visible: draft.is_visible,
@@ -83,7 +102,10 @@ export function CategoriesPanel() {
         <h1 className="display text-3xl">Categorii</h1>
         <button
           type="button"
-          onClick={() => setDraft({ ...blank, sort_order: (categories ?? []).length })}
+          onClick={() => {
+            setSlugEditable(true);
+            setDraft({ ...blank, sort_order: (categories ?? []).length });
+          }}
           className="micro border border-foreground bg-foreground px-6 py-3 text-background"
         >
           Categorie nouă
@@ -107,9 +129,26 @@ export function CategoriesPanel() {
             <input
               value={draft.slug}
               placeholder={slugify(draft.name)}
+              disabled={!!draft.id && !slugEditable}
               onChange={(e) => setDraft({ ...draft, slug: e.target.value })}
-              className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+              className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground disabled:opacity-60"
             />
+            {draft.id && !slugEditable ? (
+              <button
+                type="button"
+                className="micro-sm mt-2 link-underline"
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Schimbarea adresei modifică URL-ul public. Vechea adresă va primi redirect permanent. Continui?",
+                    )
+                  )
+                    setSlugEditable(true);
+                }}
+              >
+                Editează adresa
+              </button>
+            ) : null}
           </label>
           <label className="block">
             <span className="micro-sm text-muted-foreground">Descriere</span>
@@ -120,6 +159,64 @@ export function CategoriesPanel() {
               className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
             />
           </label>
+          <label className="block">
+            <span className="micro-sm text-muted-foreground">Introducere categorie</span>
+            <textarea
+              rows={3}
+              value={draft.intro_text}
+              onChange={(e) => setDraft({ ...draft, intro_text: e.target.value })}
+              className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+            />
+          </label>
+          <label className="block">
+            <span className="micro-sm text-muted-foreground">
+              Conținut după produse (Markdown H2/H3)
+            </span>
+            <textarea
+              rows={7}
+              value={draft.body_text}
+              onChange={(e) => setDraft({ ...draft, body_text: e.target.value })}
+              className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+            />
+          </label>
+          <div className="grid gap-5 md:grid-cols-2">
+            <SeoField
+              label="Titlu SEO"
+              value={draft.meta_title}
+              target={60}
+              onChange={(value) => setDraft({ ...draft, meta_title: value })}
+            />
+            <SeoField
+              label="Descriere SEO"
+              value={draft.meta_description}
+              target={155}
+              multiline
+              onChange={(value) => setDraft({ ...draft, meta_description: value })}
+            />
+          </div>
+          {["meta_title", "meta_description"].map((field) => {
+            const warning = duplicateSeoWarning(
+              draft.id,
+              field as "meta_title" | "meta_description",
+              draft[field as "meta_title"],
+              (categories ?? []).map((category) => ({ ...category, name: category.name })),
+            );
+            return warning ? (
+              <p key={field} className="text-xs text-amber-700">
+                {warning}
+              </p>
+            ) : null;
+          })}
+          <div className="grid gap-4 md:grid-cols-2">
+            <SeoPreview
+              title={draft.meta_title}
+              fallbackTitle={`${draft.name || "Categorie"} — Lumea Pungilor`}
+              url={`https://lumeapungilor.ro/categorie/${draft.slug || slugify(draft.name)}`}
+              description={draft.meta_description}
+              fallbackDescription={draft.intro_text || draft.description}
+            />
+            <HeadingOutline h1={draft.name} markdown={draft.body_text} />
+          </div>
           <div className="flex flex-wrap items-center gap-6">
             <label className="block">
               <span className="micro-sm text-muted-foreground">Ordine</span>
@@ -158,7 +255,7 @@ export function CategoriesPanel() {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   try {
-                    const path = await uploadProductImage(file);
+                    const path = await uploadProductImage(file, draft.slug || draft.name);
                     setDraft({ ...draft, image_url: path });
                     toast.success("Fotografie încărcată.");
                   } catch {
@@ -214,17 +311,22 @@ export function CategoriesPanel() {
               <button
                 type="button"
                 className="micro-sm link-underline"
-                onClick={() =>
+                onClick={() => {
+                  setSlugEditable(false);
                   setDraft({
                     id: c.id,
                     name: c.name,
                     slug: c.slug,
                     description: c.description ?? "",
+                    intro_text: c.intro_text ?? "",
+                    body_text: c.body_text ?? "",
+                    meta_title: c.meta_title ?? "",
+                    meta_description: c.meta_description ?? "",
                     image_url: c.image_url,
                     sort_order: c.sort_order,
                     is_visible: c.is_visible,
-                  })
-                }
+                  });
+                }}
               >
                 Editează
               </button>
