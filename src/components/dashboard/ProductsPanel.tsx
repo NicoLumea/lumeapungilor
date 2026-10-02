@@ -298,7 +298,7 @@ export function ProductsPanel() {
       const { error: categoriesError } = await supabase.rpc("set_product_categories", {
         p_product_id: productId,
         p_category_ids: draft.category_ids,
-        p_primary_category_id: draft.category_id || null,
+        p_primary_category_id: (draft.category_id || null) as string,
       });
       if (categoriesError) throw categoriesError;
 
