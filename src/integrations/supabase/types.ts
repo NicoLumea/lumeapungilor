@@ -556,16 +556,19 @@ export type Database = {
           product_id: string
           category_id: string
           created_at: string
+          sort_order: number | null
         }
         Insert: {
           product_id: string
           category_id: string
           created_at?: string
+          sort_order?: number | null
         }
         Update: {
           product_id?: string
           category_id?: string
           created_at?: string
+          sort_order?: number | null
         }
         Relationships: [
           {
@@ -1334,6 +1337,13 @@ export type Database = {
           p_product_id: string
           p_category_ids: string[]
           p_primary_category_id: string | null
+        }
+        Returns: undefined
+      }
+      reorder_category_products: {
+        Args: {
+          p_category_id: string
+          p_product_ids: string[]
         }
         Returns: undefined
       }

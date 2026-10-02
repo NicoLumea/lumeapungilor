@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PRODUCT_BASE_SELECT, specList, type Product } from "@/lib/shop-types";
+import { sortCategoryProducts, type CategoryMembership } from "@/lib/category-sorting";
 
 function normalize(row: Record<string, unknown>): Product {
   return { ...(row as unknown as Product), specs: specList(row["specs"]) };
@@ -40,21 +41,123 @@ async function withCategoryLinks(products: Product[]): Promise<Product[]> {
 }
 
 export async function fetchPublishedProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select(PRODUCT_BASE_SELECT)
-    .eq("status", "published")
-    .eq("is_archived", false)
-    .order("sort_order")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return withCategoryLinks(
-    (data ?? []).map((d) => normalize(d as unknown as Record<string, unknown>)),
-  );
+  const products: Product[] = [];
+  for (let start = 0; ; start += 500) {
+    const { data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_BASE_SELECT)
+      .eq("status", "published")
+      .eq("is_archived", false)
+      .order("sort_order")
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(start, start + 499);
+    if (error) throw error;
+    products.push(
+      ...(data ?? []).map((row) => normalize(row as unknown as Record<string, unknown>)),
+    );
+    if ((data ?? []).length < 500) break;
+  }
+  return withCategoryLinks(products);
 }
 
-export function usePublishedProducts() {
-  return useQuery({ queryKey: ["products", "published"], queryFn: fetchPublishedProducts });
+export function usePublishedProducts(enabled = true) {
+  return useQuery({
+    queryKey: ["products", "published"],
+    queryFn: fetchPublishedProducts,
+    enabled,
+  });
+}
+
+export type CategoryProductsResult = {
+  products: Product[];
+  memberships: CategoryMembership[];
+  orderingAvailable: boolean;
+};
+
+/** The category relationship is required here, but never for the All Products query. */
+export async function fetchCategoryMemberships(categoryId: string): Promise<{
+  memberships: CategoryMembership[];
+  orderingAvailable: boolean;
+}> {
+  const memberships: CategoryMembership[] = [];
+  for (let start = 0; ; start += 500) {
+    const ranked = await supabase
+      .from("product_categories")
+      .select("product_id,sort_order,created_at")
+      .eq("category_id", categoryId)
+      .order("created_at")
+      .order("product_id")
+      .range(start, start + 499);
+    if (ranked.error) {
+      // A frontend-first deployment must keep browsing safe until the migration lands.
+      if (ranked.error.code !== "42703" || !ranked.error.message.includes("sort_order")) {
+        throw ranked.error;
+      }
+      break;
+    }
+    memberships.push(...(ranked.data ?? []));
+    if ((ranked.data ?? []).length < 500) {
+      return { memberships, orderingAvailable: true };
+    }
+  }
+  const legacyMemberships: CategoryMembership[] = [];
+  for (let start = 0; ; start += 500) {
+    const legacy = await supabase
+      .from("product_categories")
+      .select("product_id,created_at")
+      .eq("category_id", categoryId)
+      .order("created_at")
+      .order("product_id")
+      .range(start, start + 499);
+    if (legacy.error) throw legacy.error;
+    legacyMemberships.push(...(legacy.data ?? []));
+    if ((legacy.data ?? []).length < 500) break;
+  }
+  return { memberships: legacyMemberships, orderingAvailable: false };
+}
+
+export async function fetchCategoryProducts(categoryId: string): Promise<CategoryProductsResult> {
+  const { memberships, orderingAvailable } = await fetchCategoryMemberships(categoryId);
+  const products: Product[] = [];
+  const ids = [...new Set(memberships.map((membership) => membership.product_id))];
+  for (let start = 0; start < ids.length; start += 100) {
+    const { data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_BASE_SELECT)
+      .in("id", ids.slice(start, start + 100))
+      .eq("status", "published")
+      .eq("is_archived", false);
+    if (error) throw error;
+    products.push(
+      ...(data ?? []).map((row) => normalize(row as unknown as Record<string, unknown>)),
+    );
+  }
+  // Legacy primary assignments without a relationship must still show in this category.
+  for (let start = 0; ; start += 500) {
+    const { data: legacy, error: legacyError } = await supabase
+      .from("products")
+      .select(PRODUCT_BASE_SELECT)
+      .eq("category_id", categoryId)
+      .eq("status", "published")
+      .eq("is_archived", false)
+      .order("id")
+      .range(start, start + 499);
+    if (legacyError) throw legacyError;
+    products.push(
+      ...(legacy ?? []).map((row) => normalize(row as unknown as Record<string, unknown>)),
+    );
+    if ((legacy ?? []).length < 500) break;
+  }
+  return { products: sortCategoryProducts(products, memberships), memberships, orderingAvailable };
+}
+
+export function useCategoryProducts(categoryId: string | undefined) {
+  return useQuery({
+    queryKey: ["products", "category", categoryId],
+    enabled: !!categoryId,
+    queryFn: () => fetchCategoryProducts(categoryId!),
+  });
 }
 
 export function useProduct(slug: string | undefined) {
