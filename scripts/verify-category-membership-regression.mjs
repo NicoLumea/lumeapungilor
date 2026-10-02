@@ -183,4 +183,3 @@ if (after[giftSlug].length === 0) {
   assert.equal(giftCount, 12);
   console.log(JSON.stringify({ phase: "after-content-rollout", retailCount, smallCount, giftCount }));
 }
-
