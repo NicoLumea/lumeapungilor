@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useContent } from "@/lib/content";
 import { uploadProductImage } from "@/lib/admin-data";
 import { imageUrl } from "@/lib/images";
+import { HEADINGS } from "@/lib/headings";
 
 type FieldKind = "text" | "textarea" | "image" | "number" | "boolean";
 type Field = { name: string; label: string; kind: FieldKind; hint?: string };
@@ -58,6 +59,17 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
         hint: "Lasă nebifat cât timp nu ai un procesator de plăți conectat.",
       },
     ],
+  },
+  {
+    key: "headings",
+    title: "Titluri pagini",
+    note: "Lasă gol pentru a păstra titlul actual (afișat sub fiecare câmp).",
+    fields: HEADINGS.map((h) => ({
+      name: h.id,
+      label: h.label,
+      kind: "text" as FieldKind,
+      hint: `Actual implicit: ${h.fallback}`,
+    })),
   },
   ...["about", "contact", "shipping", "returns", "terms", "privacy"].map((key) => ({
     key,

@@ -553,36 +553,36 @@ export type Database = {
       }
       product_categories: {
         Row: {
-          product_id: string
           category_id: string
           created_at: string
+          product_id: string
           sort_order: number | null
         }
         Insert: {
-          product_id: string
           category_id: string
           created_at?: string
+          product_id: string
           sort_order?: number | null
         }
         Update: {
-          product_id?: string
           category_id?: string
           created_at?: string
+          product_id?: string
           sort_order?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "product_categories_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "product_categories_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_categories_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -1268,35 +1268,6 @@ export type Database = {
           total: number
         }[]
       }
-      staff_order_catalog: {
-        Args: {
-          p_search?: string | null
-          p_status?: string | null
-          p_payment_status?: string | null
-          p_payment_method?: string | null
-          p_customer_type?: string | null
-          p_from?: string | null
-          p_to?: string | null
-          p_limit?: number
-          p_offset?: number
-        }
-        Returns: Database["public"]["Tables"]["orders"]["Row"][]
-      }
-      staff_customer_catalog: {
-        Args: { p_search?: string | null; p_limit?: number; p_offset?: number }
-        Returns: {
-          id: string
-          email: string | null
-          full_name: string | null
-          company_name: string | null
-          phone: string | null
-          created_at: string
-          completed_orders: number
-          last_order_at: string | null
-          total_spent: number
-        }[]
-      }
-      set_delivery_fee: { Args: { p_fee: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1321,6 +1292,91 @@ export type Database = {
         }
         Returns: Json
       }
+      reorder_category_products: {
+        Args: { p_category_id: string; p_product_ids: string[] }
+        Returns: undefined
+      }
+      set_delivery_fee: { Args: { p_fee: number }; Returns: number }
+      set_product_categories: {
+        Args: {
+          p_category_ids: string[]
+          p_primary_category_id: string
+          p_product_id: string
+        }
+        Returns: undefined
+      }
+      staff_customer_catalog: {
+        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Returns: {
+          company_name: string
+          completed_orders: number
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          last_order_at: string
+          phone: string
+          total_spent: number
+        }[]
+      }
+      staff_order_catalog: {
+        Args: {
+          p_customer_type?: string
+          p_from?: string
+          p_limit?: number
+          p_offset?: number
+          p_payment_method?: string
+          p_payment_status?: string
+          p_search?: string
+          p_status?: string
+          p_to?: string
+        }
+        Returns: {
+          archived_at: string | null
+          billing_address: string | null
+          city: string | null
+          company_name: string | null
+          contact_name: string
+          county: string | null
+          created_at: string
+          cui: string | null
+          currency: string
+          delivery_address: string | null
+          email: string
+          email_verified: boolean
+          id: string
+          internal_notes: string | null
+          is_guest: boolean
+          is_test: boolean
+          notes: string | null
+          notification_error: string | null
+          notification_status: string
+          notified_at: string | null
+          order_number: string
+          payment_method: string
+          payment_reference: string | null
+          payment_status: string
+          phone: string | null
+          postal_code: string | null
+          reg_com: string | null
+          shipping_total: number
+          status: string
+          stock_applied: boolean
+          stock_released: boolean
+          subtotal: number
+          tax_total: number
+          total: number
+          updated_at: string
+          updated_by: string | null
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       take_staff_mfa_attempt: {
         Args: { _challenge_id: string }
         Returns: number
@@ -1331,21 +1387,6 @@ export type Database = {
           product_id: string
           sold: number
         }[]
-      }
-      set_product_categories: {
-        Args: {
-          p_product_id: string
-          p_category_ids: string[]
-          p_primary_category_id: string | null
-        }
-        Returns: undefined
-      }
-      reorder_category_products: {
-        Args: {
-          p_category_id: string
-          p_product_ids: string[]
-        }
-        Returns: undefined
       }
       update_product_image_gallery: {
         Args: {

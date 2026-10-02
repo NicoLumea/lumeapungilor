@@ -21,13 +21,13 @@ export function OrdersPanel({ base }: { base: "/staff/comenzi" | "/n7q4-v2m9/ord
     queryKey: ["staff", "orders", search, status, payment, method, customerType, from, to, page],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("staff_order_catalog", {
-        p_search: search || null,
-        p_status: status || null,
-        p_payment_status: payment || null,
-        p_payment_method: method || null,
-        p_customer_type: customerType || null,
-        p_from: from || null,
-        p_to: to || null,
+        p_search: (search || null) as string,
+        p_status: (status || null) as string,
+        p_payment_status: (payment || null) as string,
+        p_payment_method: (method || null) as string,
+        p_customer_type: (customerType || null) as string,
+        p_from: (from || null) as string,
+        p_to: (to || null) as string,
         p_limit: PAGE_SIZE + 1,
         p_offset: page * PAGE_SIZE,
       });

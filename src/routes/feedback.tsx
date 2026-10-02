@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -63,7 +64,7 @@ function FeedbackPage() {
   return (
     <div className="site-container max-w-[760px] py-12 md:py-20">
       <p className="micro-sm text-muted-foreground">Părerea ta contează</p>
-      <h1 className="display mt-3 text-3xl md:text-4xl">Trimite feedback</h1>
+      <h1 className="display mt-3 text-3xl md:text-4xl"><HeadingText id="feedback_h1" /></h1>
       <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
         Spune-ne ce putem îmbunătăți pe site, la un produs sau în experiența generală. Pentru
         retururi și reclamații folosește{" "}

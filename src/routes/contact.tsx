@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ function ContactPage() {
   return (
     <article className="site-container max-w-[1100px] py-14 md:py-20">
       <div className="max-w-3xl">
-        <h1 className="display text-4xl md:text-5xl">Contactează-ne</h1>
+        <h1 className="display text-4xl md:text-5xl"><HeadingText id="contact_h1" /></h1>
         <p className="mt-6 text-base leading-relaxed text-muted-foreground">
           Pentru informații despre produse, stoc, comenzi sau colaborări, echipa Lumea Pungilor
           poate fi contactată în timpul programului operațional. Datele complete ale companiei și
