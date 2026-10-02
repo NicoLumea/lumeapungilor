@@ -106,11 +106,21 @@ for (const category of categories) {
 
 const giftSlug = categories.find((category) => category.slug.replace(/^\/+/, "") === "pungi-cadou")?.slug;
 assert.ok(giftSlug, "Gift-bag category must exist");
+const plasticSlug = categories.find((category) => ["pungute-plastic", "pungi-plastic"].includes(category.slug))?.slug;
+const smallSlug = categories.find((category) => ["pungi-mici", "pungute-mici"].includes(category.slug))?.slug;
+assert.ok(plasticSlug && smallSlug, "Plastic and small-bag categories must exist");
 
 if (after[giftSlug].length === 0) {
   // Historical pre-rollout snapshot: the new content migration has not run yet.
-  const historicalBaseline = { ...baseline, [giftSlug]: baseline["/pungi-cadou"] };
+  const historicalBaseline = {
+    ...baseline,
+    [giftSlug]: baseline["/pungi-cadou"],
+    [plasticSlug]: baseline["pungute-plastic"],
+    [smallSlug]: baseline["pungi-mici"],
+  };
   if (giftSlug !== "/pungi-cadou") delete historicalBaseline["/pungi-cadou"];
+  if (plasticSlug !== "pungute-plastic") delete historicalBaseline["pungute-plastic"];
+  if (smallSlug !== "pungi-mici") delete historicalBaseline["pungi-mici"];
   assert.deepEqual(after, historicalBaseline);
   console.log(JSON.stringify({ phase: "before-content-rollout", publishedProducts: products.length }));
 } else {
@@ -160,7 +170,7 @@ if (after[giftSlug].length === 0) {
       if (isGift) giftCount++;
       assert.deepEqual(
         [...assigned].sort(),
-        ["pungute-plastic", ...(isSmall ? ["pungi-mici"] : []), ...(isGift ? [giftSlug] : [])].sort(),
+        [plasticSlug, ...(isSmall ? [smallSlug] : []), ...(isGift ? [giftSlug] : [])].sort(),
         product.slug,
       );
     } else if (isCourier) {
@@ -173,3 +183,4 @@ if (after[giftSlug].length === 0) {
   assert.equal(giftCount, 12);
   console.log(JSON.stringify({ phase: "after-content-rollout", retailCount, smallCount, giftCount }));
 }
+
