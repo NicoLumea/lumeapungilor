@@ -689,6 +689,7 @@ export type Database = {
           description: string | null
           id: string
           is_archived: boolean
+          eco_tax_applicable: boolean | null
           is_featured: boolean
           meta_description: string | null
           meta_title: string | null
@@ -715,6 +716,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          eco_tax_applicable?: boolean | null
           is_featured?: boolean
           meta_description?: string | null
           meta_title?: string | null
@@ -741,6 +743,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_archived?: boolean
+          eco_tax_applicable?: boolean | null
           is_featured?: boolean
           meta_description?: string | null
           meta_title?: string | null

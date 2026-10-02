@@ -43,6 +43,7 @@ type Draft = {
   track_stock: boolean;
   status: "draft" | "published";
   is_featured: boolean;
+  eco_tax_applicable: boolean | null;
   is_archived: boolean;
   sort_order: number;
   specs: Spec[];
@@ -68,6 +69,7 @@ const blank: Draft = {
   track_stock: true,
   status: "draft",
   is_featured: false,
+  eco_tax_applicable: null,
   is_archived: false,
   sort_order: 0,
   specs: [],
@@ -95,6 +97,7 @@ function toDraft(p: Product): Draft {
     track_stock: p.track_stock,
     status: p.status === "published" ? "published" : "draft",
     is_featured: p.is_featured,
+    eco_tax_applicable: p.eco_tax_applicable ?? null,
     is_archived: p.is_archived,
     sort_order: p.sort_order,
     specs: p.specs ?? [],
@@ -294,6 +297,7 @@ export function ProductsPanel() {
         track_stock: draft.track_stock,
         status: draft.status,
         is_featured: draft.is_featured,
+        eco_tax_applicable: draft.eco_tax_applicable,
         is_archived: draft.is_archived,
         sort_order: draft.sort_order,
         specs: draft.specs.filter((s) => s.label.trim() && s.value.trim()),
@@ -637,6 +641,31 @@ export function ProductsPanel() {
               />
             </label>
           </div>
+
+          <label className="block">
+            <span className="micro-sm text-muted-foreground">Ecotaxă</span>
+            <select
+              value={
+                draft.eco_tax_applicable === null ? "unknown" : String(draft.eco_tax_applicable)
+              }
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  eco_tax_applicable:
+                    e.target.value === "unknown" ? null : e.target.value === "true",
+                })
+              }
+              className="mt-2 w-full border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="unknown">De confirmat</option>
+              <option value="true">Se aplică — inclusă în preț</option>
+              <option value="false">Nu se aplică</option>
+            </select>
+            <span className="mt-2 block text-xs text-muted-foreground">
+              Confirmă aplicabilitatea pentru acest produs și toate variantele sale înainte de
+              selectare. Eticheta nu modifică prețul sau totalul comenzii.
+            </span>
+          </label>
 
           <div className="flex flex-wrap gap-6">
             {[
