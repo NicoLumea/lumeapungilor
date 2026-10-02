@@ -20,6 +20,7 @@ import {
   SeoField,
   SeoPreview,
 } from "@/components/dashboard/SeoEditorTools";
+import { ImageOptimizationPanel } from "@/components/dashboard/ImageOptimizationPanel";
 
 type ImageDraft = { id?: string; url: string; alt: string; isPrimary: boolean };
 type VariantDraft = { id?: string; name: string; sku: string; price: string; stock: number };
@@ -433,6 +434,8 @@ export function ProductsPanel() {
           Produs nou
         </button>
       </div>
+
+      <ImageOptimizationPanel products={products} categories={categories} />
 
       {draft ? (
         <div className="mt-8 space-y-8 border border-border p-6">

@@ -5,6 +5,7 @@ import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
 import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
+import { imageVariantSrcSet, imageVariantUrl } from "@/lib/image-variants";
 import { companyInfo, telephoneHref } from "@/lib/company";
 import { getSeoCatalog } from "@/lib/seo-catalog.functions";
 import { getSeoContent } from "@/lib/seo-catalog.functions";
@@ -85,9 +86,12 @@ function Shop() {
                   <div className="category-card-media relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
                     {img ? (
                       <img
-                        src={img}
+                        src={imageVariantUrl(c.image_url, 640) ?? img}
+                        srcSet={imageVariantSrcSet(c.image_url, [320, 640])}
+                        sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
                         alt={c.name}
                         loading="lazy"
+                        decoding="async"
                         className="category-card-image absolute inset-0 size-full object-contain p-3 sm:p-6"
                       />
                     ) : (
@@ -159,7 +163,15 @@ function Shop() {
             </div>
             {edImage ? (
               <div className="bg-field">
-                <img src={edImage} alt={edTitle ?? ""} className="w-full object-cover" />
+                <img
+                  src={imageVariantUrl(text(home, "editorial_image_url"), 1600) ?? edImage}
+                  srcSet={imageVariantSrcSet(text(home, "editorial_image_url"), [960, 1600])}
+                  sizes="(max-width: 767px) 100vw, 50vw"
+                  alt={edTitle ?? ""}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full object-cover"
+                />
               </div>
             ) : null}
           </div>

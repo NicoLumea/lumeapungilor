@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { IMAGE_BUCKET } from "@/lib/images";
+import { uploadImageVariants } from "@/lib/image-upload-variants";
 import { PRODUCT_SELECT, type Product } from "@/lib/shop-types";
 import { slugify } from "@/lib/format";
 
@@ -42,5 +43,11 @@ export async function uploadProductImage(file: File, descriptiveName?: string): 
     .from(IMAGE_BUCKET)
     .upload(path, file, { cacheControl: "3600", upsert: false });
   if (error) throw error;
+  // A failed derivative never hides an already uploaded original. The backfill can repair it.
+  try {
+    await uploadImageVariants(file, path);
+  } catch (variantError) {
+    console.warn("[images] original uploaded, variants pending backfill", variantError);
+  }
   return path;
 }
