@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, Search, ShoppingBag, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,7 +13,6 @@ import {
 import { useCart } from "@/lib/cart";
 import { companyInfo } from "@/lib/company";
 import { useCategories, useContent } from "@/lib/content";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/use-auth";
 import { AccountBenefitsPopup } from "@/components/site/AccountBenefitsPopup";
 import { categoryRouteSlug } from "@/lib/sitemap";
@@ -28,24 +27,6 @@ export function SiteHeader() {
   const { data: categories } = useCategories();
   const { data: content } = useContent();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [compact, setCompact] = useState(false);
-
-  useEffect(() => {
-    let scheduled = false;
-    const update = () => {
-      setCompact(window.scrollY > 72);
-      scheduled = false;
-    };
-    const onScroll = () => {
-      if (scheduled) return;
-      scheduled = true;
-      window.requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   const name = companyInfo(content).brandName ?? "Lumea Pungilor";
 
   const desktopCategories = (categories ?? []).map((c) => (
@@ -73,12 +54,7 @@ export function SiteHeader() {
   ));
 
   return (
-    <header
-      className={cn(
-        "site-header sticky top-0 z-40 border-b border-border bg-background",
-        compact && "is-compact border-foreground/10 bg-background/90 backdrop-blur-[10px]",
-      )}
-    >
+    <header className="site-header sticky top-0 z-40 border-b border-border bg-background">
       <div className="site-header-inner mx-auto grid h-[3.75rem] w-full max-w-[110rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-[clamp(20px,3vw,56px)] min-[769px]:h-[4.5rem] min-[1920px]:max-w-[132rem] min-[1920px]:grid-cols-[minmax(15rem,1fr)_auto_minmax(15rem,1fr)] min-[1920px]:gap-[clamp(24px,2.5vw,48px)]">
         <div className="min-[1920px]:hidden">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
