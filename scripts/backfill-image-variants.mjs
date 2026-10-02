@@ -2,8 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 import {
   IMAGE_VARIANT_WIDTHS,
+  IMAGE_VARIANTS_READY_PATH,
   canOptimizeImage,
   imageVariantPath,
+  isExistingStorageObject,
 } from "../src/lib/image-variants.ts";
 
 const apply = process.argv.includes("--apply");
@@ -116,7 +118,7 @@ if (!apply) {
           upsert: false,
         });
         if (uploadError) {
-          if (String(uploadError.statusCode) === "409") existing++;
+          if (isExistingStorageObject(uploadError)) existing++;
           else throw uploadError;
         } else {
           variantBytes += output.length;
@@ -138,5 +140,23 @@ if (!apply) {
       failed,
     }),
   );
+  if (!failed && limit === Infinity && paths.length > 0) {
+    const marker = Buffer.from(
+      JSON.stringify({
+        version: 1,
+        completedAt: new Date().toISOString(),
+        originals: paths.length,
+      }),
+    );
+    const { error: markerError } = await bucket.upload(IMAGE_VARIANTS_READY_PATH, marker, {
+      contentType: "application/json",
+      cacheControl: "30",
+      upsert: false,
+    });
+    if (markerError && !isExistingStorageObject(markerError)) {
+      console.error(`Cannot activate image variants: ${markerError.message}`);
+      process.exitCode = 1;
+    }
+  }
   if (failed) process.exitCode = 1;
 }

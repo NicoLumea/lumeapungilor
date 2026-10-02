@@ -1,7 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IMAGE_VARIANT_WIDTHS, imageVariantPath } from "@/lib/image-variants";
+import {
+  IMAGE_VARIANT_WIDTHS,
+  IMAGE_VARIANTS_READY_PATH,
+  imageVariantPath,
+} from "@/lib/image-variants";
 
 const BUCKET = "product-images";
+let readyUntil = 0;
+let ready = false;
+let pendingReadyCheck: Promise<boolean> | null = null;
+
+function storageVariantsReady(check: () => Promise<boolean>): Promise<boolean> {
+  if (Date.now() < readyUntil) return Promise.resolve(ready);
+  if (!pendingReadyCheck) {
+    pendingReadyCheck = check()
+      .then((found) => {
+        ready = found;
+        readyUntil = Date.now() + (found ? 60_000 : 15_000);
+        return found;
+      })
+      .finally(() => {
+        pendingReadyCheck = null;
+      });
+  }
+  return pendingReadyCheck;
+}
 
 export const Route = createFileRoute("/api/public/img/$")({
   server: {
@@ -22,13 +45,17 @@ export const Route = createFileRoute("/api/public/img/$")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const bucket = supabaseAdmin.storage.from(BUCKET);
           const requestedWidth = Number(new URL(request.url).searchParams.get("w"));
-          // Existing images have no variants until the storage backfill completes.
-          // Avoid a failed variant download before every original in previews.
-          const variantsReady = process.env["PRODUCT_IMAGE_VARIANTS_READY"] === "1";
-          if (
-            variantsReady &&
-            IMAGE_VARIANT_WIDTHS.includes(requestedWidth as (typeof IMAGE_VARIANT_WIDTHS)[number])
-          ) {
+          const hasWidth = IMAGE_VARIANT_WIDTHS.includes(
+            requestedWidth as (typeof IMAGE_VARIANT_WIDTHS)[number],
+          );
+          const variantsReady =
+            hasWidth &&
+            (process.env["PRODUCT_IMAGE_VARIANTS_READY"] === "1" ||
+              (await storageVariantsReady(async () => {
+                const { error } = await bucket.download(IMAGE_VARIANTS_READY_PATH);
+                return !error;
+              })));
+          if (variantsReady) {
             const variant = await bucket.download(
               imageVariantPath(path, requestedWidth as (typeof IMAGE_VARIANT_WIDTHS)[number]),
             );
@@ -58,10 +85,11 @@ export const Route = createFileRoute("/api/public/img/$")({
           status: 200,
           headers: {
             "Content-Type": data.type || "application/octet-stream",
+            "X-Image-Source": variantFound ? "webp-variant" : "original",
             // A short fallback TTL lets a newly backfilled variant replace an original.
             "Cache-Control": variantFound
               ? "public, max-age=31536000, immutable"
-              : "public, max-age=300",
+              : "public, max-age=30",
           },
         });
       },
