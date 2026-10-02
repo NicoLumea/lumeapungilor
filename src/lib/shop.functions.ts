@@ -124,7 +124,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         return {
           ok: false,
           error:
-            "Această adresă de e-mail a folosit deja comanda fără cont. Autentifică-te sau creează un cont pentru a comanda din nou.",
+            "Comanda fără cont nu poate fi procesată. Autentifică-te sau contactează-ne pentru ajutor.",
         };
       }
     }

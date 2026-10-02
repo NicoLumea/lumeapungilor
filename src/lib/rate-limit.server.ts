@@ -1,49 +1,28 @@
-/** Server-only sliding-window rate limiting backed by public.rate_limits. */
+import { createHmac } from "node:crypto";
+import { getRequest } from "@tanstack/react-start/server";
+import { trustedClientIp } from "./auth-security.server";
+import { consumeRequestBudget } from "./request-rate-limit-core";
+
+/** Atomic fixed-window limits for the identifier and trusted client IP. */
 export async function checkRateLimit(
   bucket: string,
   identifier: string,
   limit: number,
   windowSeconds: number,
 ): Promise<{ allowed: boolean }> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const key = identifier.toLowerCase().slice(0, 200);
-  const now = Date.now();
-
-  const { data } = await supabaseAdmin
-    .from("rate_limits")
-    .select("window_start, hits")
-    .eq("bucket", bucket)
-    .eq("identifier", key)
-    .maybeSingle();
-
-  if (!data) {
-    await supabaseAdmin
-      .from("rate_limits")
-      .upsert(
-        { bucket, identifier: key, window_start: new Date(now).toISOString(), hits: 1 },
-        { onConflict: "bucket,identifier" },
-      );
-    return { allowed: true };
-  }
-
-  const started = new Date(data.window_start).getTime();
-  if (now - started > windowSeconds * 1000) {
-    await supabaseAdmin
-      .from("rate_limits")
-      .update({ window_start: new Date(now).toISOString(), hits: 1 })
-      .eq("bucket", bucket)
-      .eq("identifier", key);
-    return { allowed: true };
-  }
-
-  if (data.hits >= limit) return { allowed: false };
-
-  await supabaseAdmin
-    .from("rate_limits")
-    .update({ hits: data.hits + 1 })
-    .eq("bucket", bucket)
-    .eq("identifier", key);
-  return { allowed: true };
+  return consumeRequestBudget(bucket, identifier, limit, windowSeconds, {
+    clientIp: () => trustedClientIp(getRequest()),
+    hash: (value) => {
+      const pepper =
+        process.env["LOGIN_RATE_LIMIT_PEPPER"] ?? process.env["SUPABASE_SERVICE_ROLE_KEY"];
+      if (!pepper || pepper.length < 24) throw new Error("Rate limit secret is not configured");
+      return createHmac("sha256", pepper).update(value).digest("hex");
+    },
+    consume: async (budget) => {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      return supabaseAdmin.rpc("consume_request_rate_limit", budget);
+    },
+  });
 }
 
 /** Server-only audit writer. */
