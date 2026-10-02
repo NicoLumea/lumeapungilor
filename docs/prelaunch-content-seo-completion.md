@@ -38,6 +38,7 @@ The migration does not delete or rename populated columns and does not mutate pr
 - Live category regression: 63 published products, six visible categories, all six memberships identical, zero changed categories, zero missing products, zero duplicates.
 - Full local SSR crawl against public Supabase data: 63 product URLs and six category URLs checked; 63 Product JSON-LD pages; 59 category-to-product links; zero empty shells, broken product links, or duplicate canonical URLs.
 - Route smoke test: `/magazin`, `/produse`, `/despre`, `/contact`, `/livrare`, `/retur`, `/termeni`, and `/confidentialitate` returned 200 with exactly one H1 and one canonical. A representative category and product returned 200 with one H1, one canonical, and the expected JSON-LD. An unknown route returned HTTP 404.
+- Mobile browser check at 390 × 844: homepage, category, and product layout rendered without horizontal overflow; category and product navigation remained usable. The local image proxy returned HTTP 503 for product images and the Lovable asset path returned HTTP 404, so image appearance still needs verification on the deployment.
 
 ## Existing systems audited and retained
 
@@ -46,6 +47,7 @@ The migration does not delete or rename populated columns and does not mutate pr
 - Canonicals: retained and completed where missing; all use `VITE_PUBLIC_SITE_URL` through the existing origin helper.
 - Structured data: existing Organization, Product, and product BreadcrumbList schema retained. Product availability still reflects actual stock and no brand or SKU is invented.
 - `/produse`: retained as a complete server-rendered link index; it is not replaced with client-only pagination.
+- Category navigation: the header and footer now normalize the stored leading slash on the legacy `pungi-cadou` slug before building links. Two mismatched About-page category links were corrected to the existing category slugs; category IDs and memberships were not changed.
 - Image alt text: existing editing/rendering retained; the admin now warns when a published product image lacks alt text.
 - 404 UI: retained; the route test confirms a real HTTP 404.
 

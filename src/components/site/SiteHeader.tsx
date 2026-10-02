@@ -16,6 +16,7 @@ import { useCategories, useContent } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/use-auth";
 import { AccountBenefitsPopup } from "@/components/site/AccountBenefitsPopup";
+import { categoryRouteSlug } from "@/lib/sitemap";
 
 function headerCategoryLabel(name: string): string {
   return name.replace(/\bFARA\b/gi, "FĂRĂ").replace(/\bMANER\b/gi, "MÂNER");
@@ -51,7 +52,7 @@ export function SiteHeader() {
     <Link
       key={c.id}
       to="/categorie/$slug"
-      params={{ slug: c.slug }}
+      params={{ slug: categoryRouteSlug(c.slug) }}
       className="link-underline shrink-0 text-[0.8125rem] font-medium uppercase leading-none tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
       activeProps={{ className: "bg-[length:100%_1px]" }}
     >
@@ -63,7 +64,7 @@ export function SiteHeader() {
     <SheetClose asChild key={c.id}>
       <Link
         to="/categorie/$slug"
-        params={{ slug: c.slug }}
+        params={{ slug: categoryRouteSlug(c.slug) }}
         className="border-b border-border py-4 text-sm font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
         {headerCategoryLabel(c.name)}

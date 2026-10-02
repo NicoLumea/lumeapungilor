@@ -10,6 +10,7 @@ import {
   SUPPORT_EMAIL,
 } from "@/lib/company";
 import whatsappIcon from "@/assets/whatsapp-icon.png.asset.json";
+import { categoryRouteSlug } from "@/lib/sitemap";
 
 export function SiteFooter() {
   const { data: content } = useContent();
@@ -40,7 +41,11 @@ export function SiteFooter() {
             </li>
             {(categories ?? []).map((c) => (
               <li key={c.id}>
-                <Link to="/categorie/$slug" params={{ slug: c.slug }} className="link-underline">
+                <Link
+                  to="/categorie/$slug"
+                  params={{ slug: categoryRouteSlug(c.slug) }}
+                  className="link-underline"
+                >
                   {c.name}
                 </Link>
               </li>
