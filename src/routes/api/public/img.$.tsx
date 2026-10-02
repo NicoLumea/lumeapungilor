@@ -22,7 +22,11 @@ export const Route = createFileRoute("/api/public/img/$")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const bucket = supabaseAdmin.storage.from(BUCKET);
           const requestedWidth = Number(new URL(request.url).searchParams.get("w"));
+          // Existing images have no variants until the storage backfill completes.
+          // Avoid a failed variant download before every original in previews.
+          const variantsReady = process.env["PRODUCT_IMAGE_VARIANTS_READY"] === "1";
           if (
+            variantsReady &&
             IMAGE_VARIANT_WIDTHS.includes(requestedWidth as (typeof IMAGE_VARIANT_WIDTHS)[number])
           ) {
             const variant = await bucket.download(

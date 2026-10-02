@@ -11,7 +11,7 @@ With the chosen 90-quality WebP settings, locally generated variants for those f
 ## Delivery design
 
 - Originals stay in the private bucket. Width-specific WebP objects live under `_variants/v1/w{width}/<original-path>.webp` at 160, 320, 640, 960, and 1600 px. Resizing preserves aspect ratio and never enlarges the source.
-- The existing same-origin image proxy serves a requested variant when available and falls back to the original while a backfill is pending. Variant URLs are immutable; a fallback has a five-minute cache lifetime so it can be replaced after backfill.
+- The existing same-origin image proxy serves a requested variant after the storage backfill is enabled, and falls back to the original if an individual variant is missing. Until then, `PRODUCT_IMAGE_VARIANTS_READY` is unset and the proxy fetches originals directly, avoiding a failed variant lookup before every image. Variant URLs are immutable; a fallback has a five-minute cache lifetime so it can be replaced after backfill.
 - Catalog/search/featured cards use 320/640 `srcset` and `sizes`; product detail uses 960/1600; gallery thumbnails use 160. Homepage category and editorial images use the same mechanism. Existing `object-contain`/`object-cover` rules and layout sizes are unchanged.
 - The first two catalog cards request images eagerly; the rest retain lazy loading. Secondary card images mount only after hover or keyboard focus. The primary remains visible until the secondary finishes loading. The old load-event opacity gate was removed because a cached image could complete before hydration and remain invisible.
 - Browser uploads still save the original first, then generate WebP variants with Canvas. If local encoding fails, the original remains usable and the backfill can repair missing variants. GIF/SVG/ICO files retain their original format and behavior.
@@ -21,7 +21,7 @@ With the chosen 90-quality WebP settings, locally generated variants for those f
 
 1. Review and apply `supabase/migrations/20261002200000_normalize_gift_bag_slug.sql` through the normal migration process. It changes only the legacy `/pungi-cadou` stored slug to `pungi-cadou`; the public route was already `/categorie/pungi-cadou`, so no redirect is necessary. The admin now displays and saves normalized category slugs.
 2. With the branch code available locally and a temporary server-side `SUPABASE_SERVICE_ROLE_KEY`, run `npm run images:backfill` for a read-only inventory. Use `npm run images:backfill -- --apply` to create missing variants before deploying code. The script is idempotent and does not update database records or overwrite originals. Do not put the service key in the tracked `.env`.
-3. Deploy only after the backfill succeeds. Any later missed object safely falls back to its original. New admin uploads generate variants automatically.
+3. After the backfill succeeds, set the **server-side** environment variable `PRODUCT_IMAGE_VARIANTS_READY=1` in Lovable's project environment and republish. Without this flag, previews and published builds still fetch full-size originals, although they avoid the extra failed storage lookup. Any later missed object safely falls back to its original. New admin uploads generate variants automatically.
 
 The read-only inventory found **179 product-image records**, six categories, and **185 distinct eligible source paths**. No live database migration or storage write was run during this PR.
 
