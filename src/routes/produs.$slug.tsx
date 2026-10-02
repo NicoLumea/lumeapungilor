@@ -1,7 +1,7 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useProduct } from "@/lib/products";
+import { useCategoryProducts, useProduct } from "@/lib/products";
 import { imageUrl } from "@/lib/images";
 import { formatRon } from "@/lib/format";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/lib/shop-types";
 import { useCart } from "@/lib/cart";
 import { RestockNotice } from "@/components/site/RestockNotice";
-import { getSeoProduct } from "@/lib/seo-catalog.functions";
+import { getSeoProduct, getSeoRedirect } from "@/lib/seo-catalog.functions";
 import {
   factualProductDescription,
   jsonLd,
@@ -22,38 +22,50 @@ import {
   productJsonLd,
 } from "@/lib/product-seo";
 import { categoryRouteSlug } from "@/lib/sitemap";
+import { descriptionExcerpt, SafeMarkdown } from "@/lib/safe-markdown";
+import { socialImageUrl } from "@/lib/seo-meta";
+import { ProductCard } from "@/components/site/ProductCard";
 
 export const Route = createFileRoute("/produs/$slug")({
+  beforeLoad: async ({ params, location }) => {
+    const target = await getSeoRedirect({ data: { path: `/produs/${params.slug}` } });
+    if (target) throw redirect({ href: `${target}${location.searchStr}`, statusCode: 301 });
+  },
   loader: async ({ params }) => {
     const product = await getSeoProduct({ data: { slug: params.slug } });
     if (!product) throw notFound();
     return product;
   },
-  head: ({ loaderData, params }) => ({
-    meta: [
-      { title: `${loaderData?.name ?? params.slug} | Lumea Pungilor` },
-      {
-        name: "description",
-        content: loaderData
-          ? factualProductDescription(loaderData)
-          : "Detalii produs, specificații și preț.",
-      },
-      { property: "og:title", content: `${loaderData?.name ?? params.slug} | Lumea Pungilor` },
-      {
-        property: "og:description",
-        content: loaderData
-          ? factualProductDescription(loaderData)
-          : "Detalii produs, specificații și preț.",
-      },
-      { property: "og:type", content: "product" },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: loaderData ? productCanonical(loaderData) : productCanonical({ slug: params.slug }),
-      },
-    ],
-  }),
+  head: ({ loaderData, params }) => {
+    const title =
+      loaderData?.meta_title?.trim() || `${loaderData?.name ?? params.slug} — Lumea Pungilor`;
+    const description =
+      loaderData?.meta_description?.trim() ||
+      (loaderData
+        ? descriptionExcerpt(factualProductDescription(loaderData))
+        : "Produs Lumea Pungilor");
+    const canonical = loaderData
+      ? productCanonical(loaderData)
+      : productCanonical({ slug: params.slug });
+    const shareImage = loaderData ? socialImageUrl(primaryImage(loaderData)?.url) : null;
+    return {
+      meta: [
+        { title },
+        {
+          name: "description",
+          content: description,
+        },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonical },
+        { property: "og:type", content: "product" },
+        ...(shareImage ? [{ property: "og:image", content: shareImage }] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(shareImage ? [{ name: "twitter:image", content: shareImage }] : []),
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+    };
+  },
   component: ProductPage,
 });
 
@@ -62,6 +74,7 @@ function ProductPage() {
   const initialProduct = Route.useLoaderData();
   const { data: liveProduct, isLoading } = useProduct(slug);
   const product = liveProduct ?? initialProduct;
+  const relatedQuery = useCategoryProducts(product?.categories?.id);
   const { add } = useCart();
   const [active, setActive] = useState<number | null>(null);
   const [variantId, setVariantId] = useState<string | null>(null);
@@ -413,9 +426,10 @@ function ProductPage() {
           {!inStock ? <RestockNotice productId={product.id} variantId={variantId} /> : null}
 
           {product.description ? (
-            <div className="mt-10 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-              {product.description}
-            </div>
+            <SafeMarkdown
+              className="mt-10 text-sm text-muted-foreground"
+              children={product.description}
+            />
           ) : null}
 
           {product.specs.length > 0 ? (
@@ -433,6 +447,21 @@ function ProductPage() {
           ) : null}
         </div>
       </div>
+      {(relatedQuery.data?.products ?? [])
+        .filter((related) => related.id !== product.id)
+        .slice(0, 4).length > 0 ? (
+        <section className="mt-16 border-t border-border pt-10">
+          <h2 className="display text-2xl">Produse din aceeași categorie</h2>
+          <div className="product-grid mt-6">
+            {(relatedQuery.data?.products ?? [])
+              .filter((related) => related.id !== product.id)
+              .slice(0, 4)
+              .map((related) => (
+                <ProductCard key={related.id} product={related} />
+              ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

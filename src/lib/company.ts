@@ -13,6 +13,7 @@ export type CompanyInfo = {
   brandName: string | null;
   legalName: string | null;
   address: string | null;
+  tradingAddress: string | null;
   cui: string | null;
   tradeRegisterNumber: string | null;
   vatStatement: string;
@@ -30,13 +31,14 @@ export function companyInfo(content: ContentMap | undefined): CompanyInfo {
   return {
     brandName: text(company, "brand_name") ?? text(company, "name"),
     legalName: COMPANY_LEGAL.name,
-    address: COMPANY_LEGAL.registeredOffice,
+    address: text(company, "registered_address") ?? COMPANY_LEGAL.registeredOffice,
+    tradingAddress: text(company, "trading_address"),
     cui: COMPANY_LEGAL.cui,
     tradeRegisterNumber: COMPANY_LEGAL.tradeRegisterNumber,
     vatStatement: COMPANY_LEGAL.vatStatement,
-    phonePrimary: COMPANY_PHONE,
-    phoneSecondary: null,
-    secondaryPhoneNote: null,
+    phonePrimary: text(company, "phone_primary") ?? COMPANY_PHONE,
+    phoneSecondary: text(company, "phone_secondary"),
+    secondaryPhoneNote: text(company, "secondary_phone_note"),
     operatingDays: text(company, "operating_days"),
     operatingHours: text(company, "operating_hours"),
     sellerEnquiryHeading: text(company, "seller_enquiry_heading"),

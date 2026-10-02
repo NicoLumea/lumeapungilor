@@ -1,36 +1,49 @@
 import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
+import { getSeoContent } from "@/lib/seo-catalog.functions";
+import { staticPageHead } from "@/lib/seo-meta";
+import { text } from "@/lib/content";
+import { SafeMarkdown } from "@/lib/safe-markdown";
 
 export const Route = createFileRoute("/retur")({
-  head: () => ({
-    meta: [
-      { title: "Retururi și reclamații — Lumea Pungilor" },
-      {
-        name: "description",
-        content: "Condiții, pași și formular pentru retururi și reclamații privind produsele.",
-      },
-      { property: "og:title", content: "Retururi și reclamații — Lumea Pungilor" },
-      { property: "og:description", content: "Condiții și pași pentru retururi și reclamații." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  loader: () => getSeoContent({ data: { key: "returns" } }),
+  head: ({ loaderData }) =>
+    staticPageHead({
+      block: loaderData,
+      h1: text(loaderData, "title") ?? "Retururi și reclamații",
+      body:
+        text(loaderData, "body") ??
+        "Condiții și pași pentru trimiterea unei cereri de retur sau reclamații privind o comandă.",
+      path: "/retur",
+      image: text(loaderData, "image_url"),
+    }),
   component: ReturnsPage,
 });
 
 function ReturnsPage() {
+  const block = Route.useLoaderData();
   return (
     <article className="site-container max-w-[900px] py-16 sm:py-20">
       <p className="micro-sm text-muted-foreground">Asistență clienți</p>
-      <h1 className="display mt-3 text-4xl md:text-5xl"><HeadingText id="retur_h1" /></h1>
+      <h1 className="display mt-3 text-4xl md:text-5xl">
+        {text(block, "title") ?? <HeadingText id="retur_h1" />}
+      </h1>
       <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
         Dacă există o problemă cu produsele primite, ne poți trimite o cerere de retur sau
         reclamație folosind formularul disponibil pentru comanda ta.
       </p>
+      {text(block, "body") ? (
+        <SafeMarkdown
+          className="mt-6 max-w-3xl text-base text-muted-foreground"
+          children={text(block, "body")}
+        />
+      ) : null}
 
       <section className="mt-12 border-t border-border pt-8">
-        <h2 className="display text-2xl"><HeadingText id="retur_conditii_h2" /></h2>
+        <h2 className="display text-2xl">
+          <HeadingText id="retur_conditii_h2" />
+        </h2>
         <ol className="mt-6 list-decimal space-y-3 pl-5 text-sm leading-relaxed">
           <li>Comanda trebuie să fie achitată.</li>
           <li>
@@ -48,7 +61,9 @@ function ReturnsPage() {
       </section>
 
       <section className="mt-12 border-t border-border pt-8">
-        <h2 className="display text-2xl"><HeadingText id="retur_proces_h2" /></h2>
+        <h2 className="display text-2xl">
+          <HeadingText id="retur_proces_h2" />
+        </h2>
         <ol className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
           {[
             "Completează formularul.",
@@ -73,7 +88,9 @@ function ReturnsPage() {
       </section>
 
       <section className="mt-12 border border-border p-6 sm:p-8">
-        <h2 className="display text-2xl"><HeadingText id="retur_cerere_h2" /></h2>
+        <h2 className="display text-2xl">
+          <HeadingText id="retur_cerere_h2" />
+        </h2>
         <p className="mt-3 text-sm text-muted-foreground">
           Alege varianta potrivită comenzii tale. Formularul afișează numai comenzile achitate și
           produsele care apar în acestea.

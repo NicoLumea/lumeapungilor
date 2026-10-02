@@ -2,6 +2,7 @@ import { useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 import type { ReactNode } from "react";
+import { SafeMarkdown } from "@/lib/safe-markdown";
 
 export function ContentPage({
   contentKey,
@@ -10,6 +11,7 @@ export function ContentPage({
   bodyOverride,
   showCompany = false,
   children,
+  initialBlock,
 }: {
   contentKey: string;
   fallbackTitle: string;
@@ -17,9 +19,10 @@ export function ContentPage({
   bodyOverride?: string;
   showCompany?: boolean;
   children?: ReactNode;
+  initialBlock?: Record<string, unknown>;
 }) {
   const { data } = useContent();
-  const block = data?.[contentKey];
+  const block = data?.[contentKey] ?? initialBlock;
   const title = titleOverride ?? text(block, "title") ?? fallbackTitle;
   const body = bodyOverride ?? text(block, "body");
   const image = imageUrl(text(block, "image_url"));
@@ -32,15 +35,7 @@ export function ContentPage({
           <img src={image} alt={title} className="w-full object-cover" />
         </div>
       ) : null}
-      {body ? (
-        <div className="mt-10 space-y-5 text-base leading-relaxed text-foreground">
-          {body.split(/\n{2,}/).map((para, i) => (
-            <p key={i} className="whitespace-pre-line">
-              {para}
-            </p>
-          ))}
-        </div>
-      ) : null}
+      {body ? <SafeMarkdown className="mt-10 text-base text-foreground" children={body} /> : null}
       {children}
       {showCompany ? (
         <aside className="mt-12 border-y border-border py-6">

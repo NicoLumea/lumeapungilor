@@ -127,6 +127,12 @@ export function SiteFooter() {
               <li className="pt-4 text-foreground">{company.operatingDays}</li>
             ) : null}
             {company.operatingHours ? <li>{company.operatingHours}</li> : null}
+            {company.tradingAddress ? (
+              <li className="pt-4">
+                <span className="block text-xs">Punct de lucru</span>
+                <span className="text-foreground">{company.tradingAddress}</span>
+              </li>
+            ) : null}
           </ul>
           {company.phonePrimary ? (
             <div className="mt-4 flex items-center gap-3">

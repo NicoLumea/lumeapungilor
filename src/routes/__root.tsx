@@ -20,6 +20,8 @@ import { OrganizationStructuredData } from "@/components/site/OrganizationStruct
 import { BackToTop } from "@/components/site/BackToTop";
 import { SupportWidget } from "@/components/site/SupportWidget";
 import { Toaster } from "@/components/ui/sonner";
+import { getSeoContent } from "@/lib/seo-catalog.functions";
+import { safeGoogleVerificationToken } from "@/lib/seo-meta";
 
 function NotFoundComponent() {
   return (
@@ -87,18 +89,19 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: () => getSeoContent({ data: { key: "seo" } }),
+  head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lumea Pungilor — Ambalaje pentru afaceri" },
-      {
-        name: "description",
-        content:
-          "Pungi de plastic, pungi de hârtie, fețe de masă și folie cu bule pentru afaceri din România.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      ...(safeGoogleVerificationToken(loaderData?.["google_site_verification"])
+        ? [
+            {
+              name: "google-site-verification",
+              content: safeGoogleVerificationToken(loaderData?.["google_site_verification"])!,
+            },
+          ]
+        : []),
     ],
     links: [
       { rel: "stylesheet", href: appCss },

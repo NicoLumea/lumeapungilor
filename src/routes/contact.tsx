@@ -4,23 +4,28 @@ import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 import { companyInfo, telephoneHref, SUPPORT_EMAIL } from "@/lib/company";
-import { useContent } from "@/lib/content";
+import { text, useContent } from "@/lib/content";
+import { getSeoContent } from "@/lib/seo-catalog.functions";
+import { staticPageHead } from "@/lib/seo-meta";
+import { SafeMarkdown } from "@/lib/safe-markdown";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact — Lumea Pungilor" },
-      { name: "description", content: "Date de contact pentru comenzi și oferte." },
-      { property: "og:title", content: "Contact — Lumea Pungilor" },
-      { property: "og:description", content: "Date de contact pentru comenzi și oferte." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  loader: () => getSeoContent({ data: { key: "contact" } }),
+  head: ({ loaderData }) =>
+    staticPageHead({
+      block: loaderData,
+      h1: text(loaderData, "title") ?? "Contactează-ne",
+      body:
+        text(loaderData, "body") ??
+        "Date de contact pentru informații despre produse, stoc, comenzi și colaborări.",
+      path: "/contact",
+      image: text(loaderData, "image_url"),
+    }),
   component: ContactPage,
 });
 
 function ContactPage() {
+  const block = Route.useLoaderData();
   const { data } = useContent();
   const company = companyInfo(data);
   const phones = [company.phonePrimary, company.phoneSecondary].filter((phone): phone is string =>
@@ -30,12 +35,20 @@ function ContactPage() {
   return (
     <article className="site-container max-w-[1100px] py-14 md:py-20">
       <div className="max-w-3xl">
-        <h1 className="display text-4xl md:text-5xl"><HeadingText id="contact_h1" /></h1>
+        <h1 className="display text-4xl md:text-5xl">
+          {text(block, "title") ?? <HeadingText id="contact_h1" />}
+        </h1>
         <p className="mt-6 text-base leading-relaxed text-muted-foreground">
           Pentru informații despre produse, stoc, comenzi sau colaborări, echipa Lumea Pungilor
           poate fi contactată în timpul programului operațional. Datele complete ale companiei și
           modalitățile de contact sunt disponibile mai jos.
         </p>
+        {text(block, "body") ? (
+          <SafeMarkdown
+            className="mt-6 text-base text-muted-foreground"
+            children={text(block, "body")}
+          />
+        ) : null}
       </div>
 
       <div className="mt-12 grid gap-px border border-border bg-border md:grid-cols-3">

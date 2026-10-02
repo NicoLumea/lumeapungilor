@@ -1,22 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Catalogue } from "@/components/site/Catalogue";
 import { getSeoCatalog } from "@/lib/seo-catalog.functions";
-import { absolutePublicUrl } from "@/lib/product-seo";
+import { staticPageHead } from "@/lib/seo-meta";
 
 export const Route = createFileRoute("/produse")({
   loader: () => getSeoCatalog(),
-  head: () => ({
-    meta: [
-      { title: "Catalog produse — Lumea Pungilor" },
-      {
-        name: "description",
-        content: "Toate ambalajele disponibile: pungi, fețe de masă și folie cu bule.",
-      },
-      { property: "og:title", content: "Catalog produse — Lumea Pungilor" },
-      { property: "og:description", content: "Toate ambalajele disponibile pentru comandă." },
-    ],
-    links: [{ rel: "canonical", href: absolutePublicUrl("/produse") }],
-  }),
+  head: () =>
+    staticPageHead({
+      block: undefined,
+      h1: "Toate produsele",
+      body: "Catalogul complet de produse publicate de Lumea Pungilor.",
+      path: "/produse",
+    }),
   component: ProductsPage,
 });
 
