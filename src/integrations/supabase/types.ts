@@ -1262,17 +1262,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      consume_request_rate_limit: {
-        Args: {
-          p_bucket: string
-          p_identifier_hash: string
-          p_ip_hash: string
-          p_limit: number
-          p_ip_limit: number
-          p_window_seconds: number
-        }
-        Returns: Json
-      }
       admin_interest_dashboard: {
         Args: {
           _date_from?: string
@@ -1314,6 +1303,17 @@ export type Database = {
       clear_auth_rate_limit: {
         Args: { _account_key: string }
         Returns: undefined
+      }
+      consume_request_rate_limit: {
+        Args: {
+          p_bucket: string
+          p_identifier_hash: string
+          p_ip_hash: string
+          p_ip_limit: number
+          p_limit: number
+          p_window_seconds: number
+        }
+        Returns: Json
       }
       create_order_tx: {
         Args: { p_items: Json; p_order: Json }
