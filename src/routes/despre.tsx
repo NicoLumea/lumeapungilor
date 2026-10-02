@@ -21,7 +21,7 @@ const categories: AboutCategory[] = [
     title: "Pungi plastic",
     description:
       "Pungi cu imprimeu și pungi simple, în mai multe dimensiuni, pentru magazine și standuri comerciale.",
-    slug: "pungute-plastic",
+    slug: "pungi-plastic",
   },
   {
     title: "Pungi curierat",
@@ -32,7 +32,7 @@ const categories: AboutCategory[] = [
   {
     title: "Punguțe mici",
     description: "Pungi pentru produse mărunte, bijuterii și accesorii.",
-    slug: "pungi-mici",
+    slug: "pungute-mici",
   },
   {
     title: "Mușama",

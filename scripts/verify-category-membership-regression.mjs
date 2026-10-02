@@ -83,7 +83,10 @@ async function rows(table, query) {
 
 const [categories, products, links] = await Promise.all([
   rows("categories", "select=id,slug&is_visible=eq.true&order=slug.asc"),
-  rows("products", "select=id,category_id&status=eq.published&is_archived=eq.false&order=id.asc"),
+  rows(
+    "products",
+    "select=id,slug,name,category_id,eco_tax_applicable&status=eq.published&is_archived=eq.false&order=id.asc",
+  ),
   rows("product_categories", "select=product_id,category_id"),
 ]);
 const published = new Set(products.map((product) => product.id));
@@ -101,14 +104,82 @@ for (const category of categories) {
   ].sort();
 }
 
-assert.deepEqual(after, baseline);
-console.log(
-  JSON.stringify({
-    publishedProducts: products.length,
-    visibleCategories: categories.length,
-    identicalCategoryMemberships: Object.keys(baseline).length,
-    changedCategories: 0,
-    missingProducts: 0,
-    duplicateProducts: 0,
-  }),
-);
+const giftSlug = categories.find((category) => category.slug.replace(/^\/+/, "") === "pungi-cadou")?.slug;
+assert.ok(giftSlug, "Gift-bag category must exist");
+const plasticSlug = categories.find((category) => ["pungute-plastic", "pungi-plastic"].includes(category.slug))?.slug;
+const smallSlug = categories.find((category) => ["pungi-mici", "pungute-mici"].includes(category.slug))?.slug;
+assert.ok(plasticSlug && smallSlug, "Plastic and small-bag categories must exist");
+
+if (after[giftSlug].length === 0) {
+  // Historical pre-rollout snapshot: the new content migration has not run yet.
+  const historicalBaseline = {
+    ...baseline,
+    [giftSlug]: baseline["/pungi-cadou"],
+    [plasticSlug]: baseline["pungute-plastic"],
+    [smallSlug]: baseline["pungi-mici"],
+  };
+  if (giftSlug !== "/pungi-cadou") delete historicalBaseline["/pungi-cadou"];
+  if (plasticSlug !== "pungute-plastic") delete historicalBaseline["pungute-plastic"];
+  if (smallSlug !== "pungi-mici") delete historicalBaseline["pungi-mici"];
+  assert.deepEqual(after, historicalBaseline);
+  console.log(JSON.stringify({ phase: "before-content-rollout", publishedProducts: products.length }));
+} else {
+  const giftSlugs = new Set([
+    "punga-reni-40x50",
+    "punga-love-40x50-model-2",
+    "punga-oua-paste-25x30",
+    "punga-paste-30x40",
+    "punga-paste-fara-maner-40x50",
+    "punga-paste-cu-maner-40x50",
+    "punga-masina-40x50",
+    "punga-printesa-40x50",
+    "punga-love-40x50",
+    "punga-din-polietilena-cu-imprimeu-thank-you-40-50-cm",
+    "punga-craciun-mos-craciun",
+    "punga-craciun-reni-sanie",
+  ]);
+  const categoryById = new Map(categories.map((category) => [category.id, category.slug]));
+  assert.equal(products.length, 63);
+  assert.deepEqual(after["pungi-curierat"], baseline["pungi-curierat"]);
+  assert.deepEqual(after["folie-cu-bule"], baseline["folie-cu-bule"]);
+  assert.deepEqual(after.musama, baseline.musama);
+
+  let retailCount = 0;
+  let smallCount = 0;
+  let giftCount = 0;
+  for (const product of products) {
+    const name = product.name.toLocaleLowerCase("ro");
+    const isOther = name.startsWith("folie cu bule") || name.startsWith("mușama");
+    const isCourier = name.includes("curierat");
+    const isRetail = !isOther && !isCourier;
+    const dimensions = [...product.name.matchAll(/(\d+)\s*[×x]\s*(\d+)\s*cm/gi)].flatMap(
+      (match) => [Number(match[1]), Number(match[2])],
+    );
+    const isSmall = isRetail && dimensions.some((dimension) => dimension < 30);
+    const isGift = giftSlugs.has(product.slug);
+    const assigned = new Set(
+      links
+        .filter((link) => link.product_id === product.id)
+        .map((link) => categoryById.get(link.category_id)),
+    );
+    if (product.category_id) assigned.add(categoryById.get(product.category_id));
+
+    if (isRetail) {
+      retailCount++;
+      if (isSmall) smallCount++;
+      if (isGift) giftCount++;
+      assert.deepEqual(
+        [...assigned].sort(),
+        [plasticSlug, ...(isSmall ? [smallSlug] : []), ...(isGift ? [giftSlug] : [])].sort(),
+        product.slug,
+      );
+    } else if (isCourier) {
+      assert.deepEqual([...assigned], ["pungi-curierat"], product.slug);
+    }
+    assert.equal(product.eco_tax_applicable, !isOther, product.slug);
+  }
+  assert.equal(retailCount, 42);
+  assert.equal(smallCount, 9);
+  assert.equal(giftCount, 12);
+  console.log(JSON.stringify({ phase: "after-content-rollout", retailCount, smallCount, giftCount }));
+}

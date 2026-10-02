@@ -79,8 +79,8 @@ export function SiteHeader() {
         compact && "is-compact border-foreground/10 bg-background/90 backdrop-blur-[10px]",
       )}
     >
-      <div className="site-header-inner mx-auto grid h-[3.75rem] w-full max-w-[110rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-[clamp(20px,3vw,56px)] min-[769px]:h-[4.5rem] min-[1100px]:grid-cols-[minmax(15rem,1fr)_auto_minmax(15rem,1fr)] min-[1100px]:gap-[clamp(24px,2.5vw,48px)]">
-        <div className="min-[1100px]:hidden">
+      <div className="site-header-inner mx-auto grid h-[3.75rem] w-full max-w-[110rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-[clamp(20px,3vw,56px)] min-[769px]:h-[4.5rem] min-[1920px]:max-w-[132rem] min-[1920px]:grid-cols-[minmax(15rem,1fr)_auto_minmax(15rem,1fr)] min-[1920px]:gap-[clamp(24px,2.5vw,48px)]">
+        <div className="min-[1920px]:hidden">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <Button
@@ -153,7 +153,7 @@ export function SiteHeader() {
 
         <Link
           to="/magazin"
-          className="min-w-0 justify-self-start whitespace-nowrap text-[clamp(1rem,3.8vw,1.25rem)] font-semibold uppercase leading-none tracking-[0.035em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 min-[769px]:text-[1.35rem] min-[1100px]:text-[clamp(1.5rem,1.8vw,1.75rem)]"
+          className="min-w-0 justify-self-start whitespace-nowrap text-[clamp(1rem,3.8vw,1.25rem)] font-semibold uppercase leading-none tracking-[0.035em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 min-[769px]:text-[1.35rem] min-[1920px]:text-[clamp(1.5rem,1.8vw,1.75rem)]"
           aria-label={`${name} — pagina principală`}
         >
           {name.toUpperCase()}
@@ -161,7 +161,7 @@ export function SiteHeader() {
 
         <nav
           aria-label="Categorii produse"
-          className="hidden items-center justify-center gap-[clamp(16px,1.65vw,30px)] whitespace-nowrap min-[1100px]:flex"
+          className="hidden items-center justify-center gap-[clamp(16px,1.65vw,30px)] whitespace-nowrap min-[1920px]:flex"
         >
           <Link
             to="/produse"
