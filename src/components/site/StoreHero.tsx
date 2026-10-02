@@ -52,4 +52,3 @@ export function StoreHero({ welcome = false }: { welcome?: boolean }) {
     </section>
   );
 }
-
