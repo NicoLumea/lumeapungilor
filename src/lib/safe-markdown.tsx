@@ -27,13 +27,15 @@ export function descriptionExcerpt(value: string | null | undefined, limit = 155
   return `${clipped.slice(0, boundary > limit * 0.65 ? boundary : limit).trim()}…`;
 }
 
-/** Minimal Markdown renderer: no raw HTML, links, images or H1 can be emitted. */
+/** Minimal Markdown renderer: only explicitly allowed links; no raw HTML, images or H1. */
 export function SafeMarkdown({
   children,
   className = "",
+  allowPrivacyLink = false,
 }: {
   children: string | null | undefined;
   className?: string;
+  allowPrivacyLink?: boolean;
 }) {
   const blocks: ReactNode[] = [];
   const paragraph: string[] = [];
@@ -42,7 +44,25 @@ export function SafeMarkdown({
     if (text) {
       blocks.push(
         <p key={`p-${blocks.length}`} className="whitespace-pre-line">
-          {text}
+          {allowPrivacyLink
+            ? text
+                .split(
+                  "[Politica de confidențialitate](https://lumeapungilor.ro/confidentialitate)",
+                )
+                .map((part, index) => (
+                  <span key={index}>
+                    {index > 0 ? (
+                      <a
+                        href="https://lumeapungilor.ro/confidentialitate"
+                        className="underline underline-offset-4"
+                      >
+                        Politica de confidențialitate
+                      </a>
+                    ) : null}
+                    {part}
+                  </span>
+                ))
+            : text}
         </p>,
       );
     }

@@ -35,7 +35,13 @@ export function ContentPage({
           <img src={image} alt={title} className="w-full object-cover" />
         </div>
       ) : null}
-      {body ? <SafeMarkdown className="mt-10 text-base text-foreground" children={body} /> : null}
+      {body ? (
+        <SafeMarkdown
+          className="mt-10 text-base text-foreground"
+          children={body}
+          allowPrivacyLink={contentKey === "terms"}
+        />
+      ) : null}
       {children}
       {showCompany ? (
         <aside className="mt-12 border-y border-border py-6">
