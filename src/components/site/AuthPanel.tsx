@@ -94,12 +94,18 @@ function romanianError(message: string): string {
 }
 
 function publicAuthError(error: unknown): string {
+  if (error instanceof PublicAuthError && error.code === "invalid_credentials") {
+    return "E-mail sau parolă incorecte.";
+  }
   if (error instanceof PublicAuthError && error.code === "email_not_confirmed") {
     return "Confirmă întâi adresa de e-mail din mesajul primit.";
   }
   if (error instanceof PublicAuthError && error.code === "rate_limited") {
     const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 60) / 60));
     return `Prea multe încercări nereușite. Încearcă din nou în aproximativ ${minutes} minute.`;
+  }
+  if (error instanceof PublicAuthError) {
+    return "Autentificarea nu este disponibilă momentan. Te rugăm să reîncerci mai târziu.";
   }
   return romanianError(error instanceof Error ? error.message : "");
 }
@@ -297,3 +303,4 @@ export function AuthPanel({
     </div>
   );
 }
+
