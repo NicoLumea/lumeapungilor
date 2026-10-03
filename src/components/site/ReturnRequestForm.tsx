@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
-  EVIDENCE_REASONS,
   MAX_RETURN_IMAGE_BYTES,
   MAX_RETURN_IMAGES,
   RETURN_REASON_LABEL,
@@ -16,18 +15,46 @@ import {
 } from "@/lib/returns.functions";
 
 async function encodeImage(file: File) {
-  const dataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-  return {
-    name: file.name,
-    mime: file.type as "image/jpeg" | "image/png" | "image/webp",
-    size: file.size,
-    base64: dataUrl.split(",")[1] ?? "",
-  };
+  if (
+    !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+    file.size > MAX_RETURN_IMAGE_BYTES
+  )
+    throw new Error("Alege JPG, PNG sau WEBP de maximum 5 MB.");
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  try {
+    if (bitmap.width * bitmap.height > 24_000_000)
+      throw new Error("Fotografia depășește 24 megapixeli.");
+    const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Fotografia nu poate fi pregătită.");
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    let blob = await new Promise<Blob>((resolve, reject) =>
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Imagine invalidă"))), "image/png"),
+    );
+    if (blob.size > 4.5 * 1024 * 1024) {
+      canvas.width = Math.max(1, Math.round(canvas.width * 0.6));
+      canvas.height = Math.max(1, Math.round(canvas.height * 0.6));
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      blob = await new Promise<Blob>((resolve, reject) =>
+        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Imagine invalidă"))), "image/png"),
+      );
+    }
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let binary = "";
+    for (let n = 0; n < bytes.length; n += 8192)
+      binary += String.fromCharCode(...bytes.slice(n, n + 8192));
+    return {
+      name: file.name,
+      mime: "image/png" as const,
+      size: bytes.length,
+      base64: btoa(binary),
+    };
+  } finally {
+    bitmap.close();
+  }
 }
 
 export function ReturnRequestForm({
@@ -75,13 +102,10 @@ export function ReturnRequestForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedOrder || !selectedItem || busy) return;
-    if (EVIDENCE_REASONS.has(reason) && files.length === 0) {
-      toast.error("Pentru acest motiv este necesară cel puțin o fotografie.");
-      return;
-    }
     setBusy(true);
     try {
-      const images = await Promise.all(files.map(encodeImage));
+      const images = [];
+      for (const file of files) images.push(await encodeImage(file));
       const payload = {
         orderId: selectedOrder.id,
         orderItemId: selectedItem.id,
@@ -266,10 +290,8 @@ export function ReturnRequestForm({
           className="mt-2 block w-full text-sm file:mr-4 file:border file:border-border file:bg-background file:px-4 file:py-2"
         />
         <p className="mt-2 text-xs text-muted-foreground">
-          Maximum 5 fotografii, 5 MB fiecare. JPG, JPEG, PNG sau WEBP.
-          {EVIDENCE_REASONS.has(reason)
-            ? " Este necesară cel puțin una pentru motivul selectat."
-            : ""}
+          Fotografii opționale: maximum 3, 5 MB și 24 megapixeli fiecare. JPG, JPEG, PNG sau WEBP,
+          Fotografiile sunt redimensionate automat pentru trimitere.
         </p>
       </div>
 

@@ -1,3 +1,4 @@
+import { CustomerInvoices } from "@/components/site/CustomerInvoices";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -110,6 +111,7 @@ function OrderConfirmation() {
           {busy ? "Se pregătește…" : "Descarcă confirmarea PDF"}
         </button>
       </div>
+      <CustomerInvoices number={number} accessToken={accessToken} />
       <p className="mt-6 border border-border bg-field p-4 text-sm">
         {deliveryEstimate(order.city)}
       </p>

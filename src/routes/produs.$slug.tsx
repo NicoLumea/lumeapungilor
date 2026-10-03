@@ -1,3 +1,4 @@
+import { BagDeclarations } from "@/components/site/BagDeclarations";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -434,6 +435,16 @@ function ProductPage() {
 
           {!inStock ? <RestockNotice productId={product.id} variantId={variantId} /> : null}
 
+          {assignedCategories(product).some((c) =>
+            [
+              "pungi-plastic",
+              "pungute-plastic",
+              "pungi-curierat",
+              "pungi-cadou",
+              "pungute-mici",
+              "pungi-mici",
+            ].includes(categoryRouteSlug(c.slug)),
+          ) && <BagDeclarations />}
           {product.description ? (
             <SafeMarkdown
               className="mt-10 text-sm text-muted-foreground"

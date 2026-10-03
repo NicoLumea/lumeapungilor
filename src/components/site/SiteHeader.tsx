@@ -1,6 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, Search, ShoppingBag, UserRound } from "lucide-react";
+import { ChevronDown, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -29,18 +35,6 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const name = companyInfo(content).brandName ?? "Lumea Pungilor";
 
-  const desktopCategories = (categories ?? []).map((c) => (
-    <Link
-      key={c.id}
-      to="/categorie/$slug"
-      params={{ slug: categoryRouteSlug(c.slug) }}
-      className="link-underline shrink-0 text-[0.8125rem] font-medium uppercase leading-none tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
-      activeProps={{ className: "bg-[length:100%_1px]" }}
-    >
-      {headerCategoryLabel(c.name)}
-    </Link>
-  ));
-
   const drawerCategories = (categories ?? []).map((c) => (
     <SheetClose asChild key={c.id}>
       <Link
@@ -55,8 +49,8 @@ export function SiteHeader() {
 
   return (
     <header className="site-header sticky top-0 z-40 border-b border-border bg-background">
-      <div className="site-header-inner mx-auto grid h-[3.75rem] w-full max-w-[110rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-[clamp(20px,3vw,56px)] min-[769px]:h-[4.5rem] min-[1920px]:max-w-[132rem] min-[1920px]:grid-cols-[minmax(15rem,1fr)_auto_minmax(15rem,1fr)] min-[1920px]:gap-[clamp(24px,2.5vw,48px)]">
-        <div className="min-[1920px]:hidden">
+      <div className="site-header-inner mx-auto grid h-[3.75rem] w-full max-w-[110rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-[clamp(20px,3vw,56px)] min-[769px]:h-[4.5rem] min-[1100px]:max-w-[132rem] min-[1100px]:grid-cols-[minmax(15rem,1fr)_auto_minmax(15rem,1fr)] min-[1100px]:gap-[clamp(24px,2.5vw,48px)]">
+        <div className="min-[1100px]:hidden">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <Button
@@ -129,7 +123,7 @@ export function SiteHeader() {
 
         <Link
           to="/magazin"
-          className="min-w-0 justify-self-start whitespace-nowrap text-[clamp(1rem,3.8vw,1.25rem)] font-semibold uppercase leading-none tracking-[0.035em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 min-[769px]:text-[1.35rem] min-[1920px]:text-[clamp(1.5rem,1.8vw,1.75rem)]"
+          className="min-w-0 justify-self-start whitespace-nowrap text-[clamp(1rem,3.8vw,1.25rem)] font-semibold uppercase leading-none tracking-[0.035em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 min-[769px]:text-[1.35rem] min-[1100px]:text-[clamp(1.5rem,1.8vw,1.75rem)]"
           aria-label={`${name} — pagina principală`}
         >
           {name.toUpperCase()}
@@ -137,7 +131,7 @@ export function SiteHeader() {
 
         <nav
           aria-label="Categorii produse"
-          className="hidden items-center justify-center gap-[clamp(16px,1.65vw,30px)] whitespace-nowrap min-[1920px]:flex"
+          className="hidden items-center justify-center gap-[clamp(16px,1.65vw,30px)] whitespace-nowrap min-[1100px]:flex"
         >
           <Link
             to="/produse"
@@ -146,7 +140,34 @@ export function SiteHeader() {
           >
             Catalog
           </Link>
-          {desktopCategories}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex min-h-11 items-center gap-2 text-[0.8125rem] font-medium uppercase tracking-[0.08em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              Categorii <ChevronDown className="size-4" aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              sideOffset={12}
+              className="max-h-[70vh] w-72 overflow-y-auto bg-background p-2"
+            >
+              {(categories ?? []).map((c) => (
+                <DropdownMenuItem key={c.id} asChild>
+                  <Link
+                    to="/categorie/$slug"
+                    params={{ slug: categoryRouteSlug(c.slug) }}
+                    className="min-h-11 whitespace-normal px-3 py-3"
+                  >
+                    {headerCategoryLabel(c.name)}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Link
+            to="/despre"
+            className="link-underline text-[0.8125rem] font-medium uppercase tracking-[0.08em]"
+          >
+            Despre noi
+          </Link>
         </nav>
 
         <div className="flex items-center justify-end gap-1 whitespace-nowrap min-[769px]:gap-[clamp(12px,1.5vw,24px)]">
