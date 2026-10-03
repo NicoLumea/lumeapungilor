@@ -80,6 +80,8 @@ function Shop() {
                 <Link
                   key={c.id}
                   to="/categorie/$slug"
+                  preload="intent"
+                  preloadDelay={80}
                   params={{ slug: categoryRouteSlug(c.slug) }}
                   className="category-card group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
                 >

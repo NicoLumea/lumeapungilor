@@ -39,6 +39,8 @@ export function SiteHeader() {
     <SheetClose asChild key={c.id}>
       <Link
         to="/categorie/$slug"
+        preload="intent"
+        preloadDelay={80}
         params={{ slug: categoryRouteSlug(c.slug) }}
         className="border-b border-border py-4 text-sm font-medium uppercase tracking-[0.08em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
@@ -153,6 +155,8 @@ export function SiteHeader() {
                 <DropdownMenuItem key={c.id} asChild>
                   <Link
                     to="/categorie/$slug"
+                    preload="intent"
+                    preloadDelay={80}
                     params={{ slug: categoryRouteSlug(c.slug) }}
                     className="min-h-11 whitespace-normal px-3 py-3"
                   >

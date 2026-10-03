@@ -22,6 +22,25 @@ export const getSeoCategory = createServerFn({ method: "GET" })
     return fetchSeoCategory(data.slug);
   });
 
+// Resolve navigation in one browser/server round trip. The redirect lookup and
+// public category read are independent, so neither needs to delay the other.
+export const getCategoryNavigation = createServerFn({ method: "GET" })
+  .validator(slugInput)
+  .handler(async ({ data }) => {
+    const { fetchSeoCategory, fetchSeoRedirect } = await import("@/lib/seo-catalog.server");
+    const [redirectTo, categoryResult] = await Promise.all([
+      fetchSeoRedirect(`/categorie/${data.slug}`),
+      fetchSeoCategory(data.slug).then(
+        (value) => ({ value, error: null }),
+        (error: unknown) => ({ value: null, error }),
+      ),
+    ]);
+    // An old URL must still redirect even if its former category no longer loads.
+    if (redirectTo) return { redirectTo, result: null };
+    if (categoryResult.error) throw categoryResult.error;
+    return { redirectTo: null, result: categoryResult.value };
+  });
+
 export const getSeoProduct = createServerFn({ method: "GET" })
   .validator(slugInput)
   .handler(async ({ data }) => {
