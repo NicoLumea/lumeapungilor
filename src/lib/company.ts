@@ -2,7 +2,6 @@ import { text, type ContentMap } from "@/lib/content";
 import { COMPANY_LEGAL, COMPANY_PHONE, RETURNS_ADDRESS } from "@/lib/company-legal";
 
 export { COMPANY_PHONE, SUPPORT_EMAIL } from "@/lib/company-legal";
-export { telephoneHref, whatsappHref, internationalTelephone } from "@/lib/company-phone";
 
 /** Official Romanian consumer-protection references (ANPC / SAL). */
 export const CONSUMER_LINKS = {
@@ -47,4 +46,23 @@ export function companyInfo(content: ContentMap | undefined): CompanyInfo {
     sellerEnquiryHeading: text(company, "seller_enquiry_heading"),
     sellerEnquiryCopy: text(company, "seller_enquiry_copy"),
   };
+}
+
+export function telephoneHref(phone: string | null): string | undefined {
+  if (!phone) return undefined;
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("0") ? `tel:+40${digits.slice(1)}` : `tel:+${digits}`;
+}
+
+export function whatsappHref(phone: string | null): string | undefined {
+  if (!phone) return undefined;
+  let digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = `40${digits.slice(1)}`;
+  if (!digits.startsWith("40")) digits = `40${digits}`;
+  return `https://wa.me/${digits}`;
+}
+
+export function internationalTelephone(phone: string | null): string | undefined {
+  if (!phone) return undefined;
+  return phone.startsWith("0") ? `+40 ${phone.slice(1)}` : phone;
 }

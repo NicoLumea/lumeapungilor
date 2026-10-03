@@ -5,7 +5,7 @@ comment on column public.products.eco_tax_applicable is
 
 -- Patch confirmed company fields while preserving unrelated CMS/Lovable edits.
 insert into public.site_content(key, value)
-values ('company', '{"name":"Lumea Pungilor","brand_name":"Lumea Pungilor","website":"https://lumeapungilor.ro","legal_company_name":"DEKORAMA IMPORT SRL","address":"Str. Agricultori nr. 88, Buftea, județul Ilfov, România","registered_address":"Str. Agricultori nr. 88, Buftea, județul Ilfov, România","returns_address":"Str. Dragonul Roșu nr. 1-10, sat Fundeni, comuna Dobroești, județul Ilfov, cod poștal 077086, România","cui":"RO38393721","reg_com":"J2017005349230","trade_register_number":"J2017005349230","vat_registered":true,"email":"contact@lumeapungilor.ro","phone":"0765 514 422","phone_primary":"0765 514 422","phone_secondary":null,"secondary_phone_note":null,"operating_days":"Luni–Vineri","operating_hours":"07:00–15:00"}'::jsonb)
+values ('company', '{"name":"Lumea Pungilor","brand_name":"Lumea Pungilor","website":"https://lumeapungilor.ro","legal_company_name":"DEKORAMA IMPORT SRL","address":"Str. Agricultori nr. 88, Buftea, județul Ilfov, România","registered_address":"Str. Agricultori nr. 88, Buftea, județul Ilfov, România","returns_address":"Str. Dragonul Roșu nr. 1-10, sat Fundeni, comuna Dobroești, județul Ilfov, cod poștal 077086, România","cui":"RO38393721","reg_com":"J2017005349230","trade_register_number":"J2017005349230","vat_registered":true,"email":"contact@lumeapungilor.ro","phone":"0754 039 462","phone_primary":"0754 039 462","phone_secondary":null,"secondary_phone_note":null,"operating_days":"Luni–Vineri","operating_hours":"07:00–15:00"}'::jsonb)
 on conflict (key) do update set value = public.site_content.value || excluded.value;
 
 -- Replace only the known placeholders, preserving all other legal copy.
@@ -25,7 +25,7 @@ begin
     ('[DE COMPLETAT: numărul de ordine în Registrul Comerțului]', 'Registrul Comerțului: J2017005349230'),
     ('[DE COMPLETAT: statutul de plătitor de TVA și codul de TVA, dacă este cazul]', 'Societatea este plătitoare de TVA. Cod TVA: RO38393721.'),
     ('[DE COMPLETAT: adresa de e-mail pentru clienți]', 'contact@lumeapungilor.ro'),
-    ('[DE COMPLETAT: numărul de telefon pentru clienți]', '0765 514 422'),
+    ('[DE COMPLETAT: numărul de telefon pentru clienți]', '0754 039 462'),
     ('[DE COMPLETAT: adresa pentru retururi și reclamații, dacă diferă de sediul social]', 'Adresă pentru retururi: Str. Dragonul Roșu nr. 1-10, sat Fundeni, comuna Dobroești, județul Ilfov, cod poștal 077086, România'),
     ('[DE COMPLETAT: programul serviciului pentru clienți]', 'Luni–Vineri, 07:00–15:00'),
     ('[DE COMPLETAT: dacă prețurile pentru consumatori includ TVA și cum sunt afișate prețurile pentru clienții B2B]', 'Prețurile afișate pe website sunt exprimate în lei și includ TVA.
@@ -35,7 +35,7 @@ Pentru produsele supuse ecotaxei, aceasta este inclusă în prețul afișat.'),
     ('[DE COMPLETAT: adresa exactă la care se returnează produsele]', 'Str. Dragonul Roșu nr. 1-10, sat Fundeni, comuna Dobroești, județul Ilfov, cod poștal 077086, România'),
     ('[DE COMPLETAT: E-MAIL RECLAMAȚII]', 'contact@lumeapungilor.ro'),
     ('[DE COMPLETAT: e-mail]', 'contact@lumeapungilor.ro'),
-    ('[DE COMPLETAT: telefon și program]', '0765 514 422, Luni–Vineri, 07:00–15:00'),
+    ('[DE COMPLETAT: telefon și program]', '0754 039 462, Luni–Vineri, 07:00–15:00'),
     ('[DE COMPLETAT: adresă poștală]', 'Str. Agricultori nr. 88, Buftea, județul Ilfov, România'),
     ('[DE COMPLETAT: DENUMIREA VÂNZĂTORULUI, ADRESA, E-MAILUL]', 'DEKORAMA IMPORT SRL; sediu social: Str. Agricultori nr. 88, Buftea, județul Ilfov, România; contact@lumeapungilor.ro; adresă pentru retururi: Str. Dragonul Roșu nr. 1-10, sat Fundeni, comuna Dobroești, județul Ilfov, cod poștal 077086, România')
   ) as replacements(old_text, new_text)
