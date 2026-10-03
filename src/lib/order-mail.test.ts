@@ -40,6 +40,7 @@ const order = {
 } as ConfirmationOrder;
 test("acceptance includes recorded prices, items, address and no double tax", () => {
   const m = orderMailText(order, "acceptance", "");
+  assert.doesNotMatch(m.body, /Atașăm termenii|formularul de retragere|Păstrați acest mesaj/);
   for (const s of [
     "2 × 50.00 RON = 100.00 RON",
     "Total: 130.00 RON",

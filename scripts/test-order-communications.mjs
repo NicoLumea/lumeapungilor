@@ -73,9 +73,8 @@ try {
   await auth("");
   await assert.rejects(save("confirmat"), /FORBIDDEN/);
   await auth(staff);
-  await db.exec("begin; delete from order_legal_snapshots;");
-  await assert.rejects(save("confirmat"), /ORIGINAL_TERMS_REQUIRED/);
-  await db.exec("rollback;");
+  // Missing historical terms do not prevent draft confirmation.
+  await db.exec("delete from order_legal_snapshots;");
   await assert.rejects(save("confirmat"), /EMAIL_CONFIRMATION_REQUIRED/);
   await assert.rejects(save("in_livrare"), /ACCEPTANCE_REQUIRED/);
   await assert.rejects(save("finalizat"), /DISPATCH_REQUIRED/);

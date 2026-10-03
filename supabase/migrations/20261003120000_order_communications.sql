@@ -77,7 +77,6 @@ begin
     end if;
   end if;
   if required_kind='dispatch' and o.status not in ('confirmat','in_livrare') then raise exception 'ACCEPTANCE_REQUIRED'; end if;
-  if required_kind='acceptance' and not exists(select 1 from public.order_legal_snapshots where order_id=o.id) then raise exception 'ORIGINAL_TERMS_REQUIRED'; end if;
   if required_kind is not null then
     select * into d from public.order_email_drafts where id=p_draft for update;
     if not found or p_confirmed is distinct from true or d.order_id<>o.id

@@ -6,7 +6,6 @@ import {
   getOrderCommunications,
   prepareOrderEmail,
   saveOrderOperations,
-  supplyLegacyTerms,
   uploadOrderInvoice,
 } from "@/lib/order-communications.functions";
 import {
@@ -48,7 +47,6 @@ function EmailStep({
 }) {
   const prepare = useServerFn(prepareOrderEmail);
   const [mail, setMail] = useState<OrderMail>();
-  const [opened, setOpened] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -56,7 +54,6 @@ function EmailStep({
     setBusy(true);
     setError("");
     setMail(undefined);
-    setOpened(false);
     setConfirmed(false);
     onConfirm(undefined);
     try {
@@ -96,13 +93,6 @@ function EmailStep({
       {mail && (
         <>
           <p className="break-all">Către: {mail.recipient}</p>
-          {mail.needsOriginalTerms && (
-            <p role="status" className="border border-border bg-field p-3">
-              Poți deschide și edita acest proiect acum. Înainte de trimitere, adaugă termenii
-              originali în secțiunea de mai jos și pregătește din nou mesajul, ca să includă
-              documentul. Confirmarea trimiterii rămâne blocată până atunci.
-            </p>
-          )}
           <details>
             <summary className="cursor-pointer py-2 underline">Verifică textul mesajului</summary>
             <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words border p-3 font-sans">
@@ -139,11 +129,7 @@ function EmailStep({
           )}
           <div className="flex flex-wrap gap-3">
             {mailtoUrl(mail).length <= 1800 && (
-              <a
-                className={`${button} inline-flex items-center`}
-                href={mailtoUrl(mail)}
-                onClick={() => setOpened(true)}
-              >
+              <a className={`${button} inline-flex items-center`} href={mailtoUrl(mail)}>
                 Deschide e-mailul
               </a>
             )}
@@ -152,7 +138,6 @@ function EmailStep({
               className={button}
               onClick={() => {
                 downloadText("mesaj-comanda.eml", emlDraft(mail), "message/rfc822");
-                setOpened(true);
               }}
             >
               Descarcă proiectul de e-mail (.eml)
@@ -181,7 +166,6 @@ function EmailStep({
             <input
               type="checkbox"
               className="mt-1 size-4"
-              disabled={!opened || mail.needsOriginalTerms}
               checked={confirmed}
               onChange={(e) => {
                 setConfirmed(e.target.checked);
@@ -189,8 +173,8 @@ function EmailStep({
               }}
             />
             <span>
-              Confirm că am trimis acest e-mail din contact@lumeapungilor.ro, cu toate documentele
-              indicate atașate. Declarația va fi înregistrată pe contul meu de utilizator.
+              Confirm că am trimis acest e-mail din contact@lumeapungilor.ro. Declarația va fi
+              înregistrată pe contul meu de utilizator.
             </span>
           </label>
         </>
@@ -203,7 +187,6 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
   const qc = useQueryClient();
   const load = useServerFn(getOrderCommunications);
   const save = useServerFn(saveOrderOperations);
-  const legacy = useServerFn(supplyLegacyTerms);
   const upload = useServerFn(uploadOrderInvoice);
   const query = useQuery({
     queryKey: ["staff", "communications", o.id],
@@ -219,7 +202,6 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
   const [busy, setBusy] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [file, setFile] = useState<File>();
-  const [terms, setTerms] = useState("");
   const kind = orderStatusMailKind(status);
   async function refresh() {
     await qc.invalidateQueries({ queryKey: ["staff", "communications", o.id] });
@@ -366,31 +348,6 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
           {busy ? "Se salvează…" : "Salvează"}
         </button>
       </form>
-      {query.data && !query.data.legal && (
-        <div className="mt-6 border-t pt-5 text-sm">
-          <p className="font-medium">Termenii originali lipsesc pentru această comandă</p>
-          <p className="mt-2">
-            Comenzile noi păstrează automat versiunea termenilor. Pentru o comandă mai veche,
-            introdu textul complet al termenilor și informațiilor de retragere aplicabile la data
-            comenzii, din arhiva firmei. Nu folosi automat termenii de astăzi.
-          </p>
-          <textarea
-            className={input}
-            rows={6}
-            value={terms}
-            onChange={(e) => setTerms(e.target.value)}
-            aria-label="Termenii originali ai comenzii"
-          />
-          <button
-            type="button"
-            className={`${button} mt-3`}
-            disabled={busy || terms.trim().length < 100}
-            onClick={() => void action(() => legacy({ data: { orderId: o.id, terms } }))}
-          >
-            Confirm versiunea originală și o salvez
-          </button>
-        </div>
-      )}
       <div className="mt-6 border-t pt-5 text-sm">
         <p className="font-medium">Factura emisă de firmă</p>
         <p className="mt-2">

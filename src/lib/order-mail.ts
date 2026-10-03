@@ -13,7 +13,6 @@ export type OrderMail = {
   body: string;
   attachments: MailAttachment[];
   invoiceUrl?: string | undefined;
-  needsOriginalTerms?: boolean;
 };
 export const WITHDRAWAL_FORM = `FORMULAR DE RETRAGERE
 Completați și trimiteți acest formular numai dacă doriți să vă retrageți din contract.
@@ -45,7 +44,7 @@ export function orderMailText(
         `• ${i.product_name}${i.variant_name ? ` — ${i.variant_name}` : ""}${i.sku ? ` (SKU: ${i.sku})` : ""}\n  ${i.quantity} × ${money(i.unit_price)} = ${money(i.line_total)}`,
     )
     .join("\n");
-  const body = `Bună ziua, ${o.contact_name}!\n\n${kind === "acceptance" ? "Am acceptat comanda dumneavoastră." : kind === "dispatch" ? "Am predat comanda dumneavoastră curierului DPD." : "Vă transmitem factura aferentă comenzii."}\n\nComanda: ${o.order_number}\n${summary}\n\nSubtotal: ${money(o.subtotal)}\nLivrare: ${money(o.shipping_total)}\nTotal: ${money(o.total)}\nPrețurile includ TVA și, pentru produsele supuse ecotaxei, ecotaxa.\nPlată: ${o.payment_method === "cash" ? "numerar" : o.payment_method}\n\nClient: ${o.contact_name}\nE-mail: ${o.email}\nTelefon: ${o.phone || "—"}\n${o.company_name ? `Firmă: ${o.company_name}\nCUI: ${o.cui || "—"}\nRegistrul Comerțului: ${o.reg_com || "—"}\n` : ""}Adresă de livrare: ${o.delivery_address || "—"}, ${[o.city, o.county, o.postal_code].filter(Boolean).join(", ")}\nAdresă de facturare: ${o.billing_address || o.delivery_address || "—"}\n\n${kind === "acceptance" ? "Atașăm termenii aplicabili comenzii, inclusiv informațiile de retragere, și formularul de retragere. Păstrați acest mesaj și documentele atașate." : kind === "dispatch" ? `Curier: DPD${tracking ? `\nAWB: ${tracking}` : "\nNumărul AWB va fi comunicat separat, când este disponibil."}` : ""}\n${invoiceNumber ? `Factura ${invoiceNumber} este atașată acestui mesaj.` : kind === "dispatch" ? "Factura va fi transmisă separat după emitere." : ""}\n\nLumea Pungilor\n${COMPANY_LEGAL.name}\n${SUPPORT_EMAIL}`;
+  const body = `Bună ziua, ${o.contact_name}!\n\n${kind === "acceptance" ? "Am acceptat comanda dumneavoastră." : kind === "dispatch" ? "Am predat comanda dumneavoastră curierului DPD." : "Vă transmitem factura aferentă comenzii."}\n\nComanda: ${o.order_number}\n${summary}\n\nSubtotal: ${money(o.subtotal)}\nLivrare: ${money(o.shipping_total)}\nTotal: ${money(o.total)}\nPrețurile includ TVA și, pentru produsele supuse ecotaxei, ecotaxa.\nPlată: ${o.payment_method === "cash" ? "numerar" : o.payment_method}\n\nClient: ${o.contact_name}\nE-mail: ${o.email}\nTelefon: ${o.phone || "—"}\n${o.company_name ? `Firmă: ${o.company_name}\nCUI: ${o.cui || "—"}\nRegistrul Comerțului: ${o.reg_com || "—"}\n` : ""}Adresă de livrare: ${o.delivery_address || "—"}, ${[o.city, o.county, o.postal_code].filter(Boolean).join(", ")}\nAdresă de facturare: ${o.billing_address || o.delivery_address || "—"}\n\n${kind === "acceptance" ? "" : kind === "dispatch" ? `Curier: DPD${tracking ? `\nAWB: ${tracking}` : "\nNumărul AWB va fi comunicat separat, când este disponibil."}` : ""}\n${invoiceNumber ? `Factura ${invoiceNumber} este atașată acestui mesaj.` : kind === "dispatch" ? "Factura va fi transmisă separat după emitere." : ""}\n\nLumea Pungilor\n${COMPANY_LEGAL.name}\n${SUPPORT_EMAIL}`;
   return { subject, body };
 }
 

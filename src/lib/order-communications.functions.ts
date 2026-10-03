@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { orderMailText, WITHDRAWAL_FORM, type OrderMail } from "./order-mail";
+import { orderMailText, type OrderMail } from "./order-mail";
 import type { ConfirmationOrder } from "./order-confirmation.server";
 
 const idInput = z.object({ orderId: z.string().uuid() });
@@ -107,18 +107,6 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
     if (data.kind === "dispatch" && !["confirmat", "in_livrare"].includes(o.status))
       throw new Error("Acceptă comanda înainte de predarea la curier.");
     const attachments: OrderMail["attachments"] = [];
-    let needsOriginalTerms = false;
-    if (data.kind === "acceptance") {
-      const { data: legal, error: e } = await db
-        .from("order_legal_snapshots")
-        .select("terms")
-        .eq("order_id", o.id)
-        .maybeSingle();
-      checked(e);
-      needsOriginalTerms = !legal;
-      if (legal) attachments.push({ name: "termeni-comanda.txt", text: legal.terms });
-      attachments.push({ name: "formular-retragere.txt", text: WITHDRAWAL_FORM });
-    }
     let invoiceUrl: string | undefined;
     let invoiceNumber: string | undefined;
     if (data.invoiceId) {
@@ -169,7 +157,6 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
       body,
       attachments,
       invoiceUrl,
-      needsOriginalTerms,
     };
   });
 
