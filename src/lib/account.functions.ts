@@ -240,33 +240,6 @@ export const decideAdminPromotion = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/* ------------------------------------------------------- guest order support */
-
-export const guestOrderEligibility = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) =>
-    z.object({ email: z.string().trim().email().max(200) }).parse(data),
-  )
-  .handler(async ({ data }): Promise<{ allowed: boolean; reason?: string }> => {
-    const { checkRateLimit } = await import("./rate-limit.server");
-    const limit = await checkRateLimit("guest_eligibility", data.email, 20, 600);
-    if (!limit.allowed)
-      return { allowed: false, reason: "Prea multe verificări. Încearcă mai târziu." };
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: used } = await supabaseAdmin
-      .from("guest_checkout_usage")
-      .select("email")
-      .eq("email", data.email.toLowerCase())
-      .maybeSingle();
-    if (used)
-      return {
-        allowed: false,
-        reason:
-          "Această adresă a folosit deja comanda fără cont. Creează un cont sau autentifică-te pentru a comanda din nou.",
-      };
-    return { allowed: true };
-  });
-
 /* ---------------------------------------------- contact messages */
 
 export const submitContactRequest = createServerFn({ method: "POST" })

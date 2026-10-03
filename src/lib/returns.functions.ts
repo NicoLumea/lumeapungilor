@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { hasGuestReturnProof } from "@/lib/guest-return-access";
 import {
   EVIDENCE_REASONS,
   MAX_RETURN_IMAGE_BYTES,
@@ -246,6 +247,10 @@ export const verifyGuestReturnOrder = createServerFn({ method: "POST" })
       .object({
         orderNumber: z.string().trim().min(3).max(40),
         email: z.string().trim().email().max(200),
+        accessToken: z
+          .string()
+          .regex(/^[a-f0-9]{64}$/)
+          .optional(),
       })
       .parse(data),
   )
@@ -266,13 +271,43 @@ export const verifyGuestReturnOrder = createServerFn({ method: "POST" })
           "id,order_number,user_id,payment_status,created_at,contact_name,email,phone,order_items(id,product_name,variant_name,quantity)",
         )
         .eq("order_number", data.orderNumber.trim().toUpperCase())
-        .ilike("email", data.email.trim())
         .eq("is_guest", true)
         .maybeSingle();
-      if (!result.data) return { ok: false, error: GENERIC_ORDER_ERROR };
+      if (result.error || !result.data) return { ok: false, error: GENERIC_ORDER_ERROR };
+      // Order numbers and email addresses are identifiers, not proof of ownership.
+      // Never use ILIKE here: underscores in valid emails are SQL wildcards.
+      const { getRequestHeader } = await import("@tanstack/react-start/server");
+      const header = getRequestHeader("authorization");
+      let verifiedAccountEmail: string | null = null;
+      if (header?.startsWith("Bearer ")) {
+        const { data: identity, error } = await supabaseAdmin.auth.getUser(header.slice(7));
+        if (!error && identity.user?.email_confirmed_at) {
+          verifiedAccountEmail = identity.user.email ?? null;
+        }
+      }
+      let storedTokenHash: string | null = null;
+      if (data.accessToken) {
+        const { data: access, error } = await supabaseAdmin
+          .from("guest_order_access")
+          .select("token_hash")
+          .eq("order_id", result.data.id)
+          .maybeSingle();
+        if (!error) storedTokenHash = access?.token_hash ?? null;
+      }
+      if (
+        !hasGuestReturnProof({
+          orderEmail: result.data.email,
+          suppliedEmail: data.email,
+          storedTokenHash,
+          suppliedTokenHash: data.accessToken ? await tokenHash(data.accessToken) : null,
+          verifiedAccountEmail,
+        })
+      )
+        return { ok: false, error: GENERIC_ORDER_ERROR };
       if (!isPaidStatus(result.data.payment_status)) return { ok: false, error: PAID_ERROR };
       const { randomBytes } = await import("node:crypto");
-      const token = randomBytes(32).toString("base64url");
+      // Reject sessions issued by the previous, identifier-only verification flow.
+      const token = `v2_${randomBytes(32).toString("base64url")}`;
       const hash = await tokenHash(token);
       const session = await supabaseAdmin.from("guest_return_sessions").insert({
         order_id: result.data.id,
@@ -300,7 +335,7 @@ export const verifyGuestReturnOrder = createServerFn({ method: "POST" })
 
 export const submitGuestReturn = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
-    requestSchema.extend({ guestToken: z.string().min(32).max(100) }).parse(data),
+    requestSchema.extend({ guestToken: z.string().regex(/^v2_[A-Za-z0-9_-]{43}$/) }).parse(data),
   )
   .handler(async ({ data }): Promise<ReturnActionResult> => {
     const { checkRateLimit } = await import("./rate-limit.server");

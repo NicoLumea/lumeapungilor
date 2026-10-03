@@ -32,7 +32,16 @@ function GuestOrderHelp() {
     e.preventDefault();
     setBusy(true);
     try {
-      const result = await verify({ data: details });
+      let accessToken: string | undefined;
+      try {
+        accessToken =
+          window.sessionStorage.getItem(
+            `lp-order-access:${details.orderNumber.trim().toUpperCase()}`,
+          ) ?? undefined;
+      } catch {
+        // A verified account remains available if browser storage is disabled.
+      }
+      const result = await verify({ data: { ...details, accessToken } });
       if (!result.ok) {
         setVerified(null);
         toast.error(result.error);
@@ -52,8 +61,23 @@ function GuestOrderHelp() {
       <p className="micro-sm text-muted-foreground">Comandă fără cont</p>
       <h1 className="display mt-3 text-3xl md:text-4xl">Retur sau reclamație</h1>
       <p className="mt-5 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        Verifică mai întâi comanda folosind atât numărul comenzii, cât și adresa de e-mail folosită
-        la cumpărare. Datele nu sunt afișate pe baza numărului comenzii singur.
+        Introdu numărul comenzii și adresa de e-mail folosită la cumpărare. Pentru protejarea
+        datelor, folosește aceeași filă în care ai plasat comanda sau autentifică-te într-un cont cu
+        aceeași adresă de e-mail confirmată.
+      </p>
+      <p className="mt-3 text-sm text-muted-foreground">
+        <Link
+          to="/autentificare"
+          search={{ redirect: "/ajutor-comanda" }}
+          className="link-underline"
+        >
+          Autentifică-te sau creează un cont
+        </Link>
+        . Dacă nu mai ai acces,{" "}
+        <Link to="/contact" className="link-underline">
+          contactează-ne
+        </Link>{" "}
+        pentru ajutor cu returul.
       </p>
       <p className="mt-3 text-sm text-muted-foreground">
         Consultă{" "}
