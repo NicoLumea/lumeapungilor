@@ -1,5 +1,8 @@
 # Lumea Packaging Hub
 
+For independent hosting with branch previews and manual publication, see
+[the Cloudflare setup guide](docs/cloudflare-hosting.md). Account/backend setup is required before this workflow can run.
+
 Build a complete, editable B2B e-commerce website for Lumea Pungilor, a Romanian company selling plastic bags, paper bags, tablecloths, and bubble wrap.
 
 Use the attached Fear of God screenshots as the primary visual reference. The reference website is https://fearofgod.com/en-de. Adapt the design direction to a packaging supplier using our own branding, content, and product photographs.

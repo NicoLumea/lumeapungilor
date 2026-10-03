@@ -384,6 +384,104 @@ export type Database = {
         }
         Relationships: []
       }
+      order_email_drafts: {
+        Row: {
+          actor_email: string
+          actor_id: string
+          body: string
+          created_at: string
+          declared_sent_at: string | null
+          id: string
+          invoice_id: string | null
+          kind: string
+          order_id: string
+          order_version: string
+          recipient: string
+          subject: string
+          tracking: string
+        }
+        Insert: {
+          actor_email: string
+          actor_id: string
+          body: string
+          created_at?: string
+          declared_sent_at?: string | null
+          id?: string
+          invoice_id?: string | null
+          kind: string
+          order_id: string
+          order_version: string
+          recipient: string
+          subject: string
+          tracking?: string
+        }
+        Update: {
+          actor_email?: string
+          actor_id?: string
+          body?: string
+          created_at?: string
+          declared_sent_at?: string | null
+          id?: string
+          invoice_id?: string | null
+          kind?: string
+          order_id?: string
+          order_version?: string
+          recipient?: string
+          subject?: string
+          tracking?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_email_drafts_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "order_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_email_drafts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_invoices: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_number: string
+          order_id: string
+          storage_path: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_number: string
+          order_id: string
+          storage_path: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_number?: string
+          order_id?: string
+          storage_path?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           id: string
@@ -438,6 +536,38 @@ export type Database = {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_legal_snapshots: {
+        Row: {
+          captured_at: string
+          order_id: string
+          source: string
+          supplied_by: string | null
+          terms: string
+        }
+        Insert: {
+          captured_at?: string
+          order_id: string
+          source: string
+          supplied_by?: string | null
+          terms: string
+        }
+        Update: {
+          captured_at?: string
+          order_id?: string
+          source?: string
+          supplied_by?: string | null
+          terms?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_legal_snapshots_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -1304,6 +1434,7 @@ export type Database = {
         Args: { _account_key: string }
         Returns: undefined
       }
+      confirm_invoice_email: { Args: { p_draft: string }; Returns: undefined }
       consume_request_rate_limit: {
         Args: {
           p_bucket: string
@@ -1350,6 +1481,18 @@ export type Database = {
       }
       reorder_category_products: {
         Args: { p_category_id: string; p_product_ids: string[] }
+        Returns: undefined
+      }
+      save_order_operations: {
+        Args: {
+          p_confirmed?: boolean
+          p_draft?: string
+          p_id: string
+          p_note: string
+          p_payment: string
+          p_status: string
+          p_version: string
+        }
         Returns: undefined
       }
       set_delivery_fee: { Args: { p_fee: number }; Returns: number }

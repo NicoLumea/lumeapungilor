@@ -8,6 +8,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 export default defineConfig({
+  ...(process.env["CLOUDFLARE_BUILD"] === "1" ? { nitro: { preset: "cloudflare-module" } } : {}),
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
@@ -16,6 +17,7 @@ export default defineConfig({
   vite: {
     // mcp-js 3.0.4 compares mixed slash styles on Windows and aborts before Vite starts.
     // Generated MCP routes are committed; Lovable/Linux builds still run the generator normally.
-    plugins: process.platform === "win32" ? [] : [mcpPlugin()],
+    plugins:
+      process.platform === "win32" || process.env["CLOUDFLARE_BUILD"] === "1" ? [] : [mcpPlugin()],
   },
 });

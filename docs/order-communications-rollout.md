@@ -51,3 +51,22 @@ Items to clarify with the issuer before publication:
 - In-memory PostgreSQL migration/RPC tests (no live data): permissions, direct-write denial, stale version, missing/wrong-actor/wrong-kind confirmations, dispatch without invoice, audit attribution, replay protection and terms snapshots.
 - Reproduce SQL checks with a temporary install of `@electric-sql/pglite`, then set `PGLITE_TEST_MODULE` to its absolute `dist/index.js` and run `node scripts/test-order-communications.mjs`.
 - Desktop dropdown and category navigation; mobile drawer at 390px; bag document section. Local product imagery cannot be fully verified without the hosted private-storage server credentials. Full authenticated UI/storage/email delivery verification remains a configured-preview rollout check.
+
+## Public supplier documents (PR 50)
+
+The four public Word originals are replaced by clearly labelled PDF transcriptions.
+Supplier tax ID and all embedded graphics are omitted; company identity, business
+contacts, printed representative name and technical wording remain. No bank details
+or clearly personal contacts were found. The embedded PNG was a company logo,
+not a handwritten signature; no signature/stamp graphic is reproduced.
+Original source files remain in the owner's private Downloads folder, outside deployment.
+Previous DOCX URLs redirect to public PDFs. Prior deployed versions, Git history and
+already-downloaded copies are not erased by this change. Publish the updated build
+and purge cached old DOCX URLs when cutting over.
+
+Downloads now fetch the PDF as a blob with status/MIME validation and an explicit
+filename, with a separate new-tab PDF link and a visible failure message. The public
+Lovable DOCX URL returned 200 in inspection; the unauthenticated preview returned401.
+Authenticated Lovable preview behavior still needs an owner check after branch sync.
+The source address/regulation/coverage review notes above still apply: these public
+transcriptions do not correct or recertify the supplier's declaration.
