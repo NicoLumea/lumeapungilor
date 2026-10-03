@@ -41,9 +41,7 @@ export function BagDeclarations() {
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch {
-      setError(
-        "Descărcarea nu a reușit. Folosește linkul «Deschide PDF» pentru a deschide și salva documentul într-o filă nouă.",
-      );
+      setError("Descărcarea nu a reușit. Încearcă din nou sau contactează-ne pentru document.");
     } finally {
       setPending(null);
     }
@@ -74,15 +72,6 @@ export function BagDeclarations() {
               >
                 {pending === d.href ? "Se descarcă…" : "Descarcă PDF"}
               </button>
-              <a
-                href={d.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2 underline underline-offset-4"
-                aria-label={`Deschide ${d.label}`}
-              >
-                Deschide PDF
-              </a>
             </div>
           </li>
         ))}
