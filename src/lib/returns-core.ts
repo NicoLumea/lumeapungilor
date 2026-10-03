@@ -50,7 +50,7 @@ export const EVIDENCE_REASONS = new Set<ReturnReason>([
   "not_as_ordered",
 ]);
 export const RETURN_IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
-export const MAX_RETURN_IMAGES = 5;
+export const MAX_RETURN_IMAGES = 3;
 export const MAX_RETURN_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export function isPaidStatus(status: string): boolean {
@@ -66,9 +66,10 @@ export function validRequestedQuantity(requested: number, purchased: number): bo
 export function imageSignatureMatches(bytes: Uint8Array, mime: string): boolean {
   if (mime === "image/jpeg") return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   if (mime === "image/png")
-    return bytes
-      .slice(0, 8)
-      .every((value, index) => value === [137, 80, 78, 71, 13, 10, 26, 10][index]);
+    return (
+      bytes.length >= 8 &&
+      bytes.slice(0, 8).every((value, index) => value === [137, 80, 78, 71, 13, 10, 26, 10][index])
+    );
   if (mime === "image/webp")
     return (
       String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" &&

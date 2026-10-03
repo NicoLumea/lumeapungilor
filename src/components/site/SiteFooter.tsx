@@ -199,6 +199,29 @@ export function SiteFooter() {
 
       <div className="border-t border-border">
         <div className="site-container py-6">
+          <a
+            href={CONSUMER_LINKS.sal}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="mb-4 block h-[50px] w-[250px]"
+            aria-label="SAL — soluționarea alternativă a litigiilor"
+          >
+            <img
+              src="/legal/sal.png"
+              alt="ANPC — Soluționarea alternativă a litigiilor"
+              width={250}
+              height={50}
+              className="h-[50px] w-[250px] object-contain object-left"
+            />
+          </a>
+          <a
+            href="/legal/garantie-legala-ro.svg"
+            target="_blank"
+            rel="noreferrer"
+            className="mb-4 block text-sm underline"
+          >
+            Notificare privind garanția legală
+          </a>
           <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
             Informații pentru consumatori:{" "}
             <a

@@ -3,7 +3,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { hasGuestReturnProof } from "@/lib/guest-return-access";
 import {
-  EVIDENCE_REASONS,
   MAX_RETURN_IMAGE_BYTES,
   MAX_RETURN_IMAGES,
   RETURN_IMAGE_MIME_TYPES,
@@ -86,17 +85,17 @@ async function persistReturn(
   },
   userId: string | null,
 ): Promise<ReturnActionResult> {
+  if (userId) {
+    const { checkRateLimit } = await import("./rate-limit.server");
+    const limit = await checkRateLimit("authenticated_return_submit", userId, 5, 3600);
+    if (!limit.allowed)
+      return { ok: false, error: "Ai trimis prea multe cereri. Încearcă din nou mai târziu." };
+  }
   if (!isPaidStatus(order.payment_status)) return { ok: false, error: PAID_ERROR };
   const item = order.order_items.find((candidate) => candidate.id === input.orderItemId);
   if (!item) return { ok: false, error: "Produsul selectat nu aparține comenzii." };
   if (!validRequestedQuantity(input.requestedQuantity, item.quantity))
     return { ok: false, error: "Cantitatea solicitată depășește cantitatea cumpărată." };
-  if (EVIDENCE_REASONS.has(input.reason) && input.images.length === 0)
-    return {
-      ok: false,
-      error: "Pentru acest tip de reclamație este necesară cel puțin o fotografie.",
-    };
-
   const decodedImages: Array<{ bytes: Uint8Array; image: RequestInput["images"][number] }> = [];
   for (const image of input.images) {
     const bytes = Uint8Array.from(Buffer.from(image.base64, "base64"));
@@ -107,7 +106,20 @@ async function persistReturn(
         ok: false,
         error: "Conținutul unei fotografii nu corespunde tipului JPG, PNG sau WEBP declarat.",
       };
-    decodedImages.push({ bytes, image });
+    try {
+      const { cleanComplaintImage } = await import("./complaint-image.server");
+      const clean = await cleanComplaintImage(bytes, image.mime);
+      decodedImages.push({
+        bytes: clean,
+        image: { ...image, mime: "image/png", size: clean.length },
+      });
+    } catch {
+      return {
+        ok: false,
+        error:
+          "Fotografia nu a putut fi validată. Reîncarcă pagina și selectează din nou o imagine JPG, PNG sau WEBP de maximum 5 MB.",
+      };
+    }
   }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

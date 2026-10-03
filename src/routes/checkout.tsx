@@ -1,3 +1,4 @@
+import { LegalGuaranteeNotice } from "@/components/site/LegalGuaranteeNotice";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -552,6 +553,7 @@ function CheckoutPage() {
             </p>
           ) : null}
 
+          <LegalGuaranteeNotice />
           <button
             type="submit"
             disabled={busy || overGuestLimit || !shippingConfigured}

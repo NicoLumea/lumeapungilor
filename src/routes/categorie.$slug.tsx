@@ -1,7 +1,6 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { Catalogue } from "@/components/site/Catalogue";
-import { getSeoCategory } from "@/lib/seo-catalog.functions";
-import { getSeoRedirect } from "@/lib/seo-catalog.functions";
+import { getCategoryNavigation } from "@/lib/seo-catalog.functions";
 import { categoryBreadcrumbJsonLd, categoryCanonical, jsonLd } from "@/lib/product-seo";
 import { descriptionExcerpt } from "@/lib/safe-markdown";
 import { socialImageUrl } from "@/lib/seo-meta";
@@ -12,7 +11,8 @@ const SLUG_REDIRECTS: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/categorie/$slug")({
-  beforeLoad: async ({ params, location }) => {
+  preloadStaleTime: 30_000,
+  beforeLoad: ({ params, location }) => {
     const target = SLUG_REDIRECTS[params.slug];
     if (target) {
       throw redirect({
@@ -21,11 +21,12 @@ export const Route = createFileRoute("/categorie/$slug")({
         statusCode: 301,
       });
     }
-    const stored = await getSeoRedirect({ data: { path: `/categorie/${params.slug}` } });
-    if (stored) throw redirect({ href: `${stored}${location.searchStr}`, statusCode: 301 });
   },
-  loader: async ({ params }) => {
-    const result = await getSeoCategory({ data: { slug: params.slug } });
+  loader: async ({ params, location }) => {
+    const { redirectTo, result } = await getCategoryNavigation({ data: { slug: params.slug } });
+    if (redirectTo) {
+      throw redirect({ href: `${redirectTo}${location.searchStr}`, statusCode: 301 });
+    }
     if (!result) throw notFound();
     return result;
   },

@@ -25,7 +25,8 @@
     "test:orders": "node --test src/lib/order-experience.test.ts src/lib/order-confirmation.test.ts src/lib/order-pdf.test.ts",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:communications": "node --test src/lib/order-mail.test.ts src/lib/secure-uploads.test.ts"
   },
   "overrides": {
     "rolldown": "1.2.1",
@@ -86,7 +87,8 @@
     "tw-animate-css": "^1.3.4",
     "vaul": "^1.1.2",
     "vite-tsconfig-paths": "^6.0.2",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "pngjs": "^7.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
@@ -109,6 +111,7 @@
     "sharp": "^0.35.5",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "8.1.5"
+    "vite": "8.1.5",
+    "@types/pngjs": "^6.0.5"
   }
 }

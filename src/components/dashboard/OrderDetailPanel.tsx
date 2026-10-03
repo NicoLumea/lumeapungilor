@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { OrderOperationsPanel } from "./OrderOperationsPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { formatRon } from "@/lib/format";
-
-const STATUSES = ["nou", "confirmat", "in_livrare", "finalizat", "anulat"];
-const PAYMENTS = ["in_asteptare", "platit", "rambursat", "anulat"];
 
 export function OrderDetailPanel({
   id,
@@ -15,7 +11,6 @@ export function OrderDetailPanel({
   id: string;
   base: "/staff/comenzi" | "/n7q4-v2m9/orders";
 }) {
-  const qc = useQueryClient();
   const order = useQuery({
     queryKey: ["staff", "order-detail", id],
     queryFn: async () => {
@@ -30,40 +25,6 @@ export function OrderDetailPanel({
       return data;
     },
   });
-  const [status, setStatus] = useState("");
-  const [payment, setPayment] = useState("");
-  const [note, setNote] = useState("");
-  const [saving, setSaving] = useState(false);
-  useEffect(() => {
-    if (order.data) {
-      setStatus(order.data.status);
-      setPayment(order.data.payment_status);
-      setNote(order.data.internal_notes ?? "");
-    }
-  }, [order.data]);
-
-  async function save(event: React.FormEvent) {
-    event.preventDefault();
-    if (!order.data) return;
-    setSaving(true);
-    const { error } = await supabase
-      .from("orders")
-      .update({
-        status,
-        payment_status: payment,
-        internal_notes: note,
-      })
-      .eq("id", id);
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Comanda a fost actualizată.");
-    await qc.invalidateQueries({ queryKey: ["staff", "order-detail", id] });
-    await qc.invalidateQueries({ queryKey: ["staff", "orders"] });
-  }
-
   const o = order.data;
   return (
     <div className="mx-auto max-w-[1100px]">
@@ -184,61 +145,7 @@ export function OrderDetailPanel({
               </div>
             </dl>
           </section>
-          <form onSubmit={save} className="mt-8 border border-border p-5">
-            <h2 className="display text-xl">Informații operaționale</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Prețurile, cantitățile și sumele inițiale nu pot fi modificate. Anularea restituie
-              stocul o singură dată și nu poate fi inversată.
-            </p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <label className="text-sm">
-                Status comandă
-                <select
-                  value={status}
-                  disabled={o.status === "anulat"}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="mt-2 block w-full border border-input bg-background px-3 py-2"
-                >
-                  {STATUSES.map((x) => (
-                    <option key={x} value={x}>
-                      {x}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="text-sm">
-                Status plată
-                <select
-                  value={payment}
-                  onChange={(e) => setPayment(e.target.value)}
-                  className="mt-2 block w-full border border-input bg-background px-3 py-2"
-                >
-                  {PAYMENTS.includes(payment) ? null : <option value={payment}>{payment}</option>}
-                  {PAYMENTS.map((x) => (
-                    <option key={x} value={x}>
-                      {x}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <label className="mt-5 block text-sm">
-              Notițe interne
-              <textarea
-                rows={4}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                className="mt-2 block w-full border border-input bg-background px-3 py-2"
-              />
-            </label>
-            <button
-              type="submit"
-              disabled={saving}
-              className="micro mt-5 min-h-11 border border-foreground bg-foreground px-6 text-background disabled:opacity-40"
-            >
-              {saving ? "Se salvează…" : "Salvează"}
-            </button>
-          </form>
+          <OrderOperationsPanel key={o.id + o.updated_at} order={o} />
         </>
       ) : null}
     </div>
