@@ -1,0 +1,17 @@
+{
+  "name": "lumeapungilor",
+  "main": "cloudflare-entry.mjs",
+  "compatibility_date": "2026-10-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "no_bundle": true,
+  "find_additional_modules": true,
+  "rules": [{ "type": "ESModule", "globs": ["**/*.mjs", "**/*.js"] }],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "../public",
+    "run_worker_first": ["/robots.txt"]
+  },
+  "previews": {}
+}
