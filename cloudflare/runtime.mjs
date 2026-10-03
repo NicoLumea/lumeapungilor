@@ -21,6 +21,12 @@ export function createCloudflareHandler(loadApp, build) {
         });
       }
       if (!configurationMatches(env, build)) {
+        console.error("Cloudflare runtime configuration mismatch", {
+          environmentMatches: env.DEPLOYMENT_ENVIRONMENT === build.target,
+          databaseMatches: env.SUPABASE_URL === build.supabaseUrl,
+          publicKeyMatches: env.SUPABASE_PUBLISHABLE_KEY === build.publishableKey,
+          serverKeyPresent: typeof env.SUPABASE_SERVICE_ROLE_KEY === "string" && env.SUPABASE_SERVICE_ROLE_KEY.length > 20,
+        });
         return new Response("Site configuration is incomplete. Contact the site administrator.", {
           status: 503,
           headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" },
