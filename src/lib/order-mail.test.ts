@@ -1,6 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { orderMailText, mailtoUrl, emlDraft, WITHDRAWAL_FORM } from "./order-mail.ts";
+import {
+  orderMailText,
+  mailtoUrl,
+  emlDraft,
+  WITHDRAWAL_FORM,
+  orderStatusMailKind,
+} from "./order-mail.ts";
 import type { ConfirmationOrder } from "./order-confirmation.server";
 const order = {
   order_number: "LP-TEST",
@@ -64,4 +70,11 @@ test("draft is passive MIME, includes withdrawal attachment and encodes mailto",
   assert.match(eml, /filename="formular-retragere.txt"/);
   assert.ok(!eml.includes("text/html"));
   assert.ok(mailtoUrl(m).includes("%40"));
+});
+
+test("only confirmed and in-delivery statuses select an email draft", () => {
+  assert.equal(orderStatusMailKind("confirmat"), "acceptance");
+  assert.equal(orderStatusMailKind("in_livrare"), "dispatch");
+  for (const status of ["nou", "finalizat", "anulat", "invoice", "unknown"])
+    assert.equal(orderStatusMailKind(status), undefined);
 });

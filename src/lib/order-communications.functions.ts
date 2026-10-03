@@ -81,7 +81,7 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
   .inputValidator((v: unknown) =>
     idInput
       .extend({
-        kind: z.enum(["acceptance", "dispatch", "invoice"]),
+        kind: z.enum(["acceptance", "dispatch"]),
         tracking: z
           .string()
           .trim()
@@ -104,9 +104,10 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
     if (!o || Date.parse(o.updated_at) !== Date.parse(data.version))
       throw new Error("Comanda s-a schimbat. Reîncarcă pagina.");
     if (o.status === "anulat") throw new Error("Comanda este anulată.");
-    if (data.kind === "dispatch" && o.status !== "confirmat")
+    if (data.kind === "dispatch" && !["confirmat", "in_livrare"].includes(o.status))
       throw new Error("Acceptă comanda înainte de predarea la curier.");
     const attachments: OrderMail["attachments"] = [];
+    let needsOriginalTerms = false;
     if (data.kind === "acceptance") {
       const { data: legal, error: e } = await db
         .from("order_legal_snapshots")
@@ -114,14 +115,9 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
         .eq("order_id", o.id)
         .maybeSingle();
       checked(e);
-      if (!legal)
-        throw new Error(
-          "Lipsește versiunea termenilor aplicabili acestei comenzi. Adaugă documentul original în secțiunea de mai jos.",
-        );
-      attachments.push(
-        { name: "termeni-comanda.txt", text: legal.terms },
-        { name: "formular-retragere.txt", text: WITHDRAWAL_FORM },
-      );
+      needsOriginalTerms = !legal;
+      if (legal) attachments.push({ name: "termeni-comanda.txt", text: legal.terms });
+      attachments.push({ name: "formular-retragere.txt", text: WITHDRAWAL_FORM });
     }
     let invoiceUrl: string | undefined;
     let invoiceNumber: string | undefined;
@@ -141,7 +137,6 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
       invoiceUrl = signed.data?.signedUrl;
       invoiceNumber = invoice.invoice_number;
     }
-    if (data.kind === "invoice" && !invoiceNumber) throw new Error("Selectează factura emisă.");
     const { subject, body } = orderMailText(
       o as ConfirmationOrder,
       data.kind,
@@ -167,7 +162,15 @@ export const prepareOrderEmail = createServerFn({ method: "POST" })
       .select("id")
       .single();
     checked(draftError);
-    return { id: draft!.id, recipient: o.email, subject, body, attachments, invoiceUrl };
+    return {
+      id: draft!.id,
+      recipient: o.email,
+      subject,
+      body,
+      attachments,
+      invoiceUrl,
+      needsOriginalTerms,
+    };
   });
 
 export const saveOrderOperations = createServerFn({ method: "POST" })

@@ -2,11 +2,13 @@
 
 ## Rollout
 
-This PR is not a deployment. Apply `supabase/migrations/20261003120000_order_communications.sql` through the normal reviewed migration process when enabling this branch. **Do not apply it ahead of the application update on a shared production database:** it revokes the old direct status-update grants, so the old admin UI cannot save after the migration. Use a separate preview database for full pre-merge workflow testing, or coordinate a brief admin maintenance window for the combined release. No migration or test order was applied to the live database during development.
+The additive setup `20261003120000_order_communications.sql` was applied on 2026-10-03 at the owner's request to unblock preview drafts. It is replay-safe. No customer order or email was created. The separate `20261003120100_order_communications_cutover.sql` remains unapplied: apply it together with the new admin UI to revoke legacy direct status-update grants. Applying the cutover early would prevent the old admin screen saving. New private tables already have RLS and no browser grants.
+
+There are now only two draft options, based on the selected status: confirmed (acceptance) and in delivery (dispatch), including orders already in that status. The separate invoice-email UI is removed; attach invoices through the dispatch draft. Older orders can open an editable draft before original terms are supplied, but the send declaration stays disabled until staff supplies the original terms and regenerates the draft. The server also rejects acceptance confirmation without a terms snapshot. Today's terms are never silently substituted for historical ones.
 
 New tables are private with RLS and no browser grants. The private `order-invoices` bucket has no public or browser object policies. Authenticated staff update order state only through the guarded RPC. Existing stock and order-audit triggers remain in force. No prices, checkout totals, SEO text, public headings, or live site content are changed.
 
-Before publishing: exercise a synthetic order in the configured preview: acceptance, draft and both text attachments, declaration and Save, invoice upload, dispatch without an invoice, separate invoice email, customer invoice download and denial for another account. Check the actual staff email app can open `.eml` drafts and send with the intended sender. No actual emails have been sent in development.
+Before publishing: exercise a synthetic order in the configured preview: acceptance, draft and both text attachments, declaration and Save, invoice upload, dispatch with and without an invoice, customer invoice download and denial for another account. Check the actual staff email app can open `.eml` drafts and send with the intended sender. No actual emails have been sent in development.
 
 ## Staff workflow
 

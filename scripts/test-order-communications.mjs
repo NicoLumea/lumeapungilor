@@ -38,6 +38,15 @@ try {
   await db.exec(
     `insert into public.orders(id,status,payment_status) values('${order}','nou','in_asteptare');`,
   );
+  await db.exec(
+    await readFile(
+      new URL(
+        "../supabase/migrations/20261003120100_order_communications_cutover.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
   const version = (await db.query(`select updated_at::text as v from orders where id='${order}'`))
     .rows[0].v;
   assert.equal(
@@ -64,6 +73,9 @@ try {
   await auth("");
   await assert.rejects(save("confirmat"), /FORBIDDEN/);
   await auth(staff);
+  await db.exec("begin; delete from order_legal_snapshots;");
+  await assert.rejects(save("confirmat"), /ORIGINAL_TERMS_REQUIRED/);
+  await db.exec("rollback;");
   await assert.rejects(save("confirmat"), /EMAIL_CONFIRMATION_REQUIRED/);
   await assert.rejects(save("in_livrare"), /ACCEPTANCE_REQUIRED/);
   await assert.rejects(save("finalizat"), /DISPATCH_REQUIRED/);
@@ -80,15 +92,18 @@ try {
   await assert.rejects(save("confirmat", acceptance, false), /EMAIL_CONFIRMATION_REQUIRED/);
   await assert.rejects(save("confirmat", acceptance, true, "2000-01-01"), /ORDER_CHANGED_RELOAD/);
   await save("confirmat", acceptance, true);
+  await assert.rejects(save("confirmat", acceptance, true), /EMAIL_CONFIRMATION_REQUIRED/);
+  await save("confirmat", await draft("acceptance"), true);
   assert.equal((await db.query(`select total from orders`)).rows[0].total, "130");
   assert.equal((await db.query(`select actor_id from audit_logs`)).rows[0].actor_id, staff);
   await assert.rejects(save("in_livrare", acceptance, true), /EMAIL_CONFIRMATION_REQUIRED/);
   const dispatch = await draft("dispatch");
   await save("in_livrare", dispatch, true); // no invoice necessary
+  await save("in_livrare", await draft("dispatch"), true);
   assert.equal(
     (await db.query(`select count(*) from order_email_drafts where declared_sent_at is not null`))
       .rows[0].count,
-    2,
+    4,
   );
   await db.exec("set role authenticated");
   await assert.rejects(db.query(`update orders set status='nou'`), /permission denied/);

@@ -1,5 +1,5 @@
 -- Private documents and manual-email declarations. No email delivery claim is made.
-create table public.order_legal_snapshots (
+create table if not exists public.order_legal_snapshots (
   order_id uuid primary key references public.orders(id) on delete cascade,
   terms text not null,
   captured_at timestamptz not null default now(),
@@ -7,7 +7,7 @@ create table public.order_legal_snapshots (
   supplied_by uuid references auth.users(id)
 );
 alter table public.order_legal_snapshots enable row level security;
-create table public.order_invoices (
+create table if not exists public.order_invoices (
   id uuid primary key default gen_random_uuid(),
   order_id uuid not null references public.orders(id) on delete cascade,
   storage_path text not null unique,
@@ -16,7 +16,7 @@ create table public.order_invoices (
   created_at timestamptz not null default now()
 );
 alter table public.order_invoices enable row level security;
-create table public.order_email_drafts (
+create table if not exists public.order_email_drafts (
   id uuid primary key default gen_random_uuid(),
   order_id uuid not null references public.orders(id) on delete cascade,
   kind text not null check (kind in ('acceptance','dispatch','invoice')),
@@ -32,8 +32,8 @@ create table public.order_email_drafts (
   declared_sent_at timestamptz
 );
 alter table public.order_email_drafts enable row level security;
-create index on public.order_email_drafts(order_id, created_at desc);
-create index on public.order_invoices(order_id, created_at desc);
+create index if not exists order_email_drafts_order_id_created_at_idx on public.order_email_drafts(order_id, created_at desc);
+create index if not exists order_invoices_order_id_created_at_idx on public.order_invoices(order_id, created_at desc);
 -- No browser access to private tables or storage. Server endpoints authorize each request.
 revoke all on public.order_legal_snapshots, public.order_invoices, public.order_email_drafts from anon, authenticated;
 grant all on public.order_legal_snapshots, public.order_invoices, public.order_email_drafts to service_role;
@@ -41,7 +41,7 @@ insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 values('order-invoices','order-invoices',false,10485760,array['application/pdf'])
 on conflict(id) do nothing;
 
-create function public.capture_order_terms() returns trigger
+create or replace function public.capture_order_terms() returns trigger
 language plpgsql security definer set search_path=public as $$
 declare body text;
 begin
@@ -51,15 +51,14 @@ begin
   end if;
   return new;
 end $$;
+drop trigger if exists orders_capture_terms on public.orders;
 create trigger orders_capture_terms after insert on public.orders
 for each row execute function public.capture_order_terms();
 revoke all on function public.capture_order_terms() from public;
 
--- Also revoke column grants: table-level REVOKE alone does not remove those.
-revoke update on public.orders from authenticated;
-revoke update(status,payment_status,internal_notes) on public.orders from authenticated;
+-- Direct-write revocation is in the separate cutover migration, applied with the new UI.
 
-create function public.save_order_operations(
+create or replace function public.save_order_operations(
   p_id uuid, p_version timestamptz, p_status text, p_payment text,
   p_note text, p_draft uuid default null, p_confirmed boolean default false
 ) returns void language plpgsql security definer set search_path=public as $$
@@ -71,13 +70,14 @@ begin
   if p_status is null or p_status not in ('nou','confirmat','in_livrare','finalizat','anulat')
     or p_payment is null or p_payment not in ('in_asteptare','platit','rambursat','anulat')
     or length(coalesce(p_note,''))>10000 then raise exception 'INVALID_INPUT'; end if;
-  if p_status is distinct from o.status then
+  if p_status is distinct from o.status or p_draft is not null then
     if p_status='confirmat' then required_kind:='acceptance';
     elsif p_status='in_livrare' then required_kind:='dispatch';
     elsif p_status='finalizat' and o.status<>'in_livrare' then raise exception 'DISPATCH_REQUIRED';
     end if;
   end if;
-  if required_kind='dispatch' and o.status<>'confirmat' then raise exception 'ACCEPTANCE_REQUIRED'; end if;
+  if required_kind='dispatch' and o.status not in ('confirmat','in_livrare') then raise exception 'ACCEPTANCE_REQUIRED'; end if;
+  if required_kind='acceptance' and not exists(select 1 from public.order_legal_snapshots where order_id=o.id) then raise exception 'ORIGINAL_TERMS_REQUIRED'; end if;
   if required_kind is not null then
     select * into d from public.order_email_drafts where id=p_draft for update;
     if not found or p_confirmed is distinct from true or d.order_id<>o.id
@@ -93,7 +93,7 @@ end $$;
 revoke all on function public.save_order_operations(uuid,timestamptz,text,text,text,uuid,boolean) from public,anon;
 grant execute on function public.save_order_operations(uuid,timestamptz,text,text,text,uuid,boolean) to authenticated;
 
-create function public.confirm_invoice_email(p_draft uuid) returns void
+create or replace function public.confirm_invoice_email(p_draft uuid) returns void
 language plpgsql security definer set search_path=public as $$
 declare d public.order_email_drafts;
 begin

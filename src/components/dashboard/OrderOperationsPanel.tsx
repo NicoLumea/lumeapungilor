@@ -8,9 +8,15 @@ import {
   saveOrderOperations,
   supplyLegacyTerms,
   uploadOrderInvoice,
-  confirmInvoiceEmail,
 } from "@/lib/order-communications.functions";
-import { downloadText, emlDraft, mailtoUrl, type MailKind, type OrderMail } from "@/lib/order-mail";
+import {
+  downloadText,
+  emlDraft,
+  mailtoUrl,
+  orderStatusMailKind,
+  type MailKind,
+  type OrderMail,
+} from "@/lib/order-mail";
 
 const statuses = ["nou", "confirmat", "in_livrare", "finalizat", "anulat"] as const;
 const payments = ["in_asteptare", "platit", "rambursat", "anulat"] as const;
@@ -90,6 +96,13 @@ function EmailStep({
       {mail && (
         <>
           <p className="break-all">Către: {mail.recipient}</p>
+          {mail.needsOriginalTerms && (
+            <p role="status" className="border border-border bg-field p-3">
+              Poți deschide și edita acest proiect acum. Înainte de trimitere, adaugă termenii
+              originali în secțiunea de mai jos și pregătește din nou mesajul, ca să includă
+              documentul. Confirmarea trimiterii rămâne blocată până atunci.
+            </p>
+          )}
           <details>
             <summary className="cursor-pointer py-2 underline">Verifică textul mesajului</summary>
             <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words border p-3 font-sans">
@@ -101,8 +114,8 @@ function EmailStep({
           {mail.attachments.length > 0 && (
             <div className="space-y-2">
               <p>
-                Descarcă și atașează ambele documente. Ele rămân disponibile clientului în e-mail,
-                chiar dacă pagina de termeni se schimbă.
+                Descarcă și atașează documentele disponibile. Ele rămân disponibile clientului în
+                e-mail, chiar dacă pagina de termeni se schimbă.
               </p>
               {mail.attachments.map((a) => (
                 <button
@@ -161,14 +174,14 @@ function EmailStep({
           </div>
           <p className="text-muted-foreground">
             Deschide fișierul .eml în aplicația de e-mail și alege editare/retrimitere dacă este
-            necesar. Termenii și formularul sunt incluse în .eml; factura PDF se atașează separat.
-            Dacă folosești webmail, copiază textul și atașează documentele manual.
+            necesar. Documentele enumerate mai sus sunt incluse în .eml; factura PDF se atașează
+            separat. Dacă folosești webmail, copiază textul și atașează documentele manual.
           </p>
           <label className="flex items-start gap-3">
             <input
               type="checkbox"
               className="mt-1 size-4"
-              disabled={!opened}
+              disabled={!opened || mail.needsOriginalTerms}
               checked={confirmed}
               onChange={(e) => {
                 setConfirmed(e.target.checked);
@@ -192,7 +205,6 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
   const save = useServerFn(saveOrderOperations);
   const legacy = useServerFn(supplyLegacyTerms);
   const upload = useServerFn(uploadOrderInvoice);
-  const confirm = useServerFn(confirmInvoiceEmail);
   const query = useQuery({
     queryKey: ["staff", "communications", o.id],
     queryFn: () => load({ data: { orderId: o.id } }),
@@ -204,19 +216,11 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
   const [tracking, setTracking] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
   const [draftId, setDraftId] = useState<string>();
-  const [invoiceDraft, setInvoiceDraft] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [file, setFile] = useState<File>();
   const [terms, setTerms] = useState("");
-  const kind =
-    status !== o.status
-      ? status === "confirmat"
-        ? "acceptance"
-        : status === "in_livrare"
-          ? "dispatch"
-          : undefined
-      : undefined;
+  const kind = orderStatusMailKind(status);
   async function refresh() {
     await qc.invalidateQueries({ queryKey: ["staff", "communications", o.id] });
     await qc.invalidateQueries({ queryKey: ["staff", "order-detail", o.id] });
@@ -333,7 +337,6 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
               onChange={(e) => {
                 setInvoiceId(e.target.value);
                 setDraftId(undefined);
-                setInvoiceDraft(undefined);
               }}
             >
               <option value="">Factura va fi trimisă separat</option>
@@ -439,51 +442,6 @@ export function OrderOperationsPanel({ order: o }: { order: Order }) {
         >
           Adaugă factura
         </button>
-        <label className="mt-5 block">
-          Trimite o factură separat
-          <select
-            className={input}
-            value={invoiceId}
-            onChange={(e) => {
-              setInvoiceId(e.target.value);
-              setInvoiceDraft(undefined);
-              setDraftId(undefined);
-            }}
-          >
-            <option value="">Selectează factura</option>
-            {query.data?.invoices.map((i) => (
-              <option key={i.id} value={i.id}>
-                {i.invoice_number}
-              </option>
-            ))}
-          </select>
-        </label>
-        {invoiceId && (
-          <>
-            <EmailStep
-              key={`invoice:${invoiceId}:${o.updated_at}`}
-              order={o}
-              kind="invoice"
-              invoiceId={invoiceId}
-              tracking=""
-              onConfirm={setInvoiceDraft}
-            />
-            <button
-              type="button"
-              className={`${button} mt-3`}
-              disabled={busy || !invoiceDraft}
-              onClick={() =>
-                void action(async () => {
-                  await confirm({ data: { draftId: invoiceDraft!, confirmed: true } });
-                  setInvoiceDraft(undefined);
-                  setInvoiceId("");
-                })
-              }
-            >
-              Salvează confirmarea trimiterii facturii
-            </button>
-          </>
-        )}
       </div>
       <div className="mt-6 border-t pt-5 text-sm">
         <p className="font-medium">Istoricul declarațiilor de trimitere</p>

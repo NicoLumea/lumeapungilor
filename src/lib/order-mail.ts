@@ -2,6 +2,9 @@ import { COMPANY_LEGAL, SUPPORT_EMAIL, RETURNS_ADDRESS } from "./company-legal.t
 import type { ConfirmationOrder } from "./order-confirmation.server";
 
 export type MailKind = "acceptance" | "dispatch" | "invoice";
+export function orderStatusMailKind(status: string): "acceptance" | "dispatch" | undefined {
+  return status === "confirmat" ? "acceptance" : status === "in_livrare" ? "dispatch" : undefined;
+}
 export type MailAttachment = { name: string; text: string };
 export type OrderMail = {
   id: string;
@@ -10,6 +13,7 @@ export type OrderMail = {
   body: string;
   attachments: MailAttachment[];
   invoiceUrl?: string | undefined;
+  needsOriginalTerms?: boolean;
 };
 export const WITHDRAWAL_FORM = `FORMULAR DE RETRAGERE
 Completați și trimiteți acest formular numai dacă doriți să vă retrageți din contract.
