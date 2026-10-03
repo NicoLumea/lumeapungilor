@@ -38,6 +38,7 @@ import { Route as TermeniRouteImport } from './routes/termeni'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as CategorieSlugRouteImport } from './routes/categorie.$slug'
 import { Route as ComandaNumberRouteImport } from './routes/comanda.$number'
+import { Route as DocumenteFilenameRouteImport } from './routes/documente.$filename'
 import { Route as N7q4V2m9IndexRouteImport } from './routes/n7q4-v2m9.index'
 import { Route as N7q4V2m9AuditRouteImport } from './routes/n7q4-v2m9.audit'
 import { Route as N7q4V2m9CategoriesRouteImport } from './routes/n7q4-v2m9.categories'
@@ -217,6 +218,11 @@ const CategorieSlugRoute = CategorieSlugRouteImport.update({
 const ComandaNumberRoute = ComandaNumberRouteImport.update({
   id: '/comanda/$number',
   path: '/comanda/$number',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumenteFilenameRoute = DocumenteFilenameRouteImport.update({
+  id: '/documente/$filename',
+  path: '/documente/$filename',
   getParentRoute: () => rootRouteImport,
 } as any)
 const N7q4V2m9IndexRoute = N7q4V2m9IndexRouteImport.update({
@@ -420,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
+  '/documente/$filename': typeof DocumenteFilenameRoute
   '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
   '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
   '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
@@ -483,6 +490,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
+  '/documente/$filename': typeof DocumenteFilenameRoute
   '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
   '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
   '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
@@ -549,6 +557,7 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categorie/$slug': typeof CategorieSlugRoute
   '/comanda/$number': typeof ComandaNumberRoute
+  '/documente/$filename': typeof DocumenteFilenameRoute
   '/n7q4-v2m9/audit': typeof N7q4V2m9AuditRoute
   '/n7q4-v2m9/categories': typeof N7q4V2m9CategoriesRoute
   '/n7q4-v2m9/clienti': typeof N7q4V2m9ClientiRoute
@@ -616,6 +625,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
     | '/comanda/$number'
+    | '/documente/$filename'
     | '/n7q4-v2m9/audit'
     | '/n7q4-v2m9/categories'
     | '/n7q4-v2m9/clienti'
@@ -679,6 +689,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
     | '/comanda/$number'
+    | '/documente/$filename'
     | '/n7q4-v2m9/audit'
     | '/n7q4-v2m9/categories'
     | '/n7q4-v2m9/clienti'
@@ -744,6 +755,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/categorie/$slug'
     | '/comanda/$number'
+    | '/documente/$filename'
     | '/n7q4-v2m9/audit'
     | '/n7q4-v2m9/categories'
     | '/n7q4-v2m9/clienti'
@@ -810,6 +822,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CategorieSlugRoute: typeof CategorieSlugRoute
   ComandaNumberRoute: typeof ComandaNumberRoute
+  DocumenteFilenameRoute: typeof DocumenteFilenameRoute
   ProdusSlugRoute: typeof ProdusSlugRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiAuthLoginRoute: typeof ApiAuthLoginRoute
@@ -1020,6 +1033,13 @@ declare module '@tanstack/react-router' {
       path: '/comanda/$number'
       fullPath: '/comanda/$number'
       preLoaderRoute: typeof ComandaNumberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documente/$filename': {
+      id: '/documente/$filename'
+      path: '/documente/$filename'
+      fullPath: '/documente/$filename'
+      preLoaderRoute: typeof DocumenteFilenameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/n7q4-v2m9/': {
@@ -1390,6 +1410,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CategorieSlugRoute: CategorieSlugRoute,
   ComandaNumberRoute: ComandaNumberRoute,
+  DocumenteFilenameRoute: DocumenteFilenameRoute,
   ProdusSlugRoute: ProdusSlugRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiAuthLoginRoute: ApiAuthLoginRoute,
