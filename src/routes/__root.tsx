@@ -19,7 +19,6 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { OrganizationStructuredData } from "@/components/site/OrganizationStructuredData";
 import { BackToTop } from "@/components/site/BackToTop";
 import { SupportWidget } from "@/components/site/SupportWidget";
-import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { Toaster } from "@/components/ui/sonner";
 import { getSeoContent } from "@/lib/seo-catalog.functions";
 import { safeGoogleVerificationToken } from "@/lib/seo-meta";
@@ -112,7 +111,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.ico?v=lumea-pungilor-1", sizes: "any" },
+      { rel: "icon", href: "/lumea-pungilor-icon.svg", type: "image/svg+xml" },
     ],
   }),
   shellComponent: RootShell,
@@ -167,9 +167,9 @@ function PublicSiteFrame({ pathname }: { pathname: string }) {
         <Outlet />
       </main>
       <SiteFooter />
-      <CookieBanner />
       {showBackToTop ? <BackToTop /> : null}
       {!pathname.startsWith("/staff") ? <SupportWidget /> : null}
     </div>
   );
 }
+
