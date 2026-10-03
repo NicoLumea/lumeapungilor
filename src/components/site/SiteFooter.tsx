@@ -11,6 +11,7 @@ import {
 } from "@/lib/company";
 import whatsappIcon from "@/assets/whatsapp-icon.png.asset.json";
 import { categoryRouteSlug } from "@/lib/sitemap";
+import { openCookiePreferences } from "@/lib/cookieConsent";
 
 export function SiteFooter() {
   const { data: content } = useContent();
@@ -90,6 +91,11 @@ export function SiteFooter() {
               <Link to="/confidentialitate" className="link-underline">
                 Confidențialitate
               </Link>
+            </li>
+            <li>
+              <button type="button" onClick={openCookiePreferences} className="link-underline">
+                Setări cookie
+              </button>
             </li>
           </ul>
         </div>

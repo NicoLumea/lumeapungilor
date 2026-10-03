@@ -19,6 +19,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { OrganizationStructuredData } from "@/components/site/OrganizationStructuredData";
 import { BackToTop } from "@/components/site/BackToTop";
 import { SupportWidget } from "@/components/site/SupportWidget";
+import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { Toaster } from "@/components/ui/sonner";
 import { getSeoContent } from "@/lib/seo-catalog.functions";
 import { safeGoogleVerificationToken } from "@/lib/seo-meta";
@@ -166,6 +167,7 @@ function PublicSiteFrame({ pathname }: { pathname: string }) {
         <Outlet />
       </main>
       <SiteFooter />
+      <CookieBanner />
       {showBackToTop ? <BackToTop /> : null}
       {!pathname.startsWith("/staff") ? <SupportWidget /> : null}
     </div>
