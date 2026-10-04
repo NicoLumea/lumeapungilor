@@ -159,14 +159,12 @@ export function SiteFooter() {
                 href={whatsappHref(company.phonePrimary)}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Contactează-ne pe WhatsApp"
                 title="Scrie-ne pe WhatsApp"
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <img
                   src={whatsappIcon.url}
-                  alt=""
-                  aria-hidden="true"
+                  alt="Contactează-ne pe WhatsApp"
                   className="size-8 rounded-full object-contain"
                 />
               </a>

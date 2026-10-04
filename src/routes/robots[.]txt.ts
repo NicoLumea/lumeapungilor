@@ -4,7 +4,8 @@ import { SITEMAP_ORIGIN } from "@/lib/sitemap";
 const PRIVATE_PATHS = [
   "/admin",
   "/n7q4-v2m9",
-  "/cont",
+  // Match the account page only; a prefix rule also blocks the public /contact page.
+  "/cont$",
   "/comenzile-mele",
   "/checkout",
   "/cos",
