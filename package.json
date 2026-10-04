@@ -24,7 +24,7 @@
     "images:backfill": "node --env-file=.env scripts/backfill-image-variants.mjs",
     "test:returns": "node --test src/lib/returns-core.test.ts",
     "test:support": "node --test src/lib/support-widget.test.ts",
-    "test:security": "node --test src/lib/security-role-access.test.ts",
+    "test:security": "node --test src/lib/security-role-access.test.ts src/lib/staff-promotion.test.ts",
     "test:guest-security": "node --test src/lib/guest-return-access.test.ts src/lib/returns-security.test.ts src/lib/request-rate-limit-core.test.ts",
     "test:env-security": "node --test src/lib/sensitive-paths.test.ts && node scripts/check-env-security.mjs",
     "test:orders": "node --test src/lib/order-experience.test.ts src/lib/order-confirmation.test.ts src/lib/order-pdf.test.ts",

@@ -15,88 +15,6 @@ async function rolesOf(userId: string): Promise<string[]> {
 
 /* ----------------------------------------------------------- employee access */
 
-export const requestEmployeeAccess = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
-    z.object({ message: z.string().trim().max(1000).optional() }).parse(data),
-  )
-  .handler(async ({ data, context }): Promise<ActionResult> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const email = (context.claims["email"] as string | undefined) ?? "";
-    const pending = await supabaseAdmin
-      .from("employee_requests")
-      .select("id")
-      .eq("user_id", context.userId)
-      .eq("status", "pending")
-      .maybeSingle();
-    if (pending.data) return { ok: false, error: "Ai deja o cerere în așteptare." };
-
-    const { error } = await supabaseAdmin.from("employee_requests").insert({
-      user_id: context.userId,
-      email,
-      message: data.message ?? null,
-      status: "pending",
-    });
-    if (error) return { ok: false, error: "Cererea nu a putut fi trimisă." };
-    return { ok: true };
-  });
-
-export const decideEmployeeRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
-    z
-      .object({
-        requestId: z.string().uuid(),
-        decision: z.enum(["approved", "rejected"]),
-        note: z.string().trim().max(500).optional(),
-      })
-      .parse(data),
-  )
-  .handler(async ({ data, context }): Promise<ActionResult> => {
-    if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
-      return { ok: false, error: DENIED };
-    }
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { audit } = await import("./rate-limit.server");
-    const { data: req } = await supabaseAdmin
-      .from("employee_requests")
-      .select("id, user_id, email, status")
-      .eq("id", data.requestId)
-      .maybeSingle();
-    if (!req) return { ok: false, error: "Cererea nu există." };
-    if (req.status !== "pending") return { ok: false, error: "Cererea a fost deja procesată." };
-    if (req.user_id === context.userId)
-      return { ok: false, error: "Nu îți poți aproba propria cerere." };
-
-    if (data.decision === "approved") {
-      const { error } = await supabaseAdmin
-        .from("user_roles")
-        .upsert({ user_id: req.user_id, role: "employee" }, { onConflict: "user_id,role" });
-      if (error) return { ok: false, error: "Rolul nu a putut fi acordat." };
-    }
-
-    await supabaseAdmin
-      .from("employee_requests")
-      .update({
-        status: data.decision,
-        reviewed_by: context.userId,
-        reviewed_at: new Date().toISOString(),
-        decision_note: data.note ?? null,
-      })
-      .eq("id", req.id);
-
-    await audit({
-      actorId: context.userId,
-      actorEmail: (context.claims["email"] as string | undefined) ?? null,
-      action: `employee_request.${data.decision}`,
-      entity: "employee_requests",
-      entityId: req.id,
-      details: { candidate: req.email },
-    });
-    return { ok: true };
-  });
-
 export const setEmployeeSuspension = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
@@ -135,12 +53,22 @@ export const setEmployeeSuspension = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/* -------------------------------------------------- administrator promotion */
+/* -------------------------------------------------- direct staff promotion */
 
-export const requestAdminPromotion = createServerFn({ method: "POST" })
+export const promoteAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z.object({ candidateEmail: z.string().trim().email().max(200) }).parse(data),
+    z
+      .object({
+        candidateEmail: z
+          .string()
+          .trim()
+          .email()
+          .max(200)
+          .transform((email) => email.toLowerCase()),
+        role: z.enum(["employee", "admin"]),
+      })
+      .parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
     if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
@@ -149,93 +77,48 @@ export const requestAdminPromotion = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { audit } = await import("./rate-limit.server");
-    const { data: profile } = await supabaseAdmin
+    // Profiles are customer-editable, so verify the selected email against Auth.
+    const { data: profiles, error: lookupError } = await supabaseAdmin
       .from("profiles")
-      .select("id, email")
-      .ilike("email", data.candidateEmail)
-      .maybeSingle();
-    if (!profile) return { ok: false, error: "Nu există un cont cu acest e-mail." };
-
-    const { data: request, error } = await supabaseAdmin
-      .from("role_change_requests")
-      .insert({
-        candidate_user_id: profile.id,
-        candidate_email: profile.email ?? data.candidateEmail,
-        requested_role: "admin",
-        requested_by: context.userId,
-        requester_email: (context.claims["email"] as string | undefined) ?? null,
-        status: "pending_owner_approval",
-      })
       .select("id")
-      .single();
-    if (error || !request) return { ok: false, error: "Cererea nu a putut fi înregistrată." };
-
-    await audit({
-      actorId: context.userId,
-      action: "admin_promotion.requested",
-      entity: "role_change_requests",
-      entityId: request.id,
-      details: { candidate: profile.email },
-    });
-    return { ok: true };
-  });
-
-/**
- * Only an authenticated account that already has the owner role can finalise
- * an administrator promotion. The bootstrap secret is never accepted here.
- */
-export const decideAdminPromotion = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
-    z
-      .object({
-        requestId: z.string().uuid(),
-        decision: z.enum(["approved", "rejected"]),
-        note: z.string().trim().max(500).optional(),
-      })
-      .parse(data),
-  )
-  .handler(async ({ data, context }): Promise<ActionResult> => {
-    const roles = await rolesOf(context.userId);
-    if (!(await hasPrivilegedAccess(context.userId, "owner")))
-      return { ok: false, error: "Doar proprietarul proiectului poate aproba această cerere." };
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { audit } = await import("./rate-limit.server");
-    const { data: req } = await supabaseAdmin
-      .from("role_change_requests")
-      .select("id, candidate_user_id, candidate_email, requested_by, status")
-      .eq("id", data.requestId)
-      .maybeSingle();
-    if (!req) return { ok: false, error: "Cererea nu există." };
-    if (req.status !== "pending_owner_approval")
-      return { ok: false, error: "Cererea a fost deja procesată." };
-    if (req.candidate_user_id === context.userId && !roles.includes("owner"))
-      return { ok: false, error: "Nu îți poți aproba propria promovare." };
-
-    if (data.decision === "approved") {
-      const { error } = await supabaseAdmin
-        .from("user_roles")
-        .upsert({ user_id: req.candidate_user_id, role: "admin" }, { onConflict: "user_id,role" });
-      if (error) return { ok: false, error: "Rolul nu a putut fi acordat." };
+      .eq("email", data.candidateEmail);
+    if (lookupError) return { ok: false, error: "Contul nu a putut fi verificat." };
+    let candidate: { id: string; email?: string } | undefined;
+    for (const profile of profiles ?? []) {
+      const { data: authData, error } = await supabaseAdmin.auth.admin.getUserById(profile.id);
+      if (!error && authData.user?.email?.toLowerCase() === data.candidateEmail) {
+        if (!authData.user.email_confirmed_at) {
+          return {
+            ok: false,
+            error: "Contul trebuie să confirme adresa de e-mail înainte de promovare.",
+          };
+        }
+        candidate = authData.user;
+        break;
+      }
     }
-
-    await supabaseAdmin
-      .from("role_change_requests")
-      .update({
-        status: data.decision,
-        decided_by: context.userId,
-        decided_at: new Date().toISOString(),
-        decision_note: data.note ?? null,
-      })
-      .eq("id", req.id);
-
+    if (!candidate) return { ok: false, error: "Nu există un cont verificat cu acest e-mail." };
+    if (candidate.id === context.userId) {
+      return { ok: false, error: "Nu îți poți modifica propriul acces." };
+    }
+    const targetRoles = await rolesOf(candidate.id);
+    if (targetRoles.includes("owner") || targetRoles.includes("admin")) {
+      return { ok: false, error: "Contul are deja acces de administrator." };
+    }
+    if (targetRoles.includes(data.role)) {
+      return { ok: false, error: "Contul are deja acest rol." };
+    }
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: candidate.id, role: data.role }, { onConflict: "user_id,role" });
+    if (error) return { ok: false, error: "Rolul nu a putut fi acordat." };
     await audit({
       actorId: context.userId,
-      action: `admin_promotion.${data.decision}`,
-      entity: "role_change_requests",
-      entityId: req.id,
-      details: { candidate: req.candidate_email },
+      actorEmail: (context.claims["email"] as string | undefined) ?? null,
+      action: "account.promoted",
+      entity: "user_roles",
+      entityId: candidate.id,
+      details: { candidate: candidate.email, role: data.role },
     });
     return { ok: true };
   });

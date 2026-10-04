@@ -91,34 +91,6 @@ export function useAuditLogs() {
   });
 }
 
-export function useEmployeeRequests() {
-  return useQuery({
-    queryKey: ["dashboard", "employee-requests"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("employee_requests")
-        .select("id,user_id,email,message,status,reviewed_at,created_at")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
-
-export function useRoleChangeRequests() {
-  return useQuery({
-    queryKey: ["dashboard", "role-requests"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("role_change_requests")
-        .select("id,candidate_email,requester_email,requested_role,status,decided_at,created_at")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
-
 export function useTeam() {
   return useQuery({
     queryKey: ["dashboard", "team"],
