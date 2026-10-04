@@ -45,6 +45,26 @@ test("direct promotion is authenticated and checks administrator rights before a
   assert.doesNotMatch(promotion, /role_change_requests|pending_owner_approval/);
 });
 
+test("demotion requires admin rights and protects the owner and acting account", () => {
+  const demotion = account.slice(
+    account.indexOf("export const demoteAccount"),
+    account.indexOf("/* -------------------------------------------------- direct staff promotion"),
+  );
+  assert.match(demotion, /middleware\(\[requireSupabaseAuth\]\)/);
+  assert.match(demotion, /role: z.enum\(\["employee", "customer"\]\)/);
+  const guard = demotion.indexOf('hasPrivilegedAccess(context.userId, "admin")');
+  const write = demotion.indexOf('.from("user_roles")');
+  assert.ok(guard >= 0 && guard < write);
+  assert.ok(demotion.indexOf("data.userId === context.userId") < write);
+  assert.ok(demotion.indexOf('targetRoles.includes("owner")') < write);
+  assert.match(demotion, /data.role === "employee"\s*\? await removal.eq\("role", "admin"\)/);
+  assert.match(demotion, /await removal.in\("role", \["admin", "employee"\]\)/);
+  assert.match(demotion, /if \(grantError\)/);
+  assert.match(demotion, /if \(revokeError\)/);
+  assert.match(workers, /member.user_id !== auth.user\?\.id/);
+  assert.match(workers, /!member.roles.includes\("owner"\)/);
+});
+
 test("workers page grants both roles directly and retains failed candidate input", () => {
   assert.match(workers, /option value="employee"/);
   assert.match(workers, /option value="admin"/);

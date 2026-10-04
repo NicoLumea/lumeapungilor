@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useTeam } from "@/lib/dashboard-data";
-import { promoteAccount, setEmployeeSuspension } from "@/lib/account.functions";
+import { demoteAccount, promoteAccount } from "@/lib/account.functions";
+import { useAuth } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/n7q4-v2m9/roluri")({ component: RolesPage });
 
@@ -17,9 +18,10 @@ const ROLE_LABEL: Record<string, string> = {
 
 function RolesPage() {
   const qc = useQueryClient();
+  const auth = useAuth();
   const { data: team, isLoading, isError } = useTeam();
   const promote = useServerFn(promoteAccount);
-  const suspend = useServerFn(setEmployeeSuspension);
+  const demote = useServerFn(demoteAccount);
   const [candidate, setCandidate] = useState("");
   const [role, setRole] = useState<"employee" | "admin">("employee");
   const [busy, setBusy] = useState(false);
@@ -49,8 +51,8 @@ function RolesPage() {
       <section>
         <h1 className="display text-3xl">Angajați și accese</h1>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-          Administratorii acordă direct acces de angajat sau administrator conturilor existente.
-          Rolul ales se activează imediat, fără cerere de aprobare.
+          Administratorii pot acorda sau reduce direct accesul conturilor existente. Modificările se
+          activează imediat, fără cerere de aprobare.
         </p>
       </section>
 
@@ -124,35 +126,50 @@ function RolesPage() {
               <span className="micro-sm text-muted-foreground">
                 {member.roles.map((r) => ROLE_LABEL[r] ?? r).join(", ")}
               </span>
-              {member.roles.includes("employee") &&
-              !member.roles.includes("admin") &&
-              !member.roles.includes("owner") ? (
+              {!member.roles.includes("owner") && member.user_id !== auth.user?.id ? (
                 <div className="ml-auto flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    disabled={busy || !member.email}
-                    onClick={() =>
-                      run(
-                        () => promote({ data: { candidateEmail: member.email!, role: "admin" } }),
-                        "Acces de administrator acordat.",
-                      )
-                    }
-                    className="micro-sm min-h-9 border border-foreground px-3 py-1 disabled:opacity-40"
-                  >
-                    Promovează administrator
-                  </button>
+                  {member.roles.includes("employee") && !member.roles.includes("admin") ? (
+                    <button
+                      type="button"
+                      disabled={busy || !member.email}
+                      onClick={() =>
+                        run(
+                          () => promote({ data: { candidateEmail: member.email!, role: "admin" } }),
+                          "Acces de administrator acordat.",
+                        )
+                      }
+                      className="micro-sm min-h-9 border border-foreground px-3 py-1 disabled:opacity-40"
+                    >
+                      Promovează administrator
+                    </button>
+                  ) : null}
+                  {member.roles.includes("admin") ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() =>
+                        run(
+                          () => demote({ data: { userId: member.user_id, role: "employee" } }),
+                          "Contul are acum acces de angajat.",
+                        )
+                      }
+                      className="micro-sm min-h-9 border border-foreground px-3 py-1 disabled:opacity-40"
+                    >
+                      Schimbă în angajat
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     disabled={busy}
                     onClick={() =>
                       run(
-                        () => suspend({ data: { userId: member.user_id, revoke: true } }),
-                        "Acces retras.",
+                        () => demote({ data: { userId: member.user_id, role: "customer" } }),
+                        "Contul are acum acces de client.",
                       )
                     }
                     className="micro-sm min-h-9 border border-foreground px-3 py-1 disabled:opacity-40"
                   >
-                    Retrage accesul
+                    Schimbă în client
                   </button>
                 </div>
               ) : null}

@@ -13,12 +13,12 @@ async function rolesOf(userId: string): Promise<string[]> {
   return (data ?? []).map((r) => r.role as string);
 }
 
-/* ----------------------------------------------------------- employee access */
+/* ----------------------------------------------------------- staff demotion */
 
-export const setEmployeeSuspension = createServerFn({ method: "POST" })
+export const demoteAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z.object({ userId: z.string().uuid(), revoke: z.boolean() }).parse(data),
+    z.object({ userId: z.string().uuid(), role: z.enum(["employee", "customer"]) }).parse(data),
   )
   .handler(async ({ data, context }): Promise<ActionResult> => {
     if (!(await hasPrivilegedAccess(context.userId, "admin"))) {
@@ -28,27 +28,35 @@ export const setEmployeeSuspension = createServerFn({ method: "POST" })
       return { ok: false, error: "Nu îți poți modifica propriul acces." };
 
     const targetRoles = await rolesOf(data.userId);
-    if (targetRoles.includes("admin") || targetRoles.includes("owner"))
-      return { ok: false, error: "Conturile de administrator nu pot fi modificate aici." };
+    if (targetRoles.includes("owner"))
+      return { ok: false, error: "Rolul de proprietar nu poate fi modificat aici." };
+    if (!targetRoles.includes("admin") && !targetRoles.includes("employee"))
+      return { ok: false, error: "Contul nu are acces de angajat sau administrator." };
+    if (data.role === "employee" && !targetRoles.includes("admin"))
+      return { ok: false, error: "Contul are deja acces de angajat." };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { audit } = await import("./rate-limit.server");
-    if (data.revoke) {
-      await supabaseAdmin
-        .from("user_roles")
-        .delete()
-        .eq("user_id", data.userId)
-        .eq("role", "employee");
-    } else {
-      await supabaseAdmin
-        .from("user_roles")
-        .upsert({ user_id: data.userId, role: "employee" }, { onConflict: "user_id,role" });
-    }
+    // Grant the lower role first so a failed write cannot strand the account without it.
+    const { error: grantError } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id,role" });
+    if (grantError) return { ok: false, error: "Noul rol nu a putut fi acordat." };
+
+    const removal = supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
+    const { error: revokeError } =
+      data.role === "employee"
+        ? await removal.eq("role", "admin")
+        : await removal.in("role", ["admin", "employee"]);
+    if (revokeError) return { ok: false, error: "Accesul anterior nu a putut fi retras." };
+
     await audit({
       actorId: context.userId,
-      action: data.revoke ? "employee.revoked" : "employee.restored",
+      actorEmail: (context.claims["email"] as string | undefined) ?? null,
+      action: "account.demoted",
       entity: "user_roles",
       entityId: data.userId,
+      details: { role: data.role },
     });
     return { ok: true };
   });
