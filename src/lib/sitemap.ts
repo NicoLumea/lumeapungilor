@@ -1,11 +1,10 @@
-// Current public site. Override together with hosting/DNS when the custom domain is connected.
-export const SITEMAP_ORIGIN = (
-  import.meta.env?.["VITE_PUBLIC_SITE_URL"] || "https://lumeapungilor.lovable.app"
-).replace(/\/$/, "");
+import { PRODUCTION_ORIGIN } from "./seo-routing.ts";
 
-// The root route redirects to /magazin, so only its canonical destination belongs here.
+// Search signals always name production; previews remain excluded from indexing.
+export const SITEMAP_ORIGIN = PRODUCTION_ORIGIN;
+
 export const INDEXABLE_STATIC_PATHS = [
-  "/magazin",
+  "/",
   "/produse",
   "/despre",
   "/contact",

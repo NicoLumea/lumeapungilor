@@ -51,12 +51,10 @@ test("Product JSON-LD uses only factual catalogue fields", () => {
   const schema = productJsonLd(product());
   assert.equal(schema["name"], "Pungă test 40x50");
   assert.equal(schema["sku"], "TEST-1");
-  assert.deepEqual(schema["image"], [
-    "https://lumeapungilor.lovable.app/api/public/img/products/test.webp",
-  ]);
+  assert.deepEqual(schema["image"], ["https://lumeapungilor.ro/api/public/img/products/test.webp"]);
   assert.deepEqual(schema["offers"], {
     "@type": "Offer",
-    url: "https://lumeapungilor.lovable.app/produs/punga-test-40x50",
+    url: "https://lumeapungilor.ro/produs/punga-test-40x50",
     price: "12.50",
     priceCurrency: "RON",
     availability: "https://schema.org/OutOfStock",
@@ -76,5 +74,5 @@ test("metadata and alt fallbacks use stored facts without inventing claims", () 
 test("breadcrumbs normalize only the public route, not the category identity", () => {
   const breadcrumb = productBreadcrumbJsonLd(product());
   const items = breadcrumb["itemListElement"] as Record<string, unknown>[];
-  assert.equal(items[2]?.["item"], "https://lumeapungilor.lovable.app/categorie/pungi-test");
+  assert.equal(items[2]?.["item"], "https://lumeapungilor.ro/categorie/pungi-test");
 });

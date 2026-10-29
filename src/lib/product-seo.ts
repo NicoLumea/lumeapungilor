@@ -64,7 +64,7 @@ export function productJsonLd(product: Product): Record<string, unknown> {
 export function productBreadcrumbJsonLd(product: Product): Record<string, unknown> {
   const primary = assignedCategories(product)[0];
   const items: Record<string, unknown>[] = [
-    { "@type": "ListItem", position: 1, name: "Magazin", item: absolutePublicUrl("/magazin") },
+    { "@type": "ListItem", position: 1, name: "Magazin", item: absolutePublicUrl("/") },
     { "@type": "ListItem", position: 2, name: "Produse", item: absolutePublicUrl("/produse") },
   ];
   if (primary) {
@@ -92,7 +92,7 @@ export function categoryBreadcrumbJsonLd(category: {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Magazin", item: absolutePublicUrl("/magazin") },
+      { "@type": "ListItem", position: 1, name: "Magazin", item: absolutePublicUrl("/") },
       {
         "@type": "ListItem",
         position: 2,

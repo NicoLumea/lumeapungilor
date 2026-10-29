@@ -11,7 +11,7 @@ test("content field aliases preserve existing production copy", () => {
     read("src/components/site/StoreHero.tsx"),
     /text\(home, "hero_text"\)[\s\S]*hero_subtitle/,
   );
-  assert.match(read("src/routes/magazin.tsx"), /editorial_text[\s\S]*editorial_body/);
+  assert.match(read("src/routes/index.tsx"), /editorial_text[\s\S]*editorial_body/);
   const migration = read("supabase/migrations/20261002180000_prelaunch_content_seo.sql");
   assert.match(migration, /hero_subtitle/);
   assert.match(migration, /editorial_body/);

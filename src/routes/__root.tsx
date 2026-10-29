@@ -37,7 +37,7 @@ function NotFoundComponent() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
-            to="/magazin"
+            to="/"
             className="micro inline-flex min-h-11 items-center justify-center border border-foreground bg-foreground px-6 py-3 text-background transition-opacity hover:opacity-85"
           >
             Înapoi la magazin
@@ -79,7 +79,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             Încearcă din nou
           </button>
           <a
-            href="/magazin"
+            href="/"
             className="micro border border-border px-6 py-3 transition-colors hover:bg-accent"
           >
             Acasă
@@ -141,13 +141,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isInternalDashboard = pathname.startsWith("/n7q4-v2m9");
-  const isGateway = pathname === "/";
 
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <GoogleAnalytics />
-        {isInternalDashboard || isGateway ? <Outlet /> : <PublicSiteFrame pathname={pathname} />}
+        {isInternalDashboard ? <Outlet /> : <PublicSiteFrame pathname={pathname} />}
         {!isInternalDashboard && !pathname.startsWith("/staff") ? <CookieBanner /> : null}
         <Toaster position="bottom-right" />
       </CartProvider>
@@ -160,7 +159,7 @@ function PublicSiteFrame({ pathname }: { pathname: string }) {
   const showBackToTop =
     pathname === "/produse" ||
     pathname === "/despre" ||
-    pathname === "/magazin" ||
+    pathname === "/" ||
     pathname.startsWith("/categorie/");
 
   return (

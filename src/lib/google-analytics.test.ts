@@ -4,20 +4,14 @@ import { COOKIE_CONSENT_KEY, setCookieConsent } from "./cookieConsent.ts";
 import { analyticsPageUrl, GA_MEASUREMENT_ID, syncGoogleAnalytics } from "./google-analytics.ts";
 
 test("only public production routes are measurable, without query strings or fragments", () => {
-  for (const path of [
-    "/",
-    "/magazin",
-    "/produse",
-    "/produs/punga",
-    "/categorie/ambalaje",
-    "/contact",
-  ]) {
+  for (const path of ["/", "/produse", "/produs/punga", "/categorie/ambalaje", "/contact"]) {
     assert.equal(
       analyticsPageUrl("https://lumeapungilor.ro", path),
       `https://lumeapungilor.ro${path}`,
     );
   }
   for (const path of [
+    "/magazin",
     "/cont",
     "/checkout",
     "/cos",
@@ -41,7 +35,7 @@ test("only public production routes are measurable, without query strings or fra
     "https://lumeapungilor.ro.evil.test",
     "https://lovable.app",
   ]) {
-    assert.equal(analyticsPageUrl(origin, "/magazin"), null, origin);
+    assert.equal(analyticsPageUrl(origin, "/"), null, origin);
   }
 });
 
@@ -77,23 +71,23 @@ test("analytics respects consent, deduplicates page views, excludes private page
   const commands = () => browser.dataLayer.map((entry) => Array.from(entry as ArrayLike<unknown>));
   const views = () => commands().filter((entry) => entry[0] === "event");
   try {
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
     assert.equal(appended.length, 0);
     assert.equal(browser.dataLayer.length, 0);
     setCookieConsent({ analytics: false });
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
     assert.equal(appended.length, 0);
 
     setCookieConsent({ analytics: true });
     browser.location.origin = "https://preview.workers.dev";
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
     assert.equal(appended.length, 0);
     browser.location.origin = "https://lumeapungilor.ro";
     syncGoogleAnalytics("/cont");
     assert.equal(appended.length, 0);
 
-    syncGoogleAnalytics("/magazin");
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
+    syncGoogleAnalytics("/");
     assert.equal(appended.length, 1);
     assert.equal(views().length, 1);
     assert.deepEqual(commands()[0], [
@@ -110,24 +104,31 @@ test("analytics respects consent, deduplicates page views, excludes private page
     assert.equal((config?.[2] as Record<string, unknown>)["send_page_view"], false);
     assert.deepEqual(views()[0]?.[2], {
       send_to: GA_MEASUREMENT_ID,
-      page_location: "https://lumeapungilor.ro/magazin",
+      page_location: "https://lumeapungilor.ro/",
       page_title: documentMock.title,
       page_referrer: "https://www.google.com",
     });
 
     syncGoogleAnalytics("/produs/punga");
     assert.equal(views().length, 2);
+    const latestConfig = commands()
+      .filter((entry) => entry[0] === "config")
+      .at(-1);
+    assert.equal(
+      (latestConfig?.[2] as Record<string, unknown>)["page_location"],
+      "https://lumeapungilor.ro/produs/punga",
+    );
     syncGoogleAnalytics("/checkout");
     assert.equal(views().length, 2);
     assert.equal(
       (browser as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`],
       true,
     );
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
     assert.equal(views().length, 3);
 
     setCookieConsent({ analytics: false });
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
     assert.equal(views().length, 3);
     assert.ok(deletedCookies.some((cookie) => cookie.startsWith("_ga=")));
     assert.ok(deletedCookies.every((cookie) => !cookie.startsWith("session=")));
@@ -137,7 +138,7 @@ test("analytics respects consent, deduplicates page views, excludes private page
     );
 
     setCookieConsent({ analytics: true });
-    syncGoogleAnalytics("/magazin");
+    syncGoogleAnalytics("/");
     assert.equal(views().length, 4);
     assert.equal(appended.length, 1);
     values.set(COOKIE_CONSENT_KEY, "invalid");

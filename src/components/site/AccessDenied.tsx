@@ -26,7 +26,7 @@ export function AccessDenied({
           </Link>
         ) : null}
         <Link
-          to="/magazin"
+          to="/"
           className="micro inline-flex min-h-11 items-center border border-foreground px-6 py-3 transition-colors hover:bg-foreground hover:text-background"
         >
           Înapoi în magazin

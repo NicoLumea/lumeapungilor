@@ -30,7 +30,7 @@ export function StoreHero({
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5 xl:mt-6 xl:gap-3">
               <Link
-                to={welcome ? "/magazin" : "/produse"}
+                to={welcome ? "/" : "/produse"}
                 className="micro inline-flex min-h-11 w-fit max-w-full items-center border border-foreground bg-foreground px-4 py-3 text-background transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground xl:px-6"
               >
                 {welcome ? "Intră în magazin" : "Vezi catalogul"}

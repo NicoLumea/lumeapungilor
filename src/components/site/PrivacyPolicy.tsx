@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import policySource from "./privacy-policy.md?raw";
 import analyticsPolicySource from "./analytics-privacy-policy.md?raw";
+import { openCookiePreferences } from "@/lib/cookieConsent";
 
 const ANSPDCP_FORMS_URL = "https://www.dataprotection.ro/formulare/";
 
@@ -58,6 +59,43 @@ const policy = {
 };
 
 function PolicyText({ children }: { children: string }) {
+  if (children === "Deschideți Setări cookie") {
+    return (
+      <button
+        type="button"
+        onClick={openCookiePreferences}
+        className="link-underline text-foreground"
+      >
+        {children}
+      </button>
+    );
+  }
+  if (children === "Politica privind cookie-urile") {
+    return (
+      <a href="#sectiunea-15" className="link-underline text-foreground">
+        {children}
+      </a>
+    );
+  }
+  const analyticsReferences: Record<string, string> = {
+    "https://policies.google.com/privacy": "Politica de confidențialitate Google",
+    "https://policies.google.com/technologies/partner-sites":
+      "Cum utilizează Google datele de pe site-urile partenere",
+    "https://support.google.com/analytics/answer/11397207?hl=ro":
+      "Documentația Google Analytics privind cookie-urile",
+  };
+  if (analyticsReferences[children]) {
+    return (
+      <a
+        href={children}
+        className="link-underline text-foreground"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {analyticsReferences[children]}
+      </a>
+    );
+  }
   if (children === "Termeni și condiții") {
     return (
       <Link to="/termeni" className="link-underline text-foreground">

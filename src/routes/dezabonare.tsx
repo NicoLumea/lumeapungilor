@@ -49,7 +49,7 @@ function UnsubscribePage() {
             ? "Nu vei mai primi anunțuri pentru acest produs."
             : "Linkul de dezabonare nu este valid sau a fost deja folosit."}
       </p>
-      <Link to="/magazin" className="micro mt-8 inline-block link-underline">
+      <Link to="/" className="micro mt-8 inline-block link-underline">
         Înapoi la magazin
       </Link>
     </div>

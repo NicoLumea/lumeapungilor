@@ -124,7 +124,7 @@ export function SiteHeader() {
         </div>
 
         <Link
-          to="/magazin"
+          to="/"
           className="min-w-0 justify-self-start whitespace-nowrap text-[clamp(1rem,3.8vw,1.25rem)] font-semibold uppercase leading-none tracking-[0.035em] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 min-[769px]:text-[1.35rem] min-[1100px]:text-[clamp(1.5rem,1.8vw,1.75rem)]"
           aria-label={`${name} — pagina principală`}
         >

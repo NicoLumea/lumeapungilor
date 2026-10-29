@@ -5,7 +5,11 @@ Production measurement ID: `G-5C1GD5RB5W`.
 ## Required Google stream setting
 
 In Google Analytics → Admin → Data streams → the lumeapungilor.ro web stream,
-turn **Enhanced measurement OFF** before promoting this version to production.
+keep **Enhanced measurement ON**. Under Page views → Show advanced settings,
+turn **Page changes based on browser history events OFF** before promoting.
+Keep **Site search OFF** and **Form interactions OFF**. Scrolls, outbound clicks,
+video engagement and file downloads remain ON. These settings were saved in
+the Google Analytics stream on 29 October 2026.
 The website sends its own `page_view` events on public route changes. Leaving
 Google's automatic history measurement enabled produces duplicate page views
 and can collect URLs from account/order screens. Do not paste the plain Google
@@ -23,7 +27,8 @@ Official references:
 - Advertising consent stays denied; Google Signals and ad personalization are disabled.
 - Saving cookie settings updates tracking immediately. Withdrawing analytics consent sets Google's disable flag and deletes accessible `_ga` / `_ga_*` cookies. Changes in another tab are also observed.
 - The root mounts the cookie banner and preferences, which previously existed but were not mounted.
-- This integration measures visits and public pages. Ecommerce purchase/cart events are not included.
+- This integration measures visits and public pages, plus the enabled enhanced events above. Ecommerce purchase/cart events are not included.
+- Section 15 of the privacy policy is supplied by `src/components/site/analytics-privacy-policy.md`, replacing the earlier cookie section. Keep its collection descriptions aligned with both the code and the stream settings.
 
 ## Validation
 
