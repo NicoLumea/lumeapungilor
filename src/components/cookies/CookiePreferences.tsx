@@ -52,7 +52,8 @@ export function CookiePreferences({
               <span>
                 <span className="block font-medium text-foreground">Analiză</span>
                 <span className="text-muted-foreground">
-                  Opțională. Nu există momentan scripturi de analiză.
+                  Google Analytics ne ajută să înțelegem utilizarea magazinului. Se activează numai
+                  cu acordul tău. Poți retrage acordul oricând din Setări cookie.
                 </span>
               </span>
             </label>

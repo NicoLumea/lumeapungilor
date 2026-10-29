@@ -22,6 +22,8 @@ import { SupportWidget } from "@/components/site/SupportWidget";
 import { Toaster } from "@/components/ui/sonner";
 import { getSeoContent } from "@/lib/seo-catalog.functions";
 import { safeGoogleVerificationToken } from "@/lib/seo-meta";
+import { CookieBanner } from "@/components/cookies/CookieBanner";
+import { GoogleAnalytics } from "@/components/cookies/GoogleAnalytics";
 
 function NotFoundComponent() {
   return (
@@ -144,7 +146,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
+        <GoogleAnalytics />
         {isInternalDashboard || isGateway ? <Outlet /> : <PublicSiteFrame pathname={pathname} />}
+        {!isInternalDashboard && !pathname.startsWith("/staff") ? <CookieBanner /> : null}
         <Toaster position="bottom-right" />
       </CartProvider>
     </QueryClientProvider>
@@ -172,4 +176,3 @@ function PublicSiteFrame({ pathname }: { pathname: string }) {
     </div>
   );
 }
-

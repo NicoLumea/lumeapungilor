@@ -1,5 +1,6 @@
 export const COOKIE_CONSENT_KEY = "lumea_pungilor_cookie_consent";
 export const COOKIE_PREFERENCES_EVENT = "lumea-pungilor:cookie-preferences";
+export const COOKIE_CONSENT_CHANGED_EVENT = "lumea-pungilor:cookie-consent-changed";
 
 export type CookieConsent = {
   necessary: true;
@@ -42,6 +43,7 @@ export function setCookieConsent(value: Partial<CookieConsent>): CookieConsent {
 
   try {
     window.localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
+    window.dispatchEvent(new Event(COOKIE_CONSENT_CHANGED_EVENT));
     return consent;
   } catch {
     // An unsaved choice must never grant optional consent.

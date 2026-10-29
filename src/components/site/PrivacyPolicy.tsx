@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import policySource from "./privacy-policy.md?raw";
+import analyticsPolicySource from "./analytics-privacy-policy.md?raw";
 
 const ANSPDCP_FORMS_URL = "https://www.dataprotection.ro/formulare/";
 
@@ -47,7 +48,14 @@ function parsePolicy(source: string) {
   return { preface, sections };
 }
 
-const policy = parsePolicy(policySource);
+const originalPolicy = parsePolicy(policySource);
+const analyticsPolicy = parsePolicy(analyticsPolicySource);
+const policy = {
+  preface: analyticsPolicy.preface,
+  sections: originalPolicy.sections.map(
+    (section) => analyticsPolicy.sections.find((update) => update.id === section.id) ?? section,
+  ),
+};
 
 function PolicyText({ children }: { children: string }) {
   if (children === "Termeni și condiții") {

@@ -26,6 +26,7 @@ function useStorage() {
   Object.defineProperty(globalThis, "window", {
     configurable: true,
     value: {
+      dispatchEvent: () => true,
       localStorage: {
         getItem: (key: string) => values.get(key) ?? null,
         setItem: (key: string, value: string) => {

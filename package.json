@@ -9,6 +9,7 @@
     "cf:upload": "node scripts/cloudflare-release.mjs upload",
     "cf:check": "node scripts/cloudflare-release.mjs dry-run",
     "test:cloudflare": "node --test scripts/cloudflare.test.mjs",
+    "test:analytics": "node --test src/lib/cookieConsent.test.ts src/lib/google-analytics.test.ts",
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
