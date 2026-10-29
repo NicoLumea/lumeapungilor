@@ -112,7 +112,7 @@ const GROUPS: { key: string; title: string; note?: string; fields: Field[] }[] =
 ];
 
 const PUBLIC_PATHS: Record<string, string> = {
-  home: "/magazin",
+  home: "/",
   about: "/despre",
   contact: "/contact",
   shipping: "/livrare",

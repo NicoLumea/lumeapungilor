@@ -209,7 +209,7 @@ export function Catalogue({
     <div className="catalogue-container py-14">
       {category ? (
         <nav className="micro-sm mb-5 text-muted-foreground" aria-label="Breadcrumb">
-          <Link to="/magazin" className="link-underline">
+          <Link to="/" className="link-underline">
             Acasă
           </Link>
           {" / "}

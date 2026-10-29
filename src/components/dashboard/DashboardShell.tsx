@@ -27,7 +27,7 @@ export function DashboardShell({
   return (
     <div className="min-h-screen bg-background">
       <header className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-border px-4 py-4 md:px-8">
-        <Link to="/magazin" className="micro">
+        <Link to="/" className="micro">
           Lumea Pungilor
         </Link>
         <span className="micro-sm text-muted-foreground">{title}</span>

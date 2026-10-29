@@ -28,7 +28,7 @@ export function analyticsPageUrl(origin: string, pathname: string): string | nul
     return null;
   }
   const publicPage =
-    /^\/(?:magazin|produse|despre|contact|confidentialitate|termeni|retur|livrare|conformitate)?\/?$/.test(
+    /^\/(?:produse|despre|contact|confidentialitate|termeni|retur|livrare|conformitate)?\/?$/.test(
       pathname,
     ) || /^\/(?:produs|categorie)\/[^/?#]+\/?$/.test(pathname);
   return publicPage ? `${origin}${pathname}` : null;
@@ -94,6 +94,17 @@ export function syncGoogleAnalytics(pathname: string) {
     }
   } else {
     browser.gtag?.("consent", "update", { analytics_storage: "granted" });
+    if (lastPage !== page) {
+      // Enhanced events must inherit the current public page, never a stale page or raw query.
+      browser.gtag?.("config", GA_MEASUREMENT_ID, {
+        send_page_view: false,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false,
+        page_location: page,
+        page_title: document.title,
+        page_referrer: lastPage ?? externalReferrer(),
+      });
+    }
   }
 
   if (lastPage === page) return;

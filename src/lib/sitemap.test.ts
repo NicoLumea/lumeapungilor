@@ -8,8 +8,8 @@ test("sitemap contains canonical static, visible category, and published product
     [{ slug: "produs-test", updated_at: null }],
   );
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
-  assert.match(xml, /<loc>https:\/\/lumeapungilor\.lovable\.app\/categorie\/folie-cu-bule<\/loc>/);
-  assert.match(xml, /<loc>https:\/\/lumeapungilor\.lovable\.app\/produs\/produs-test<\/loc>/);
+  assert.match(xml, /<loc>https:\/\/lumeapungilor\.ro\/categorie\/folie-cu-bule<\/loc>/);
+  assert.match(xml, /<loc>https:\/\/lumeapungilor\.ro\/produs\/produs-test<\/loc>/);
   assert.match(xml, /<lastmod>2026-09-30T12:00:00\.000Z<\/lastmod>/);
   assert.equal((xml.match(/<url>/g) ?? []).length, INDEXABLE_STATIC_PATHS.length + 2);
   assert.doesNotMatch(xml, /localhost|preview--|\/admin|\/checkout|\/autentificare/);

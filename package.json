@@ -10,6 +10,7 @@
     "cf:check": "node scripts/cloudflare-release.mjs dry-run",
     "test:cloudflare": "node --test scripts/cloudflare.test.mjs",
     "test:analytics": "node --test src/lib/cookieConsent.test.ts src/lib/google-analytics.test.ts",
+    "test:seo-routing": "node --test src/lib/seo-routing.test.ts src/lib/sitemap.test.ts",
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
