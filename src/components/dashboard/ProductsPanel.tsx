@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import { Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminProducts, uploadProductImage } from "@/lib/admin-data";
@@ -157,8 +158,24 @@ export function ProductsPanel() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
   const [slugEditable, setSlugEditable] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   const draggedImageKey = useRef<string | null>(null);
   const dragStartImages = useRef<ImageDraft[] | null>(null);
+
+  const normalizeSearch = (value: string) =>
+    value.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("ro-RO").trim();
+  const query = normalizeSearch(search);
+  const filteredProducts = (products ?? []).filter((product) =>
+    [product.name, product.sku, ...(product.product_variants ?? []).map((v) => v.sku)].some(
+      (value) => normalizeSearch(value ?? "").includes(query),
+    ),
+  );
+
+  function clearSearch() {
+    setSearchInput("");
+    setSearch("");
+  }
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["admin", "products"] });
@@ -434,6 +451,55 @@ export function ProductsPanel() {
           Produs nou
         </button>
       </div>
+
+      <form
+        role="search"
+        aria-label="Căutare produse în administrare"
+        className="mt-6"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSearch(searchInput);
+        }}
+      >
+        <label htmlFor="admin-product-search" className="micro-sm text-muted-foreground">
+          Caută după nume sau cod produs
+        </label>
+        <div className="mt-2 flex flex-wrap gap-3">
+          <input
+            id="admin-product-search"
+            type="search"
+            value={searchInput}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              if (!event.target.value) setSearch("");
+            }}
+            placeholder="Nume sau cod produs…"
+            className="min-w-0 flex-1 basis-56 border border-input bg-background px-3 py-3 text-sm outline-none focus:border-foreground"
+          />
+          <button
+            type="submit"
+            className="micro flex items-center gap-2 border border-foreground bg-foreground px-5 py-3 text-background"
+          >
+            <Search aria-hidden="true" className="size-4" />
+            Caută
+          </button>
+          {searchInput || search ? (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="micro border border-foreground px-5 py-3"
+            >
+              Resetează
+            </button>
+          ) : null}
+        </div>
+        {!isLoading && query ? (
+          <p role="status" className="mt-3 text-sm text-muted-foreground">
+            {filteredProducts.length} din {(products ?? []).length} produse găsite pentru „
+            {search.trim()}”.
+          </p>
+        ) : null}
+      </form>
 
       <ImageOptimizationPanel products={products} categories={categories} />
 
@@ -967,9 +1033,13 @@ export function ProductsPanel() {
         <p className="py-16 text-sm text-muted-foreground">
           Nu ai adăugat încă niciun produs. Apasă „Produs nou” pentru a începe.
         </p>
+      ) : filteredProducts.length === 0 ? (
+        <p role="status" className="py-16 text-sm text-muted-foreground">
+          Niciun produs găsit. Încearcă alt nume sau cod ori resetează căutarea.
+        </p>
       ) : (
         <ul className="mt-10 divide-y divide-border border-y border-border">
-          {(products ?? []).map((p) => (
+          {filteredProducts.map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-4 py-4">
               <div className="size-16 shrink-0 bg-field p-1">
                 {primaryImage(p) ? (
