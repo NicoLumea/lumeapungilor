@@ -1,8 +1,35 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { ImageOff } from "lucide-react";
 import { OrderOperationsPanel } from "./OrderOperationsPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { formatRon } from "@/lib/format";
+import { imageUrl } from "@/lib/images";
+
+function OrderItemPhoto({ src }: { src: string | null }) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded border border-border bg-field">
+      {src && !failed ? (
+        <img
+          src={src}
+          alt=""
+          width={64}
+          height={64}
+          loading="lazy"
+          className="size-full object-contain"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span role="img" aria-label="Fotografie indisponibilă" className="text-muted-foreground">
+          <ImageOff aria-hidden="true" className="size-5" />
+        </span>
+      )}
+    </div>
+  );
+}
 
 export function OrderDetailPanel({
   id,
@@ -17,7 +44,7 @@ export function OrderDetailPanel({
       const { data, error } = await supabase
         .from("orders")
         .select(
-          "id,order_number,user_id,contact_name,email,phone,company_name,cui,reg_com,billing_address,delivery_address,city,county,postal_code,notes,internal_notes,status,payment_status,payment_method,subtotal,shipping_total,tax_total,total,currency,created_at,updated_at,updated_by,order_items(id,product_name,variant_name,sku,quantity,unit_price,line_total)",
+          "id,order_number,user_id,contact_name,email,phone,company_name,cui,reg_com,billing_address,delivery_address,city,county,postal_code,notes,internal_notes,status,payment_status,payment_method,subtotal,shipping_total,tax_total,total,currency,created_at,updated_at,updated_by,order_items(id,product_id,product_image_url,product_name,variant_name,sku,quantity,unit_price,line_total)",
         )
         .eq("id", id)
         .maybeSingle();
@@ -26,6 +53,34 @@ export function OrderDetailPanel({
     },
   });
   const o = order.data;
+  const missingPhotoIds = [
+    ...new Set(
+      (o?.order_items ?? []).flatMap((item) =>
+        item.product_id && !imageUrl(item.product_image_url) ? [item.product_id] : [],
+      ),
+    ),
+  ].sort();
+  const catalogPhotos = useQuery({
+    queryKey: ["staff", "order-item-photos", missingPhotoIds],
+    enabled: missingPhotoIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_images")
+        .select("product_id,url")
+        .in("product_id", missingPhotoIds)
+        .order("is_primary", { ascending: false })
+        .order("sort_order")
+        .order("created_at")
+        .order("id");
+      if (error) throw error;
+
+      const photos: Record<string, string> = {};
+      for (const image of data) {
+        photos[image.product_id] ??= image.url;
+      }
+      return photos;
+    },
+  });
   return (
     <div className="mx-auto max-w-[1100px]">
       <Link to={base as "/staff/comenzi"} className="micro-sm underline underline-offset-4">
@@ -110,19 +165,29 @@ export function OrderDetailPanel({
                   </tr>
                 </thead>
                 <tbody>
-                  {o.order_items.map((it) => (
-                    <tr key={it.id} className="border-b border-border/60">
-                      <td className="py-3">
-                        {it.product_name}
-                        {it.variant_name ? ` — ${it.variant_name}` : ""}
-                        <br />
-                        <span className="text-xs text-muted-foreground">{it.sku || "—"}</span>
-                      </td>
-                      <td>{it.quantity}</td>
-                      <td>{formatRon(it.unit_price)}</td>
-                      <td>{formatRon(it.line_total)}</td>
-                    </tr>
-                  ))}
+                  {o.order_items.map((it) => {
+                    const photo =
+                      imageUrl(it.product_image_url) ??
+                      imageUrl(it.product_id ? catalogPhotos.data?.[it.product_id] : null);
+                    return (
+                      <tr key={it.id} className="border-b border-border/60">
+                        <td className="py-3 pr-4">
+                          <div className="flex items-center gap-3">
+                            <OrderItemPhoto key={photo} src={photo} />
+                            <div>
+                              {it.product_name}
+                              {it.variant_name ? ` — ${it.variant_name}` : ""}
+                              <br />
+                              <span className="text-xs text-muted-foreground">{it.sku || "—"}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{it.quantity}</td>
+                        <td>{formatRon(it.unit_price)}</td>
+                        <td>{formatRon(it.line_total)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
