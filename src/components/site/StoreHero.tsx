@@ -20,7 +20,7 @@ export function StoreHero({
   return (
     <section className="overflow-hidden border-b border-border bg-[linear-gradient(90deg,#e9e1d6_0%,#f8f4ee_16%,#f8f4ee_84%,#e9e1d6_100%)]">
       <div
-        className={`relative mx-auto w-full max-w-[1920px] bg-hero ${welcome ? "" : "xl:grid xl:grid-cols-[42%_58%]"}`}
+        className={`relative mx-auto w-full max-w-[1920px] bg-hero ${welcome ? "" : "holiday-hero"}`}
       >
         <div
           className={
@@ -72,12 +72,12 @@ export function StoreHero({
               ? undefined
               : "/images/studio/store-bags-640.webp 640w, /images/studio/store-bags-1280.webp 1280w"
           }
-          sizes={welcome ? undefined : "(min-width: 1280px) 58vw, 100vw"}
+          sizes={welcome ? undefined : "(min-width: 1920px) 1114px, (min-width: 960px) 58vw, 100vw"}
           alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
-          width={welcome ? 1920 : 1363}
-          height="800"
+          width={welcome ? 1920 : 1280}
+          height={welcome ? 800 : 752}
           fetchPriority="high"
-          className={`pointer-events-none relative block h-auto w-full xl:object-cover ${welcome ? "xl:h-[min(41.6667vw,600px)]" : "xl:h-full xl:min-h-0 xl:object-right"}`}
+          className={`pointer-events-none relative block h-auto w-full xl:object-cover ${welcome ? "xl:h-[min(41.6667vw,600px)]" : "holiday-hero-photo"}`}
         />
       </div>
     </section>
