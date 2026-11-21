@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { imageVariantSrcSet, imageVariantUrl } from "@/lib/image-variants";
 import { storageGet, storageSet } from "@/lib/safe-storage";
 import { Search, X } from "lucide-react";
 import { useCategoryProducts, usePublishedProducts } from "@/lib/products";
@@ -222,33 +221,29 @@ export function Catalogue({
       <header
         className={
           christmasBanner
-            ? "grid grid-cols-[minmax(0,1fr)_36%] overflow-hidden bg-[#f4ebdc] text-[#203f32] md:grid-cols-[minmax(0,1fr)_30%]"
+            ? "grid overflow-hidden bg-[#14352b] text-[#faf1dc] sm:grid-cols-[1fr_minmax(16rem,35%)]"
             : undefined
         }
       >
-        <div className={christmasBanner ? "self-center p-4 sm:p-8" : undefined}>
+        <div className={christmasBanner ? "self-center p-6 sm:p-10" : undefined}>
           <h1 className="display text-3xl md:text-4xl">{category?.name ?? title}</h1>
           {category?.intro_text || category?.description || intro ? (
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            <p
+              className={`mt-4 max-w-xl text-sm leading-relaxed ${christmasBanner ? "text-[#ebe2ce]" : "text-muted-foreground"}`}
+            >
               {category?.intro_text ?? category?.description ?? intro}
             </p>
           ) : null}
         </div>
         {christmasBanner && (
           <img
-            src={
-              imageVariantUrl("pungi-craciun-la-multi-ani-40x50-bucla-b4697144.jpg", 640) ??
-              undefined
-            }
-            srcSet={imageVariantSrcSet(
-              "pungi-craciun-la-multi-ani-40x50-bucla-b4697144.jpg",
-              [320, 640, 960],
-            )}
-            sizes="(max-width: 767px) 36vw, 30vw"
-            alt="Pungă roșie de Crăciun «La mulți ani!» cu mâner alb, lângă brad"
-            width="640"
-            height="800"
-            className="h-full max-h-[25rem] w-full self-center object-contain"
+            src="/images/christmas/five-bags-480.webp"
+            srcSet="/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+            sizes="(max-width: 639px) 92vw, 35vw"
+            alt="Cele cinci modele de pungi de Crăciun, inclusiv modelul roșu «La mulți ani!»"
+            width="960"
+            height="1200"
+            className="mx-auto block h-auto w-full max-w-[26rem]"
           />
         )}
       </header>
