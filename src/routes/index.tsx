@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductCard } from "@/components/site/ProductCard";
 import { usePublishedProducts } from "@/lib/products";
 import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
+import { StudioPhotoLighting, studioCover } from "@/components/site/StudioPhotoLighting";
 import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
@@ -93,6 +94,7 @@ function Shop() {
             {(categories ?? []).map((c) => {
               const festive = categoryRouteSlug(c.slug) === "pungi-cadou-craciun";
               const img = festive ? "/images/christmas/five-bags-480.webp" : imageUrl(c.image_url);
+              const studio = studioCover(img);
               return (
                 <Link
                   key={c.id}
@@ -104,19 +106,24 @@ function Shop() {
                 >
                   <div className="category-card-media relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
                     {img ? (
-                      <img
-                        src={festive ? img : (imageVariantUrl(c.image_url, 640) ?? img)}
-                        srcSet={
-                          festive
-                            ? "/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
-                            : imageVariantSrcSet(c.image_url, [320, 640])
-                        }
-                        sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
-                        alt={c.name}
-                        loading="lazy"
-                        decoding="async"
-                        className={`category-card-image absolute inset-0 size-full ${festive ? "object-cover" : "object-contain p-3 sm:p-6"}`}
-                      />
+                      <div className={studio ? "category-card-image absolute inset-0" : "contents"}>
+                        <img
+                          src={festive ? img : (imageVariantUrl(c.image_url, 640) ?? img)}
+                          srcSet={
+                            festive
+                              ? "/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+                              : imageVariantSrcSet(c.image_url, [320, 640])
+                          }
+                          sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
+                          alt={c.name}
+                          loading="lazy"
+                          decoding="async"
+                          className={`${studio ? "" : "category-card-image"} absolute inset-0 size-full ${festive || studio ? "object-cover" : "object-contain p-3 sm:p-6"}`}
+                        />
+                        {studio && (
+                          <StudioPhotoLighting outline={studio.path} height={studio.height} />
+                        )}
+                      </div>
                     ) : (
                       <div className="flex size-full items-center justify-center">
                         <span className="micro-sm text-muted-foreground">{c.name}</span>
