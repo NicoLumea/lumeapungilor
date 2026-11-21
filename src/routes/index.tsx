@@ -40,13 +40,11 @@ export const Route = createFileRoute("/")({
 function Shop() {
   const initial = Route.useLoaderData();
   const { data: liveProducts } = usePublishedProducts();
-  const featuredBags = (liveProducts ?? initial.products).filter((product) => {
-    const isChristmasBag = assignedCategories(product).some(
+  const featuredBags = (liveProducts ?? initial.products).filter((product) =>
+    assignedCategories(product).some(
       (category) => categoryRouteSlug(category.slug) === "pungi-cadou-craciun",
-    );
-    const isThankYouBag = /\bthank[\s-]+you\b/i.test(`${product.name} ${product.slug}`);
-    return isChristmasBag || isThankYouBag;
-  });
+    ),
+  );
   const { data: content } = useContent();
   const { data: liveCategories } = useCategories();
   const categories = liveCategories ?? initial.categories;
@@ -156,7 +154,7 @@ function Shop() {
       {featuredBags.length > 0 ? (
         <section className="rule-t">
           <div className="catalogue-container py-10 md:py-20">
-            <h2 className="display text-3xl md:text-4xl">Pungi de Crăciun și Thank You</h2>
+            <h2 className="display text-3xl md:text-4xl">Produse recomandate</h2>
             <div className="product-grid mt-7 md:mt-10">
               {featuredBags.map((product) => (
                 <ProductCard key={product.id} product={product} />
