@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductCard } from "@/components/site/ProductCard";
 import { usePublishedProducts } from "@/lib/products";
 import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
-import { StudioPhotoLighting, studioCover } from "@/components/site/StudioPhotoLighting";
 import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
 import { imageUrl } from "@/lib/images";
@@ -16,6 +15,15 @@ import { staticPageHead } from "@/lib/seo-meta";
 import { SafeMarkdown } from "@/lib/safe-markdown";
 
 const newChristmasBagSlug = "pungi-craciun-la-multi-ani-40x50-bucla";
+const studioCovers: Record<string, string> = {
+  "/api/public/img/categories/pungi-cu-maner-display.png": "pungi-plastic",
+  "/api/public/img/a5393dfa-d93e-4525-a971-3fd9ffafe952.png": "pungi-curierat",
+  "/api/public/img/eb458272-802c-45c3-baf0-8e01fe211360.webp": "pungi-cadou",
+  "/api/public/img/categories/pungi-fara-maner-display.png": "pungute-mici",
+  "/api/public/img/categories/fete-de-masa.png": "musama",
+  "/api/public/img/categories/folie-cu-bule.png": "folie-cu-bule",
+};
+
 const recommendedSlugs = [
   newChristmasBagSlug,
   "punga-din-polietilena-cu-imprimeu-thank-you-40-50-cm",
@@ -94,7 +102,7 @@ function Shop() {
             {(categories ?? []).map((c) => {
               const festive = categoryRouteSlug(c.slug) === "pungi-cadou-craciun";
               const img = festive ? "/images/christmas/five-bags-480.webp" : imageUrl(c.image_url);
-              const studio = studioCover(img);
+              const studio = img && studioCovers[img];
               return (
                 <Link
                   key={c.id}
@@ -106,24 +114,27 @@ function Shop() {
                 >
                   <div className="category-card-media relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
                     {img ? (
-                      <div className={studio ? "category-card-image absolute inset-0" : "contents"}>
-                        <img
-                          src={festive ? img : (imageVariantUrl(c.image_url, 640) ?? img)}
-                          srcSet={
-                            festive
-                              ? "/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+                      <img
+                        src={
+                          studio
+                            ? `/images/studio/${studio}.webp`
+                            : festive
+                              ? img
+                              : (imageVariantUrl(c.image_url, 640) ?? img)
+                        }
+                        srcSet={
+                          festive
+                            ? "/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+                            : studio
+                              ? undefined
                               : imageVariantSrcSet(c.image_url, [320, 640])
-                          }
-                          sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
-                          alt={c.name}
-                          loading="lazy"
-                          decoding="async"
-                          className={`${studio ? "" : "category-card-image"} absolute inset-0 size-full ${festive || studio ? "object-cover" : "object-contain p-3 sm:p-6"}`}
-                        />
-                        {studio && (
-                          <StudioPhotoLighting outline={studio.path} height={studio.height} />
-                        )}
-                      </div>
+                        }
+                        sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
+                        alt={c.name}
+                        loading="lazy"
+                        decoding="async"
+                        className={`category-card-image absolute inset-0 size-full ${festive || studio ? "object-cover" : "object-contain p-3 sm:p-6"}`}
+                      />
                     ) : (
                       <div className="flex size-full items-center justify-center">
                         <span className="micro-sm text-muted-foreground">{c.name}</span>
