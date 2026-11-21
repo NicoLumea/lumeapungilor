@@ -2,7 +2,6 @@ import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductCard } from "@/components/site/ProductCard";
 import { usePublishedProducts } from "@/lib/products";
-import { primaryImage } from "@/lib/shop-types";
 import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
 import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
@@ -54,8 +53,6 @@ function Shop() {
   const { data: liveProducts } = usePublishedProducts();
   const productsBySlug = new Map((liveProducts ?? initial.products).map((p) => [p.slug, p]));
   const featuredBags = recommendedSlugs.flatMap((slug) => productsBySlug.get(slug) ?? []);
-  const newBag = productsBySlug.get(newChristmasBagSlug);
-  const newBagCover = newBag && primaryImage(newBag);
   const { data: content } = useContent();
   const { data: liveCategories } = useCategories();
   const categories = liveCategories ?? initial.categories;
@@ -94,7 +91,8 @@ function Shop() {
           <p className="micro-sm text-muted-foreground">Categorii</p>
           <div className="mt-5 grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 md:mt-8 md:gap-x-[clamp(16px,2vw,32px)] md:gap-y-10 lg:grid-cols-4">
             {(categories ?? []).map((c) => {
-              const img = imageUrl(c.image_url);
+              const festive = categoryRouteSlug(c.slug) === "pungi-cadou-craciun";
+              const img = festive ? "/images/christmas/five-bags-480.webp" : imageUrl(c.image_url);
               return (
                 <Link
                   key={c.id}
@@ -107,29 +105,22 @@ function Shop() {
                   <div className="category-card-media relative aspect-[4/5] overflow-hidden bg-field md:aspect-[3/4]">
                     {img ? (
                       <img
-                        src={imageVariantUrl(c.image_url, 640) ?? img}
-                        srcSet={imageVariantSrcSet(c.image_url, [320, 640])}
+                        src={festive ? img : (imageVariantUrl(c.image_url, 640) ?? img)}
+                        srcSet={
+                          festive
+                            ? "/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+                            : imageVariantSrcSet(c.image_url, [320, 640])
+                        }
                         sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
                         alt={c.name}
                         loading="lazy"
                         decoding="async"
-                        className="category-card-image absolute inset-0 size-full object-contain p-3 sm:p-6"
+                        className={`category-card-image absolute inset-0 size-full ${festive ? "object-cover" : "object-contain p-3 sm:p-6"}`}
                       />
                     ) : (
                       <div className="flex size-full items-center justify-center">
                         <span className="micro-sm text-muted-foreground">{c.name}</span>
                       </div>
-                    )}
-                    {categoryRouteSlug(c.slug) === "pungi-cadou-craciun" && newBagCover && (
-                      <img
-                        src={imageVariantUrl(newBagCover.url, 320) ?? undefined}
-                        srcSet={imageVariantSrcSet(newBagCover.url, [160, 320])}
-                        sizes="(max-width: 767px) 18vw, 10vw"
-                        alt={newBagCover.alt ?? newBag?.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="absolute bottom-[5%] right-[5%] w-[36%] border-2 border-white object-contain shadow-md"
-                      />
                     )}
                     <span className="category-card-overlay absolute inset-0" aria-hidden="true" />
                   </div>

@@ -445,3 +445,22 @@
     border-color: var(--color-foreground);
   }
 }
+
+.holiday-hero-panel {
+  position: relative;
+  display: grid;
+  align-items: center;
+  padding: clamp(2rem, 5vw, 5rem) clamp(1.25rem, 4vw, 4rem);
+  color: #fff5dd;
+  background-color: #14352b;
+  background-image: linear-gradient(90deg, rgb(4 21 16 / 76%), rgb(6 22 17 / 54%) 63%, transparent),
+    image-set(url("/images/christmas/holiday-table-640.webp") 1x, url("/images/christmas/holiday-table-1200.webp") 2x);
+  background-position: center;
+  background-size: cover;
+}
+
+@media (min-width: 1280px) {
+  .holiday-hero-panel {
+    min-height: clamp(28rem, 34vw, 38rem);
+  }
+}
