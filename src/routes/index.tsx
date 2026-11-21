@@ -2,7 +2,7 @@ import { HeadingText } from "@/components/site/HeadingText";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductCard } from "@/components/site/ProductCard";
 import { usePublishedProducts } from "@/lib/products";
-import { assignedCategories } from "@/lib/shop-types";
+import { primaryImage } from "@/lib/shop-types";
 import { PreviouslyPurchased } from "@/components/site/PreviouslyPurchased";
 import { StoreHero } from "@/components/site/StoreHero";
 import { useCategories, useContent, text } from "@/lib/content";
@@ -14,6 +14,18 @@ import { getSeoContent } from "@/lib/seo-catalog.functions";
 import { categoryRouteSlug } from "@/lib/sitemap";
 import { staticPageHead } from "@/lib/seo-meta";
 import { SafeMarkdown } from "@/lib/safe-markdown";
+
+const newChristmasBagSlug = "pungi-craciun-la-multi-ani-40x50-bucla";
+const recommendedSlugs = [
+  newChristmasBagSlug,
+  "punga-din-polietilena-cu-imprimeu-thank-you-40-50-cm",
+  "pungi-craciun-green-santa-25x30-cutout",
+  "punga-love-40x50",
+  "punga-din-polietilena-cu-imprimeu-leopard-30-40-cm",
+  "pungi-craciun-white-reindeer-40x50-loop",
+  "punga-maci-40x50",
+  "punga-floarea-soarelui-27x32",
+];
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -40,11 +52,10 @@ export const Route = createFileRoute("/")({
 function Shop() {
   const initial = Route.useLoaderData();
   const { data: liveProducts } = usePublishedProducts();
-  const featuredBags = (liveProducts ?? initial.products).filter((product) =>
-    assignedCategories(product).some(
-      (category) => categoryRouteSlug(category.slug) === "pungi-cadou-craciun",
-    ),
-  );
+  const productsBySlug = new Map((liveProducts ?? initial.products).map((p) => [p.slug, p]));
+  const featuredBags = recommendedSlugs.flatMap((slug) => productsBySlug.get(slug) ?? []);
+  const newBag = productsBySlug.get(newChristmasBagSlug);
+  const newBagCover = newBag && primaryImage(newBag);
   const { data: content } = useContent();
   const { data: liveCategories } = useCategories();
   const categories = liveCategories ?? initial.categories;
@@ -108,6 +119,17 @@ function Shop() {
                       <div className="flex size-full items-center justify-center">
                         <span className="micro-sm text-muted-foreground">{c.name}</span>
                       </div>
+                    )}
+                    {categoryRouteSlug(c.slug) === "pungi-cadou-craciun" && newBagCover && (
+                      <img
+                        src={imageVariantUrl(newBagCover.url, 320) ?? undefined}
+                        srcSet={imageVariantSrcSet(newBagCover.url, [160, 320])}
+                        sizes="(max-width: 767px) 18vw, 10vw"
+                        alt={newBagCover.alt ?? newBag?.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute bottom-[5%] right-[5%] w-[36%] border-2 border-white object-contain shadow-md"
+                      />
                     )}
                     <span className="category-card-overlay absolute inset-0" aria-hidden="true" />
                   </div>
