@@ -1,4 +1,3 @@
-import { StudioPhotoLighting, homepageBagOutline } from "./StudioPhotoLighting";
 import { Link } from "@tanstack/react-router";
 import heroBackground from "@/assets/lumea-pungilor-b2b-header-1920x800.png.asset.json";
 import { text } from "@/lib/content";
@@ -66,23 +65,20 @@ export function StoreHero({
             </div>
           </div>
         </div>
-        <div className={welcome ? "contents" : "relative overflow-hidden xl:self-stretch"}>
-          <img
-            src={welcome ? heroBackground.url : "/images/christmas/store-bags-1280.webp"}
-            srcSet={
-              welcome
-                ? undefined
-                : "/images/christmas/store-bags-640.webp 640w, /images/christmas/store-bags-1280.webp 1280w"
-            }
-            sizes={welcome ? undefined : "(min-width: 1280px) 58vw, 100vw"}
-            alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
-            width={welcome ? 1920 : 1363}
-            height="800"
-            fetchPriority="high"
-            className={`pointer-events-none relative block h-auto w-full xl:object-cover ${welcome ? "xl:h-[min(41.6667vw,600px)]" : "xl:h-full xl:min-h-0 xl:object-right"}`}
-          />
-          {!welcome && <StudioPhotoLighting outline={homepageBagOutline} hero />}
-        </div>
+        <img
+          src={welcome ? heroBackground.url : "/images/studio/store-bags-1280.webp"}
+          srcSet={
+            welcome
+              ? undefined
+              : "/images/studio/store-bags-640.webp 640w, /images/studio/store-bags-1280.webp 1280w"
+          }
+          sizes={welcome ? undefined : "(min-width: 1280px) 58vw, 100vw"}
+          alt="Colecție de pungi din plastic pentru comenzi en-gros Lumea Pungilor."
+          width={welcome ? 1920 : 1363}
+          height="800"
+          fetchPriority="high"
+          className={`pointer-events-none relative block h-auto w-full xl:object-cover ${welcome ? "xl:h-[min(41.6667vw,600px)]" : "xl:h-full xl:min-h-0 xl:object-right"}`}
+        />
       </div>
     </section>
   );
