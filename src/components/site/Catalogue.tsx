@@ -237,8 +237,8 @@ export function Catalogue({
         </div>
         {christmasBanner && (
           <img
-            src="/images/christmas/five-bags-480.webp"
-            srcSet="/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+            src="/images/christmas/christmas-bag-collection-480.webp"
+            srcSet="/images/christmas/christmas-bag-collection-480.webp 480w, /images/christmas/christmas-bag-collection-960.webp 960w"
             sizes="(max-width: 639px) 92vw, 35vw"
             alt="Cele cinci modele de pungi de Crăciun, inclusiv modelul roșu «La mulți ani!»"
             width="960"
