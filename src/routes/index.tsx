@@ -101,7 +101,7 @@ function Shop() {
           <div className="mt-5 grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 md:mt-8 md:gap-x-[clamp(16px,2vw,32px)] md:gap-y-10 lg:grid-cols-4">
             {(categories ?? []).map((c) => {
               const festive = categoryRouteSlug(c.slug) === "pungi-cadou-craciun";
-              const img = festive ? "/images/christmas/five-bags-480.webp" : imageUrl(c.image_url);
+              const img = festive ? "/images/christmas/christmas-bag-collection-480.webp" : imageUrl(c.image_url);
               const studio = img && studioCovers[img];
               return (
                 <Link
@@ -124,7 +124,7 @@ function Shop() {
                         }
                         srcSet={
                           festive
-                            ? "/images/christmas/five-bags-480.webp 480w, /images/christmas/five-bags-960.webp 960w"
+                            ? "/images/christmas/christmas-bag-collection-480.webp 480w, /images/christmas/christmas-bag-collection-960.webp 960w"
                             : studio
                               ? undefined
                               : imageVariantSrcSet(c.image_url, [320, 640])
