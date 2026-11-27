@@ -47,6 +47,12 @@ try {
       "utf8",
     ),
   );
+  await db.exec(
+    await readFile(
+      new URL("../supabase/migrations/20261127090000_allow_staff_order_finalization.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   const version = (await db.query(`select updated_at::text as v from orders where id='${order}'`))
     .rows[0].v;
   assert.equal(
@@ -77,7 +83,13 @@ try {
   await db.exec("delete from order_legal_snapshots;");
   await assert.rejects(save("confirmat"), /EMAIL_CONFIRMATION_REQUIRED/);
   await assert.rejects(save("in_livrare"), /ACCEPTANCE_REQUIRED/);
-  await assert.rejects(save("finalizat"), /DISPATCH_REQUIRED/);
+  await db.exec("begin");
+  await save("finalizat");
+  assert.deepEqual((await db.query("select status,payment_status from orders")).rows, [
+    { status: "finalizat", payment_status: "in_asteptare" },
+  ]);
+  assert.equal((await db.query("select count(*)::int as count from order_email_drafts")).rows[0].count, 0);
+  await db.exec("rollback");
   const draft = async (kind, actor = staff) =>
     (
       await db.query(
