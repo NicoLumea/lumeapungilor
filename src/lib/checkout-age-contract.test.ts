@@ -33,7 +33,7 @@ test("new order backend rejects missing, false and non-boolean declarations befo
   assert.ok(guard > replay, "verified existing-order replays remain possible");
   assert.ok(guard < transaction, "new orders require declaration before atomic stock changes");
   assert.match(handler, /AGE_CONFIRMATION_ERROR/);
-  assert.match(handler, /data\\.ageConfirmed === undefined/);
+  assert.match(handler, /data\.ageConfirmed === undefined/);
   assert.match(handler, /Reîncarcă pagina de finalizare a comenzii/);
   const schemaGuard = handler.indexOf('.select("age_confirmed")');
   assert.ok(schemaGuard > guard && schemaGuard < transaction,
