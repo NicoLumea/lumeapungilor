@@ -575,6 +575,9 @@ export type Database = {
       }
       orders: {
         Row: {
+          age_confirmed: boolean | null
+          age_confirmed_at: string | null
+          age_declaration_version: string | null
           archived_at: string | null
           billing_address: string | null
           city: string | null
@@ -614,6 +617,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          age_confirmed?: boolean | null
+          age_confirmed_at?: string | null
+          age_declaration_version?: string | null
           archived_at?: string | null
           billing_address?: string | null
           city?: string | null
@@ -653,6 +659,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          age_confirmed?: boolean | null
+          age_confirmed_at?: string | null
+          age_declaration_version?: string | null
           archived_at?: string | null
           billing_address?: string | null
           city?: string | null

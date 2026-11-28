@@ -12,6 +12,7 @@ import { useGuestCartLimit } from "@/lib/dashboard-data";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 import { COMPANY_PHONE, SUPPORT_EMAIL, telephoneHref } from "@/lib/company";
 import { useEnabledMethods } from "@/lib/methods";
+import { AGE_CONFIRMATION_ERROR } from "@/lib/checkout-age";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -129,7 +130,8 @@ function CheckoutPage() {
   const [customerType, setCustomerType] = useState<"persoana" | "companie">("persoana");
   const [billingSame, setBillingSame] = useState(true);
   const [terms, setTerms] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<FormKey | "terms", string | undefined>>>({});
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<FormKey | "terms" | "ageConfirmed", string | undefined>>>({});
   const [busy, setBusy] = useState(false);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [guestAccessToken] = useState(() =>
@@ -166,7 +168,7 @@ function CheckoutPage() {
   };
 
   function validate() {
-    const next: Partial<Record<FormKey | "terms", string | undefined>> = {};
+    const next: Partial<Record<FormKey | "terms" | "ageConfirmed", string | undefined>> = {};
     if (form.contact_name.trim().length < 2) next.contact_name = "Introdu numele și prenumele.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim()))
       next.email = "Introdu o adresă de e-mail validă.";
@@ -185,6 +187,7 @@ function CheckoutPage() {
       next.billing_address = "Introdu adresa de facturare.";
     }
     if (!terms) next.terms = "Pentru a trimite cererea trebuie să accepți Termenii și condițiile.";
+    if (!ageConfirmed) next.ageConfirmed = AGE_CONFIRMATION_ERROR;
     setErrors(next);
     const firstInvalid = Object.keys(next)[0];
     if (firstInvalid && firstInvalid !== "terms") {
@@ -216,6 +219,7 @@ function CheckoutPage() {
           guestAccessToken: auth.user ? undefined : guestAccessToken,
           expectedTotal: total,
           termsAccepted: true as const,
+          ageConfirmed,
           customer: {
             ...form,
             billing_address: billing,
@@ -402,7 +406,13 @@ function CheckoutPage() {
                   type="button"
                   role="radio"
                   aria-checked={customerType === t}
-                  onClick={() => setCustomerType(t)}
+                  onClick={() => {
+                    setCustomerType(t);
+                    if (customerType !== t) {
+                      setAgeConfirmed(false);
+                      setErrors((x) => ({ ...x, ageConfirmed: undefined }));
+                    }
+                  }}
                   className="micro-sm min-h-11 border px-5 py-2.5"
                   style={{
                     borderColor: customerType === t ? "var(--foreground)" : "var(--border)",
@@ -550,6 +560,32 @@ function CheckoutPage() {
           {errors.terms ? (
             <p id="terms-error" role="alert" className="mt-2 text-sm text-destructive">
               {errors.terms}
+            </p>
+          ) : null}
+
+          <label className="mt-5 flex items-start gap-3 text-sm">
+            <input
+              id="ageConfirmed"
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={(e) => {
+                setAgeConfirmed(e.target.checked);
+                if (e.target.checked) setErrors((x) => ({ ...x, ageConfirmed: undefined }));
+              }}
+              aria-required="true"
+              aria-invalid={!!errors.ageConfirmed}
+              aria-describedby={errors.ageConfirmed ? "ageConfirmed-error" : undefined}
+              className="mt-1 size-4"
+            />
+            <span>
+              {customerType === "companie"
+                ? "Confirm că am împlinit vârsta de 18 ani și sunt autorizat(ă) să plasez comanda în numele societății."
+                : "Confirm că am împlinit vârsta de 18 ani și am capacitatea legală de a încheia contracte."}
+            </span>
+          </label>
+          {errors.ageConfirmed ? (
+            <p id="ageConfirmed-error" role="alert" className="mt-2 text-sm text-destructive">
+              {errors.ageConfirmed}
             </p>
           ) : null}
 

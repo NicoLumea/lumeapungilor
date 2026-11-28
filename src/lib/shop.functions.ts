@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { calculateOrderTotals } from "@/lib/order-totals";
+import { AGE_CONFIRMATION_ERROR, isAgeConfirmed } from "@/lib/checkout-age";
 
 const lineSchema = z.object({
   productId: z.string().uuid(),
@@ -17,6 +18,8 @@ const orderSchema = z.object({
     .optional(),
   expectedTotal: z.number().nonnegative().optional(),
   termsAccepted: z.literal(true),
+  // Checked in the handler so missing/invalid values receive the same localised error.
+  ageConfirmed: z.unknown().optional(),
   customer: z.object({
     contact_name: z.string().trim().min(2).max(120),
     email: z.string().trim().email().max(200),
@@ -168,6 +171,31 @@ export const placeOrder = createServerFn({ method: "POST" })
       };
     }
 
+    // Keep ownership-verified idempotent replays working for orders created before rollout.
+    // Reject every NEW customer-submitted order before stock reservation or payment work.
+    if (!isAgeConfirmed(data.ageConfirmed)) {
+      return {
+        ok: false,
+        error:
+          data.ageConfirmed === undefined
+            ? `${AGE_CONFIRMATION_ERROR} Reîncarcă pagina de finalizare a comenzii și bifează confirmarea de vârstă.`
+            : AGE_CONFIRMATION_ERROR,
+      };
+    }
+
+    // Do not create an order against an unmigrated database: the old RPC would
+    // silently ignore the declaration, losing its required audit snapshot.
+    const { error: ageSchemaError } = await supabaseAdmin
+      .from("orders")
+      .select("age_confirmed")
+      .limit(0);
+    if (ageSchemaError) {
+      return {
+        ok: false,
+        error: "Finalizarea comenzii este temporar indisponibilă. Te rugăm să reîncerci mai târziu.",
+      };
+    }
+
     const ids = [...new Set(data.lines.map((l) => l.productId))];
     const { data: products, error: pErr } = await supabaseAdmin
       .from("products")
@@ -299,6 +327,8 @@ export const placeOrder = createServerFn({ method: "POST" })
         is_guest: !userId,
         email_verified: !!userId && !!userEmail && userEmail.toLowerCase() === email,
         payment_reference: reference,
+        // The SQL transaction assigns the timestamp and declaration version server-side.
+        age_confirmed: true,
         subtotal,
         shipping_total: shipping,
         tax_total: tax,
