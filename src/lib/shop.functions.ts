@@ -174,7 +174,26 @@ export const placeOrder = createServerFn({ method: "POST" })
     // Keep ownership-verified idempotent replays working for orders created before rollout.
     // Reject every NEW customer-submitted order before stock reservation or payment work.
     if (!isAgeConfirmed(data.ageConfirmed)) {
-      return { ok: false, error: AGE_CONFIRMATION_ERROR };
+      return {
+        ok: false,
+        error:
+          data.ageConfirmed === undefined
+            ? `${AGE_CONFIRMATION_ERROR} Reîncarcă pagina de finalizare a comenzii și bifează confirmarea de vârstă.`
+            : AGE_CONFIRMATION_ERROR,
+      };
+    }
+
+    // Do not create an order against an unmigrated database: the old RPC would
+    // silently ignore the declaration, losing its required audit snapshot.
+    const { error: ageSchemaError } = await supabaseAdmin
+      .from("orders")
+      .select("age_confirmed")
+      .limit(0);
+    if (ageSchemaError) {
+      return {
+        ok: false,
+        error: "Finalizarea comenzii este temporar indisponibilă. Te rugăm să reîncerci mai târziu.",
+      };
     }
 
     const ids = [...new Set(data.lines.map((l) => l.productId))];
