@@ -32,7 +32,12 @@ test("new order backend rejects missing, false and non-boolean declarations befo
   const replay = handler.indexOf("// Idempotency: a repeated submit returns the existing order.");
   assert.ok(guard > replay, "verified existing-order replays remain possible");
   assert.ok(guard < transaction, "new orders require declaration before atomic stock changes");
-  assert.match(handler, /return \{ ok: false, error: AGE_CONFIRMATION_ERROR \}/);
+  assert.match(handler, /AGE_CONFIRMATION_ERROR/);
+  assert.match(handler, /data\\.ageConfirmed === undefined/);
+  assert.match(handler, /Reîncarcă pagina de finalizare a comenzii/);
+  const schemaGuard = handler.indexOf('.select("age_confirmed")');
+  assert.ok(schemaGuard > guard && schemaGuard < transaction,
+    "unmigrated databases must fail before stock and order creation");
   assert.match(handler, /age_confirmed: true/);
 });
 
