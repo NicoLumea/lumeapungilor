@@ -52,3 +52,34 @@ test("SQL records self-report in the existing atomic transaction without backfil
   assert.doesNotMatch(migration, /update public\.orders\s+set\s+age_confirmed/i);
   assert.doesNotMatch(migration, /age_confirmed\s+boolean\s+not\s+null/i);
 });
+
+test("the atomic stock function retains its original implementation and RPC privileges", () => {
+  const original = readFileSync(
+    new URL("../../supabase/migrations/20261003183500_fix_order_stock_id_ambiguity.sql", import.meta.url),
+    "utf8",
+  );
+  const functionSql = migration.slice(
+    migration.indexOf("CREATE OR REPLACE FUNCTION"),
+    migration.indexOf("\n\n-- Preserve original privileges"),
+  );
+  const unchanged = functionSql
+    .replace(
+      /,\s*age_confirmed,age_confirmed_at,age_declaration_version(?=\s*\) values \()/,
+      "",
+    )
+    .replace(
+      /,\s*case when p_order->>'age_confirmed' = 'true' then true else null end,\s*case when p_order->>'age_confirmed' = 'true' then now\(\) else null end,\s*case when p_order->>'age_confirmed' = 'true' then 'checkout-18-v1' else null end(?=\s*\) returning)/,
+      "",
+    );
+  assert.equal(unchanged.trim(), original.trim());
+  assert.match(functionSql, /SECURITY DEFINER/);
+  assert.match(functionSql, /SET search_path TO 'public'/);
+  assert.match(
+    migration,
+    /revoke all on function public\.create_order_tx\(jsonb,jsonb\) from public, anon, authenticated;/i,
+  );
+  assert.match(
+    migration,
+    /grant execute on function public\.create_order_tx\(jsonb,jsonb\) to service_role;/i,
+  );
+});
