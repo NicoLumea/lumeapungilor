@@ -190,7 +190,7 @@ function CheckoutPage() {
     if (!ageConfirmed) next.ageConfirmed = AGE_CONFIRMATION_ERROR;
     setErrors(next);
     const firstInvalid = Object.keys(next)[0];
-    if (firstInvalid) {
+    if (firstInvalid && firstInvalid !== "terms") {
       window.document.getElementById(firstInvalid)?.focus();
     }
     return Object.keys(next).length === 0;
