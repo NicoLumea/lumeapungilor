@@ -168,7 +168,7 @@ function CheckoutPage() {
   };
 
   function validate() {
-    const next: Partial<Record<FormKey | "terms", string | undefined>> = {};
+    const next: Partial<Record<FormKey | "terms" | "ageConfirmed", string | undefined>> = {};
     if (form.contact_name.trim().length < 2) next.contact_name = "Introdu numele și prenumele.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim()))
       next.email = "Introdu o adresă de e-mail validă.";
